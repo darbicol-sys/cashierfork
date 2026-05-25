@@ -7,6 +7,10 @@ use App\Models\Payment;
 use App\Models\AuditLog;
 use App\Models\OpNumberHistory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Notifications\NewMessageNotification;
 
 class ReviewerController extends Controller
 {
@@ -42,6 +46,18 @@ class ReviewerController extends Controller
             ]);
         } catch (\Throwable $e) {
             // ignore logging errors
+        }
+        // Notify accountants that a payment has been forwarded
+        try {
+            $accountantRoleId = DB::table('roles')->where('name', 'accountant')->value('id');
+            if ($accountantRoleId) {
+                $accountants = User::where('role_id', $accountantRoleId)->get();
+                foreach ($accountants as $a) {
+                    $a->notify(new NewMessageNotification($payment));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to notify accountants on forward: ' . $e->getMessage());
         }
         return redirect()->route('reviewer')->with('success', 'Payment forwarded.');
     }

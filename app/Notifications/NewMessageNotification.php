@@ -55,14 +55,17 @@ class NewMessageNotification extends Notification
             $status = 'approved';
             $icon = 'bi-check-circle-fill';
             $cls = 'ni-green';
+            $message = 'Payment by ' . ($this->payment->name ?? '—') . ' has been approved.';
         } elseif (in_array($raw, ['rejected', 'accountant_rejected'])) {
             $status = 'rejected';
             $icon = 'bi-x-circle-fill';
             $cls = 'ni-red';
+            $message = 'Payment by ' . ($this->payment->name ?? '—') . ' was rejected.';
         } else {
             $status = 'waiting';
             $icon = 'bi-hourglass-split';
             $cls = 'ni-gold';
+            $message = 'New transaction from ' . ($this->payment->name ?? '—') . ' forwarded for your approval.';
         }
 
         return [
@@ -73,6 +76,7 @@ class NewMessageNotification extends Notification
             'icon' => $icon,
             'cls' => $cls,
             'time' => now()->diffForHumans(),
+            'message' => $message,
         ];
     }
 }

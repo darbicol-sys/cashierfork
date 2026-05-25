@@ -6,7 +6,7 @@
     <title>Accountant — My Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
+    <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
     <style>
         :root {
             --green-deep:   #0e2a1a;
@@ -115,7 +115,7 @@
 <div class="top-stripe"></div>
 
 <header class="page-header">
-    <div class="header-seal">🌾</div>
+    <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:38px;height:38px;object-fit:cover;border-radius:50%;display:block;" /></div>
     <div class="header-text">
         <div class="t1">Republic of the Philippines</div>
         <div class="t2">Department of Agrarian Reform</div>

@@ -11,7 +11,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
+  <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
   <style>
     :root {
       --green-deep:    #0e2a1a;
@@ -444,7 +444,7 @@
     <div class="panel-visual">
       <div>
         <div class="visual-seal">
-          <img src="{{ asset('img/dar-logo.png') }}" alt="DAR logo">
+          <img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo">
         </div>
         <div class="visual-copy">
           <p class="visual-eyebrow">DAR — Official System</p>

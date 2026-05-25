@@ -24,7 +24,23 @@ class AccountantController extends Controller
         $payments = Payment::whereIn('status', ['forwarded', 'accountant_rejected'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-        return view('accountant.approval', compact('payments'));
+        // Load recent notifications for the authenticated accountant to render in the header
+        $notifications = Auth::user()->notifications()->latest()->take(20)->get();
+        $notif_data = $notifications->map(function($n) {
+            $d = $n->data ?? [];
+            return [
+                'id' => $n->id,
+                'icon' => $d['icon'] ?? 'bi-bell',
+                'cls' => $d['cls'] ?? 'ni-gold',
+                'text' => $d['message'] ?? ($d['text'] ?? ''),
+                'time' => $d['time'] ?? ($n->created_at ? $n->created_at->diffForHumans() : ''),
+                'ts' => $n->created_at ? $n->created_at->toIso8601String() : null,
+                'unread' => $n->read_at ? false : true,
+                'data' => $d,
+            ];
+        });
+
+        return view('accountant.approval', compact('payments', 'notif_data'));
     }
 
     /**

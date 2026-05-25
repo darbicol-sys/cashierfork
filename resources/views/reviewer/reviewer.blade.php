@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
+  <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
   <style>
     /* ════════════════════════════════════════
        CSS VARIABLES & RESET
@@ -60,10 +60,11 @@
     .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
 
     /* ── NOTIFICATION ICON ── */
-    .notif-btn { position: relative; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,.07); border: none; color: rgba(245,240,232,.55); cursor: pointer; transition: background .15s, color .15s; flex-shrink: 0; }
+    .notif-btn { position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 10px; background: rgba(255,255,255,.07); border: none; color: rgba(245,240,232,.55); cursor: pointer; transition: background .15s, color .15s; flex-shrink: 0; }
     .notif-btn:hover { background: rgba(255,255,255,.14); color: var(--cream); }
-    .notif-badge { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--red); border: 2px solid var(--green-deep); display: none; }
-    .notif-badge.show { display: block; }
+    .notif-btn i { font-size: 1.25rem; }
+    .notif-badge { position: absolute; top: 6px; right: 6px; min-width: 18px; height: 18px; padding: 0 6px; border-radius: 12px; background: var(--red); color: #fff; font-size: .72rem; font-weight: 700; line-height: 18px; text-align: center; display: none; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
+    .notif-badge.show { display: inline-block; }
 
     /* Notification dropdown */
     .notif-dropdown {
@@ -521,7 +522,7 @@
 
 <!-- ══════════════ HEADER ══════════════ -->
 <header class="page-header">
-  <div class="header-seal">🌾</div>
+  <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:36px;height:36px;object-fit:cover;border-radius:50%;display:block;" /></div>
   <div class="header-text">
     <div class="t1">Republic of the Philippines</div>
     <div class="t2">Department of Agrarian Reform</div>
@@ -535,7 +536,7 @@
 
     <!-- Notification Button -->
     <button class="notif-btn" id="notif-btn" title="Notifications" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
-      <i class="bi bi-bell" style="font-size:1rem;"></i>
+      <i class="bi bi-bell" style="font-size:1.25rem;"></i>
       <span class="notif-badge" id="notif-badge"></span>
     </button>
 
@@ -942,7 +943,7 @@
 
             <div class="form-card" id="form-card">
               <div class="form-header">
-                <div class="form-header-seal">🌾</div>
+                <div class="form-header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:40px;height:40px;object-fit:cover;border-radius:50%;display:block;" /></div>
                 <div class="form-header-info">
                   <div class="org">Department of Agrarian Reform — Regional Office V</div>
                   <div class="txn-name" id="form-txn-name">—</div>
@@ -1279,8 +1280,15 @@
     const list = document.getElementById('notif-list');
     const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
     const badge = document.getElementById('notif-badge');
-    if (unreadCount > 0) badge.classList.add('show');
-    else badge.classList.remove('show');
+    if (unreadCount > 0) {
+      badge.classList.add('show');
+      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+      badge.setAttribute('title', unreadCount + ' unread notifications');
+    } else {
+      badge.classList.remove('show');
+      badge.textContent = '';
+      badge.removeAttribute('title');
+    }
 
     if (NOTIF_DATA.length === 0) {
       list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>';
