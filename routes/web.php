@@ -57,6 +57,8 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':accountan
 	Route::get('/accountant/profile', [AccountantController::class, 'profile'])->name('accountant.profile');
 	Route::patch('/accountant/profile', [AccountantController::class, 'updateProfile'])->name('accountant.profile.update');
 	Route::patch('/accountant/profile/password', [AccountantController::class, 'updatePassword'])->name('accountant.profile.password');
+	// Remove profile picture
+	Route::post('/accountant/profile/picture/remove', [AccountantController::class, 'removeProfilePicture'])->name('accountant.profile.remove_picture');
 	Route::post('/accountant/approval/{id}/approve', [AccountantController::class, 'approve'])->name('accountant.approve');
 	Route::post('/accountant/approval/{id}/reject', [AccountantController::class, 'reject'])->name('accountant.reject');
 });

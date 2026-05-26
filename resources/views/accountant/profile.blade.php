@@ -1,280 +1,883 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accountant — My Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-    <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
-    <style>
-        :root {
-            --green-deep:   #0e2a1a;
-            --green-mid:    #1a4a2e;
-            --green-accent: #2d7a4f;
-            --green-light:  #e8f4ee;
-            --gold:         #c9992a;
-            --gold-light:   #e8c46a;
-            --cream:        #f5f0e8;
-            --border:       #e2ddd5;
-            --text-dark:    #0e2a1a;
-            --text-mid:     #3d5045;
-            --muted:        #8a9e90;
-            --bg:           #f4f1eb;
-            --surface:      #ffffff;
-            --red:          #a0251c;
-        }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text-dark); }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile — DAR Accountant</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
+  <style>
+    :root {
+      --green-deep:   #0e2a1a;
+      --green-mid:    #1a4a2e;
+      --green-accent: #2d7a4f;
+      --green-light:  #e8f4ee;
+      --gold:         #c9992a;
+      --gold-light:   #e8c46a;
+      --cream:        #f5f0e8;
+      --border:       #e2ddd5;
+      --text-dark:    #0e2a1a;
+      --text-mid:     #3d5045;
+      --muted:        #8a9e90;
+      --bg:           #f4f1eb;
+      --surface:      #ffffff;
+      --red:          #a0251c;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text-dark); }
 
-        .top-stripe { height: 4px; background: linear-gradient(90deg, var(--green-accent), var(--gold), var(--red)); }
+    /* ── TOP STRIPE ── */
+    .top-stripe { height: 4px; background: linear-gradient(90deg, var(--green-accent), var(--gold), var(--red)); }
 
-        .page-header {
-            background: var(--green-deep);
-            padding: 16px 32px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            position: sticky;
-            top: 0;
-            z-index: 200;
-        }
-        .header-seal { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-        .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
-        .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
-        .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
-        .header-page { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
-        .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-        .btn-logout {
-            display: flex; align-items: center; gap: 6px; padding: 8px 16px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border: 1px solid rgba(201,153,42,.35); border-radius: 8px; color: var(--green-deep);
-            font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: .75rem; letter-spacing: .5px;
-            cursor: pointer; transition: all .18s ease; box-shadow: 0 2px 6px rgba(0,0,0,.08);
-        }
-        .btn-logout:hover { background: linear-gradient(135deg, #d6a73b, #f0cf7b); transform: translateY(-1px); }
+    /* ── HEADER ── */
+    .page-header {
+      background: var(--green-deep);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .header-seal { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .header-seal img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+    .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
+    .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
+    .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
+    .header-page { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
 
-        .outer-wrapper { display: flex; min-height: calc(100vh - 72px); }
+    /* ── NOTIFICATION ── */
+    .notif-btn {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(255,255,255,.07); border: none;
+      color: rgba(245,240,232,.55); cursor: pointer;
+      transition: background .15s, color .15s; flex-shrink: 0;
+    }
+    .notif-btn:hover { background: rgba(255,255,255,.14); color: var(--cream); }
+    .notif-badge {
+      position: absolute; top: 6px; right: 6px;
+      min-width: 18px; height: 18px; padding: 0 6px; border-radius: 12px;
+      background: var(--red); color: #fff; font-size: .72rem; font-weight: 700;
+      line-height: 18px; text-align: center; display: none;
+    }
+    .notif-badge.show { display: inline-block; }
+    .notif-dropdown {
+      display: none; position: absolute; top: calc(100% + 10px); right: 0;
+      width: 300px; background: var(--surface); border-radius: 12px;
+      border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      z-index: 400; overflow: hidden;
+    }
+    .notif-dropdown.open { display: block; animation: dropIn .18s cubic-bezier(.16,1,.3,1); }
+    @keyframes dropIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform:none; } }
+    .notif-drop-head { padding: 12px 16px; background: var(--green-deep); display: flex; align-items: center; justify-content: space-between; }
+    .notif-drop-title { font-size: .78rem; font-weight: 600; color: var(--gold-light); letter-spacing: .5px; }
+    .notif-drop-mark { font-size: .68rem; color: rgba(245,240,232,.45); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; transition: color .15s; }
+    .notif-drop-mark:hover { color: var(--cream); }
+    .notif-list { max-height: 260px; overflow-y: auto; }
+    .notif-list::-webkit-scrollbar { width: 3px; }
+    .notif-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread { background: #f5fbf7; }
+    .notif-item:hover { background: #f0f7f3; }
+    .notif-item-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+    .ni-green { background: var(--green-light); color: var(--green-accent); }
+    .ni-gold  { background: #fdf3dc; color: var(--gold); }
+    .ni-red   { background: #fdf0ef; color: var(--red); }
+    .notif-item-body { flex: 1; min-width: 0; }
+    .notif-item-text { font-size: .78rem; color: var(--text-dark); line-height: 1.4; }
+    .notif-item-time { font-size: .67rem; color: var(--muted); margin-top: 3px; }
+    .notif-unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-accent); flex-shrink: 0; margin-top: 6px; }
+    .notif-empty { padding: 30px 16px; text-align: center; }
+    .notif-empty i { font-size: 1.6rem; color: var(--border); display: block; margin-bottom: 8px; }
+    .notif-empty p { font-size: .78rem; color: var(--muted); }
+    .notif-drop-foot { padding: 9px 16px; border-top: 1px solid var(--border); text-align: center; }
+    .notif-drop-foot a { font-size: .72rem; color: var(--green-accent); text-decoration: none; font-weight: 600; }
+    .notif-drop-foot a:hover { text-decoration: underline; }
 
-        .sidebar {
-            width: 260px; flex-shrink: 0; background: var(--green-deep);
-            border-right: 1px solid rgba(255,255,255,.07);
-            position: sticky; top: 72px; height: calc(100vh - 72px);
-            display: flex; flex-direction: column;
-        }
-        .sidebar-inner { flex: 1; overflow-y: auto; padding: 24px 0 0; }
-        .sidebar-inner::-webkit-scrollbar { width: 3px; }
-        .sidebar-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
-        .sidebar-profile { padding: 0 22px 20px; display: flex; align-items: center; gap: 11px; }
-        .profile-avatar {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            display: flex; align-items: center; justify-content: center;
-            font-size: .85rem; font-weight: 700; color: var(--green-deep); flex-shrink: 0;
-        }
-        .profile-name { font-size: .83rem; font-weight: 600; color: var(--cream); }
-        .profile-role { font-size: .63rem; color: rgba(245,240,232,.35); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
-        .sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 0 22px 16px; }
-        .nav-section-label { padding: 0 22px; font-size: .6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,240,232,.28); margin-bottom: 6px; margin-top: 12px; }
-        .nav-item { display: flex; align-items: center; gap: 11px; padding: 10px 22px; cursor: pointer; transition: background .15s; border-left: 3px solid transparent; text-decoration: none; }
-        .nav-item:hover { background: rgba(255,255,255,.04); }
-        .nav-item.active { background: rgba(45,122,79,.18); border-left-color: var(--gold); }
-        .nav-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .88rem; flex-shrink: 0; transition: background .15s, color .15s; }
-        .nav-item:not(.active) .nav-icon { background: rgba(255,255,255,.07); color: rgba(245,240,232,.55); }
-        .nav-item.active .nav-icon { background: var(--gold); color: var(--green-deep); }
-        .nav-label { font-size: .81rem; font-weight: 600; color: rgba(245,240,232,.7); }
-        .nav-item.active .nav-label { color: var(--cream); }
-        .nav-badge { margin-left: auto; background: #c2640a; color: #fff; font-size: .6rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
-        .sidebar-footer { padding: 14px 22px; border-top: 1px solid rgba(255,255,255,.07); flex-shrink: 0; }
-        .sidebar-footer-label { font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: 4px; }
-        .sidebar-footer-value { font-size: .73rem; color: rgba(245,240,232,.5); font-weight: 300; }
+    .btn-logout {
+      display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: 1px solid rgba(201,153,42,.35); border-radius: 8px; color: var(--green-deep);
+      font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: .75rem; letter-spacing: .5px;
+      cursor: pointer; transition: all .18s ease; box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+    .btn-logout:hover { background: linear-gradient(135deg, #d6a73b, #f0cf7b); transform: translateY(-1px); }
 
-        .main-content { flex: 1; min-width: 0; }
-        .page-body { max-width: 1100px; margin: 0 auto; padding: 36px 28px 60px; }
+    /* ── LAYOUT ── */
+    .outer-wrapper { display: flex; min-height: calc(100vh - 72px); }
 
-        .page-title-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
-        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; }
-        .page-sub { font-size: .8rem; color: var(--muted); font-weight: 300; }
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 260px; flex-shrink: 0; background: var(--green-deep);
+      border-right: 1px solid rgba(255,255,255,.07);
+      position: sticky; top: 72px; height: calc(100vh - 72px);
+      display: flex; flex-direction: column;
+    }
+    .sidebar-inner { flex: 1; overflow-y: auto; padding: 24px 0 0; }
+    .sidebar-inner::-webkit-scrollbar { width: 3px; }
+    .sidebar-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
+    .sidebar-profile { padding: 0 22px 20px; display: flex; align-items: center; gap: 11px; }
+    .profile-avatar-sm {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; font-weight: 700; color: var(--green-deep); flex-shrink: 0;
+      overflow: hidden;
+    }
+    .profile-name { font-size: .83rem; font-weight: 600; color: var(--cream); }
+    .profile-role { font-size: .63rem; color: rgba(245,240,232,.35); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+    .sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 0 22px 16px; }
+    .nav-section-label { padding: 0 22px; font-size: .6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(245,240,232,.28); margin-bottom: 6px; margin-top: 12px; }
+    .nav-item { display: flex; align-items: center; gap: 11px; padding: 10px 22px; cursor: pointer; transition: background .15s; border-left: 3px solid transparent; text-decoration: none; }
+    .nav-item:hover { background: rgba(255,255,255,.04); }
+    .nav-item.active { background: rgba(45,122,79,.18); border-left-color: var(--gold); }
+    .nav-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .88rem; flex-shrink: 0; transition: background .15s, color .15s; }
+    .nav-item:not(.active) .nav-icon { background: rgba(255,255,255,.07); color: rgba(245,240,232,.55); }
+    .nav-item.active .nav-icon { background: var(--gold); color: var(--green-deep); }
+    .nav-label { font-size: .81rem; font-weight: 600; color: rgba(245,240,232,.7); }
+    .nav-item.active .nav-label { color: var(--cream); }
+    .sidebar-footer { padding: 14px 22px; border-top: 1px solid rgba(255,255,255,.07); flex-shrink: 0; }
+    .sidebar-footer-label { font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: 4px; }
+    .sidebar-footer-value { font-size: .73rem; color: rgba(245,240,232,.5); font-weight: 300; }
 
-        .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 18px; }
-        label { display:block; margin-bottom:6px; font-weight:600; color:var(--text-mid); font-size:.88rem; }
-        input, textarea { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:9px; background:var(--surface); }
-        .row-3 { display:flex; gap:12px; }
-        .col { flex:1; }
-        .btn { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:700; }
-        .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color:var(--green-deep); }
-        .btn-muted { background:#f3f3f3; color:var(--text-dark); }
-        .messages { margin-bottom:12px; }
-        .alert-success { background: var(--green-light); color: var(--green-accent); padding:10px 12px; border-radius:8px; }
-        .alert-danger { background:#fdf0ef; color:var(--red); padding:10px 12px; border-radius:8px; }
-        @media (max-width: 768px) { .row-3 { flex-direction:column; } }
-    </style>
+    /* ── MAIN ── */
+    .main-content { flex: 1; min-width: 0; }
+    .page-body { max-width: 900px; margin: 0 auto; padding: 36px 28px 60px; }
+
+    /* ── ALERTS ── */
+    .alert-bar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; font-size: .84rem; font-weight: 500; }
+    .alert-success { background: var(--green-light); color: var(--green-accent); border: 1px solid rgba(45,122,79,.2); }
+    .alert-danger   { background: #fdf0ef; color: var(--red); border: 1px solid rgba(160,37,28,.2); }
+
+    /* ── PAGE TITLE ── */
+    .page-title-row { margin-bottom: 24px; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; }
+    .page-sub { font-size: .8rem; color: var(--muted); font-weight: 300; }
+
+    /* ── PROFILE HERO ── */
+    .profile-hero {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .profile-hero-banner {
+      height: 90px;
+      background: linear-gradient(120deg, var(--green-deep) 0%, var(--green-mid) 50%, #1e5c38 100%);
+      position: relative;
+    }
+    .profile-hero-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,.03) 0px,
+        rgba(255,255,255,.03) 1px,
+        transparent 1px,
+        transparent 12px
+      );
+    }
+    /* ── FIXED: avatar wrapper sits below the banner, avatar peeks up ── */
+    .profile-hero-avatar-wrap {
+      padding: 0 24px;
+      margin-top: -36px;
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+    }
+    .profile-hero-avatar-container {
+      position: relative;
+      width: 72px; height: 72px;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .profile-hero-avatar-container:hover .avatar-camera-overlay { opacity: 1; }
+    .profile-hero-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700;
+      color: var(--green-deep);
+      border: 4px solid var(--surface);
+      box-shadow: 0 2px 12px rgba(0,0,0,.15);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .avatar-camera-overlay {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(0,0,0,.45);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity .2s ease;
+      pointer-events: none;
+    }
+    .avatar-camera-overlay i { font-size: 1.1rem; color: #fff; }
+    .avatar-camera-overlay span { font-size: .5rem; color: rgba(255,255,255,.85); font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+    .avatar-file-input { display: none; }
+    .profile-hero-body {
+      padding: 8px 24px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .profile-hero-info { flex: 1; min-width: 0; padding-top: 4px; }
+    .profile-hero-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--text-dark); }
+    .profile-hero-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 4px; }
+    .profile-hero-role, .profile-hero-email {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .75rem; color: var(--muted); font-weight: 400;
+    }
+    .profile-hero-role { color: var(--green-accent); font-weight: 600; }
+    .profile-hero-since {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .73rem; color: var(--muted); padding-top: 4px; flex-shrink: 0;
+    }
+
+    /* ── PROFILE CARD (TABS) ── */
+    .profile-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    /* ── TAB NAV ── */
+    .tab-nav {
+      display: flex;
+      background: linear-gradient(90deg, var(--green-mid), var(--green-deep));
+      border-bottom: none;
+    }
+    .tab-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 14px 22px;
+      background: none; border: none; border-bottom: 3px solid transparent;
+      font-family: 'DM Sans', sans-serif; font-size: .78rem; font-weight: 600;
+      color: rgba(245,240,232,.5); cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+      letter-spacing: .2px;
+    }
+    .tab-btn:hover { color: var(--cream); background: rgba(255,255,255,.05); }
+    .tab-btn.active { color: var(--gold-light); border-bottom-color: var(--gold); background: rgba(255,255,255,.04); }
+
+    /* ── TAB PANES ── */
+    .tab-pane { display: none; padding: 28px 28px 32px; }
+    .tab-pane.active { display: block; }
+
+    /* ── INFO ROWS (Account Details tab) ── */
+    .info-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: .72rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); flex-shrink: 0; }
+    .info-value { font-size: .88rem; color: var(--text-dark); font-weight: 500; text-align: right; }
+    .badge-active {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px; border-radius: 20px;
+      background: var(--green-light); color: var(--green-accent);
+      font-size: .72rem; font-weight: 700;
+    }
+    .badge-active span {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--green-accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .4; }
+    }
+
+    /* ── FORM (Personal Info + Password tabs) ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.span-2 { grid-column: span 2; }
+    .form-label { font-size: .72rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--text-mid); }
+    .form-control-dar {
+      padding: 10px 13px;
+      border: 1.5px solid var(--border); border-radius: 9px;
+      font-family: 'DM Sans', sans-serif; font-size: .875rem; color: var(--text-dark);
+      background: var(--surface); outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-control-dar:focus { border-color: var(--green-accent); box-shadow: 0 0 0 3px rgba(45,122,79,.1); }
+    .form-control-dar:disabled { background: var(--bg); color: var(--muted); cursor: not-allowed; }
+    textarea.form-control-dar { resize: vertical; }
+    .form-hint { font-size: .72rem; color: var(--muted); }
+    .form-section-sep { grid-column: span 2; border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+    .form-section-label { grid-column: span 2; font-size: .68rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: -6px; }
+    .form-footer {
+      display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+      margin-top: 24px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-action {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+      font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .15s;
+      border: 1.5px solid var(--border); background: var(--surface); color: var(--text-mid);
+      text-decoration: none;
+    }
+    .btn-action:hover { background: var(--bg); }
+    .btn-action.btn-primary {
+      background: linear-gradient(135deg, var(--green-accent), var(--green-mid));
+      color: #fff; border-color: transparent;
+      box-shadow: 0 2px 8px rgba(14,42,26,.18);
+    }
+    .btn-action.btn-primary:hover { background: linear-gradient(135deg, #35906d, var(--green-accent)); transform: translateY(-1px); }
+
+    /* ── PASSWORD STRENGTH ── */
+    .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+    .strength-seg { flex: 1; height: 4px; border-radius: 4px; background: var(--border); transition: background .3s; }
+    .strength-seg.weak   { background: var(--red); }
+    .strength-seg.fair   { background: #c2640a; }
+    .strength-seg.good   { background: var(--gold); }
+    .strength-seg.strong { background: var(--green-accent); }
+    .strength-label { font-size: .72rem; color: var(--muted); margin-top: 5px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .outer-wrapper { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
+      .sidebar-profile, .sidebar-divider, .nav-section-label, .sidebar-footer { display: none; }
+      .sidebar-inner { display: flex; overflow-x: auto; padding: 8px 0; }
+      .nav-item { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+      .nav-item.active { border-bottom-color: var(--gold); }
+      .page-body { padding: 20px 16px 48px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.span-2 { grid-column: span 1; }
+      .form-section-sep, .form-section-label { grid-column: span 1; }
+      .profile-hero-body { flex-direction: column; gap: 10px; }
+      .profile-hero-since { margin-left: 0; }
+      .notif-dropdown { right: -60px; width: 280px; }
+    }
+    @media (max-width: 540px) {
+      .tab-btn { padding: 12px 14px; font-size: .72rem; }
+      .tab-pane { padding: 20px 16px 24px; }
+    }
+  </style>
 </head>
 <body>
+
+@php
+  $user = auth()->user();
+  $nameParts = preg_split('/\s+/', trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')));
+  $initials = count($nameParts) >= 2
+    ? strtoupper(substr($nameParts[0],0,1) . substr($nameParts[count($nameParts)-1],0,1))
+    : strtoupper(substr($user->name ?? 'AC', 0, 2));
+  $fullName = trim(($user->first_name ?? '') . ' ' . ($user->middle_name ?? '') . ' ' . ($user->last_name ?? ''));
+  $fullName = preg_replace('/\s+/', ' ', $fullName) ?: ($user->name ?? 'Accountant');
+@endphp
 
 <div class="top-stripe"></div>
 
 <header class="page-header">
-    <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:38px;height:38px;object-fit:cover;border-radius:50%;display:block;" /></div>
-    <div class="header-text">
-        <div class="t1">Republic of the Philippines</div>
-        <div class="t2">Department of Agrarian Reform</div>
+  <div class="header-seal">
+    <img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" />
+  </div>
+  <div class="header-text">
+    <div class="t1">Republic of the Philippines</div>
+    <div class="t2">Department of Agrarian Reform</div>
+  </div>
+  <div class="header-sep"></div>
+  <div class="header-page">Accountant Panel</div>
+
+  <div class="header-actions">
+    <button class="notif-btn" id="notif-btn" title="Notifications" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
+      <i class="bi bi-bell" style="font-size:1.25rem;"></i>
+      <span class="notif-badge" id="notif-badge"></span>
+    </button>
+    <div class="notif-dropdown" id="notif-dropdown">
+      <div class="notif-drop-head">
+        <span class="notif-drop-title">Notifications</span>
+        <button class="notif-drop-mark" onclick="markAllRead()">Mark all as read</button>
+      </div>
+      <div class="notif-list" id="notif-list"></div>
+      <div class="notif-drop-foot">
+        <a href="#">View all notifications</a>
+      </div>
     </div>
-    <div class="header-sep"></div>
-    <div class="header-page">My Profile</div>
-    <div class="header-actions">
-        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-            @csrf
-            <button type="submit" class="btn-logout">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
-        </form>
-    </div>
+
+    <form method="POST" action="{{ route('logout') }}" style="display:inline; margin:0;">
+      @csrf
+      <button type="submit" class="btn-logout">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </form>
+  </div>
 </header>
 
 <div class="outer-wrapper">
 
-    <aside class="sidebar">
-        <div class="sidebar-inner">
-            <div class="sidebar-profile">
-                <div class="profile-avatar">AC</div>
-                <div>
-                    <div class="profile-name">{{ auth()->user()->name ?? 'Accountant' }}</div>
-                    <div class="profile-role">Accountant</div>
-                </div>
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <div class="sidebar-profile">
+        <div class="profile-avatar-sm">
+          @if(!empty(auth()->user()->profile_picture))
+            <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ auth()->user()->name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
+          @else
+            {{ $initials }}
+          @endif
+        </div>
+        <div>
+            @php
+              $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Accountant');
+            @endphp
+          <div class="profile-name">{{ $displayName }}</div>
+          <div class="profile-role">Accountant</div>
+        </div>
+      </div>
+      <hr class="sidebar-divider">
+
+      <div class="nav-section-label" style="margin-top:16px;">Transactions</div>
+      <a class="nav-item" href="{{ route('accountant.approval') }}">
+        <div class="nav-icon"><i class="bi bi-hourglass-split"></i></div>
+        <span class="nav-label">For Review</span>
+      </a>
+      <a class="nav-item" href="{{ route('accountant.approved') }}">
+        <div class="nav-icon"><i class="bi bi-check2-circle"></i></div>
+        <span class="nav-label">Approved Records</span>
+      </a>
+
+      <div class="nav-section-label" style="margin-top:16px;">Account</div>
+      <a class="{{ request()->routeIs('accountant.profile') ? 'nav-item active' : 'nav-item' }}" href="{{ route('accountant.profile') }}">
+        <div class="nav-icon"><i class="bi bi-person-badge"></i></div>
+        <span class="nav-label">My Profile</span>
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-label">System</div>
+      <div class="sidebar-footer-value">DAR Cashier — Regional Office V</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-body">
+
+      @if(session('success'))
+        <div class="alert-bar alert-success">
+          <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+        </div>
+      @endif
+      @if(session('error'))
+        <div class="alert-bar alert-danger">
+          <i class="bi bi-exclamation-circle-fill"></i> {{ session('error') }}
+        </div>
+      @endif
+      @if($errors->any())
+        <div class="alert-bar alert-danger">
+          <i class="bi bi-exclamation-circle-fill"></i> Please fix the errors below before saving.
+        </div>
+      @endif
+
+      <div class="page-title-row">
+        <div class="page-title">My Profile</div>
+        <div class="page-sub">Manage your account information and security settings</div>
+      </div>
+
+      <!-- PROFILE HERO -->
+      <div class="profile-hero">
+        <div class="profile-hero-banner"></div>
+
+        <!-- Avatar peeks up from the banner -->
+        <div class="profile-hero-avatar-wrap">
+          <div class="profile-hero-avatar-container" onclick="document.getElementById('hero-pic-input').click()" title="Change profile picture">
+            <div class="profile-hero-avatar">
+              @if(!empty($user->profile_picture))
+                <img id="hero-avatar-img" src="{{ asset('storage/' . $user->profile_picture) }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
+              @else
+                <span id="hero-avatar-initials">{{ $initials }}</span>
+              @endif
             </div>
-            <hr class="sidebar-divider">
-
-            <div class="nav-section-label" style="margin-top:16px;">Transactions</div>
-            <a class="{{ request()->routeIs('accountant.approval') ? 'nav-item active' : 'nav-item' }}" href="{{ route('accountant.approval') }}">
-                <div class="nav-icon"><i class="bi bi-hourglass-split"></i></div>
-                <span class="nav-label">For Review</span>
-                @php $pendingCount = \App\Models\Payment::whereIn('status', ['forwarded','under_review','submitted'])->count(); @endphp
-                @if($pendingCount > 0)
-                    <span class="nav-badge">{{ $pendingCount }}</span>
-                @endif
-            </a>
-            <a class="{{ request()->routeIs('accountant.approved') ? 'nav-item active' : 'nav-item' }}" href="{{ route('accountant.approved') }}">
-                <div class="nav-icon"><i class="bi bi-check2-circle"></i></div>
-                <span class="nav-label">Approved Records</span>
-            </a>
-
-            <div class="nav-section-label" style="margin-top:16px;">Account</div>
-            <a class="{{ request()->routeIs('accountant.profile') ? 'nav-item active' : 'nav-item' }}" href="{{ route('accountant.profile') }}">
-                <div class="nav-icon"><i class="bi bi-person-badge"></i></div>
-                <span class="nav-label">My Profile</span>
-            </a>
-        </div>
-        <div class="sidebar-footer">
-            <div class="sidebar-footer-label">System</div>
-            <div class="sidebar-footer-value">DAR Cashier — Regional Office V</div>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <div class="page-body">
-
-            @if(session('success'))
-                <div class="alert-success">{{ session('success') }}</div>
-            @endif
-            @if(session('error'))
-                <div class="alert-danger">{{ session('error') }}</div>
-            @endif
-
-            <div class="card">
-                <div class="page-title-row" style="margin-bottom:12px">
-                    <div>
-                        <div class="page-title">My Profile</div>
-                        <div class="page-sub">Manage your account details and change password</div>
-                    </div>
-                </div>
-
-                @if($errors->any())
-                    <div class="alert-danger" style="margin-bottom:12px">
-                        <ul style="margin:0;padding-left:18px">
-                            @foreach($errors->all() as $err)
-                                <li>{{ $err }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('accountant.profile.update') }}">
-                    @csrf
-                    @method('PATCH')
-
-                    <div class="row-3" style="margin-bottom:12px">
-                        <div class="col">
-                            <label for="first_name">First name</label>
-                            <input id="first_name" name="first_name" value="{{ old('first_name', auth()->user()->first_name ?? '') }}" required />
-                        </div>
-                        <div class="col">
-                            <label for="middle_name">Middle name</label>
-                            <input id="middle_name" name="middle_name" value="{{ old('middle_name', auth()->user()->middle_name ?? '') }}" />
-                        </div>
-                        <div class="col">
-                            <label for="last_name">Last name</label>
-                            <input id="last_name" name="last_name" value="{{ old('last_name', auth()->user()->last_name ?? '') }}" required />
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom:12px">
-                        <label for="username">Username</label>
-                        <input id="username" name="username" value="{{ old('username', auth()->user()->username ?? '') }}" />
-                    </div>
-
-                    <div style="margin-bottom:12px">
-                        <label for="email">Email (read-only)</label>
-                        <input id="email" value="{{ auth()->user()->email ?? '' }}" disabled />
-                    </div>
-
-                    <div style="margin-bottom:12px">
-                        <label for="phone_number">Phone number</label>
-                        <input id="phone_number" name="phone_number" value="{{ old('phone_number', auth()->user()->phone_number ?? '') }}" />
-                    </div>
-
-                    <div style="margin-bottom:12px">
-                        <label for="address">Address</label>
-                        <textarea id="address" name="address" rows="3">{{ old('address', auth()->user()->address ?? '') }}</textarea>
-                    </div>
-
-                    <div style="display:flex;gap:8px;align-items:center">
-                        <button class="btn btn-primary" type="submit">Save profile</button>
-                        <a class="btn btn-muted" href="{{ route('accountant.approval') }}">Back</a>
-                    </div>
-                </form>
-
-                <hr style="margin:18px 0">
-
-                <h3 style="margin-bottom:8px">Change password</h3>
-                <form method="POST" action="{{ route('accountant.profile.password') }}">
-                    @csrf
-                    @method('PATCH')
-
-                    <div style="margin-bottom:12px">
-                        <label for="current_password">Current password</label>
-                        <input id="current_password" name="current_password" type="password" required />
-                    </div>
-
-                    <div style="margin-bottom:12px">
-                        <label for="password">New password</label>
-                        <input id="password" name="password" type="password" required />
-                    </div>
-
-                    <div style="margin-bottom:12px">
-                        <label for="password_confirmation">Confirm new password</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" required />
-                    </div>
-
-                    <div>
-                        <button class="btn btn-primary" type="submit">Change password</button>
-                    </div>
-                </form>
+            <div class="avatar-camera-overlay">
+              <i class="bi bi-camera-fill"></i>
+              <span>Change</span>
             </div>
-
+          </div>
+          <!-- Hidden file input — submits via the Personal Info form -->
+          <input type="file" id="hero-pic-input" class="avatar-file-input" accept="image/*" onchange="previewHeroAvatar(this)">
         </div>
-    </main>
-</div>
+
+        <!-- Info row below avatar, no overlap issues -->
+        <div class="profile-hero-body">
+          <div class="profile-hero-info">
+            <div class="profile-hero-name">{{ $fullName }}</div>
+            <div class="profile-hero-meta">
+              <span class="profile-hero-role"><i class="bi bi-calculator-fill"></i> Accountant</span>
+              <span class="profile-hero-email"><i class="bi bi-envelope"></i> {{ $user->email ?? '—' }}</span>
+            </div>
+          </div>
+          <div class="profile-hero-since">
+            <i class="bi bi-clock"></i>
+            Member since {{ optional($user->created_at)->format('M Y') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE CARD + TABS -->
+      <div class="profile-card">
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="switchTab('details', this)" type="button">
+            <i class="bi bi-info-circle-fill"></i> Account Details
+          </button>
+          <button class="tab-btn" onclick="switchTab('personal', this)" type="button">
+            <i class="bi bi-person-lines-fill"></i> Personal Info
+          </button>
+          <button class="tab-btn" onclick="switchTab('password', this)" type="button">
+            <i class="bi bi-shield-lock-fill"></i> Password
+          </button>
+        </div>
+
+        <!-- TAB: ACCOUNT DETAILS -->
+        <div class="tab-pane active" id="tab-details">
+          <div class="info-row">
+            <span class="info-label">Account ID</span>
+            <span class="info-value">#{{ str_pad($user->id ?? 0, 5, '0', STR_PAD_LEFT) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Role</span>
+            <span class="info-value">Accountant</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Username</span>
+            <span class="info-value">{{ $user->username ?? '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ $user->email ?? '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value">{{ $user->phone_number ?? '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Status</span>
+            <span class="info-value">
+              <span class="badge-active"><span></span> Active</span>
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Joined</span>
+            <span class="info-value">{{ optional($user->created_at)->format('F d, Y') ?? '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Last Updated</span>
+            <span class="info-value">{{ optional($user->updated_at)->format('F d, Y') ?? '—' }}</span>
+          </div>
+        </div>
+
+        <!-- TAB: PERSONAL INFO -->
+        <div class="tab-pane" id="tab-personal">
+          <form method="POST" action="{{ route('accountant.profile.update') }}" enctype="multipart/form-data">
+            @csrf
+            @method('PATCH')
+            <div class="form-grid">
+
+              <div class="form-group span-2">
+                <label class="form-label">Profile Picture</label>
+                <input type="file" name="profile_picture" accept="image/*" class="form-control-dar">
+                @if(!empty($user->profile_picture))
+                  
+                @endif
+                @error('profile_picture')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-control-dar"
+                  value="{{ old('first_name', $user->first_name ?? '') }}" placeholder="First name" required>
+                @error('first_name')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-control-dar"
+                  value="{{ old('last_name', $user->last_name ?? '') }}" placeholder="Last name" required>
+                @error('last_name')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Middle Name</label>
+                <input type="text" name="middle_name" class="form-control-dar"
+                  value="{{ old('middle_name', $user->middle_name ?? '') }}" placeholder="Middle name (optional)">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control-dar"
+                  value="{{ old('username', $user->username ?? '') }}" placeholder="username">
+                @error('username')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+              <hr class="form-section-sep">
+              <div class="form-section-label">Contact</div>
+
+              <div class="form-group span-2">
+                <label class="form-label">Email Address (read-only)</label>
+                <input type="email" class="form-control-dar" value="{{ $user->email ?? '' }}" disabled>
+                <span class="form-hint">Email cannot be changed. Contact your administrator.</span>
+              </div>
+
+              <div class="form-group span-2">
+                <label class="form-label">Phone Number</label>
+                <input type="text" name="phone_number" class="form-control-dar"
+                  value="{{ old('phone_number', $user->phone_number ?? '') }}" placeholder="+63 9XX XXX XXXX">
+                @error('phone_number')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+              <div class="form-group span-2">
+                <label class="form-label">Address</label>
+                <textarea name="address" class="form-control-dar" rows="3"
+                  placeholder="Your address">{{ old('address', $user->address ?? '') }}</textarea>
+                @error('address')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+            </div>
+            <div class="form-footer">
+              <a href="{{ route('accountant.approval') }}" class="btn-action">
+                <i class="bi bi-x-lg"></i> Cancel
+              </a>
+              <button type="submit" class="btn-action btn-primary">
+                <i class="bi bi-check-lg"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB: CHANGE PASSWORD -->
+        <div class="tab-pane" id="tab-password">
+          <form method="POST" action="{{ route('accountant.profile.password') }}">
+            @csrf
+            @method('PATCH')
+            <div class="form-grid">
+
+              <div class="form-group span-2">
+                <label class="form-label">Current Password</label>
+                <input type="password" name="current_password" class="form-control-dar"
+                  placeholder="Enter your current password" autocomplete="current-password" required>
+                @error('current_password')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" name="password" id="new-password" class="form-control-dar"
+                  placeholder="New password" autocomplete="new-password" required>
+                <div class="strength-bar">
+                  <div class="strength-seg" id="seg1"></div>
+                  <div class="strength-seg" id="seg2"></div>
+                  <div class="strength-seg" id="seg3"></div>
+                  <div class="strength-seg" id="seg4"></div>
+                </div>
+                <div class="strength-label" id="strength-text">Enter a password</div>
+                @error('password')
+                  <span class="form-hint" style="color:var(--red);">{{ $message }}</span>
+                @enderror
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" name="password_confirmation" class="form-control-dar"
+                  placeholder="Repeat new password" autocomplete="new-password" required>
+                <span class="form-hint">Must match the new password above.</span>
+              </div>
+
+            </div>
+            <div class="form-footer">
+              <button type="submit" class="btn-action btn-primary">
+                <i class="bi bi-lock-fill"></i> Update Password
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div><!-- /.profile-card -->
+
+    </div><!-- /.page-body -->
+  </main>
+
+</div><!-- /.outer-wrapper -->
+
+<script>
+  /* ── HERO AVATAR PREVIEW ── */
+  function previewHeroAvatar(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const container = document.querySelector(".profile-hero-avatar");
+      container.innerHTML = '<img src="' + e.target.result + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+      const tabInput = document.querySelector('input[name="profile_picture"]');
+      if (tabInput) {
+        const dt = new DataTransfer();
+        dt.items.add(input.files[0]);
+        tabInput.files = dt.files;
+      }
+      switchTab("personal", document.querySelectorAll(".tab-btn")[1]);
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
+  /* ── TAB SWITCHER ── */
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* Auto-open correct tab on validation errors */
+  @if($errors->hasAny(['first_name','last_name','middle_name','username','phone_number','address']))
+    switchTab('personal', document.querySelectorAll('.tab-btn')[1]);
+  @elseif($errors->hasAny(['current_password','password']))
+    switchTab('password', document.querySelectorAll('.tab-btn')[2]);
+  @endif
+
+  /* ── PASSWORD STRENGTH ── */
+  const pwInput     = document.getElementById('new-password');
+  const segs        = [1,2,3,4].map(i => document.getElementById('seg' + i));
+  const strengthTxt = document.getElementById('strength-text');
+
+  function scorePassword(pw) {
+    if (!pw) return 0;
+    let score = 0;
+    if (pw.length >= 8)  score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    return Math.min(score, 4);
+  }
+
+  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  const cls    = ['', 'weak', 'fair', 'good', 'strong'];
+
+  if (pwInput) {
+    pwInput.addEventListener('input', () => {
+      const score = scorePassword(pwInput.value);
+      segs.forEach((seg, i) => {
+        seg.className = 'strength-seg';
+        if (i < score) seg.classList.add(cls[score]);
+      });
+      strengthTxt.textContent = pwInput.value ? (labels[score] || 'Enter a password') : 'Enter a password';
+      strengthTxt.style.color = score <= 1 ? 'var(--red)' : score === 2 ? '#c2640a' : score === 3 ? 'var(--gold)' : 'var(--green-accent)';
+    });
+  }
+
+  /* ── NOTIFICATIONS ── */
+  const NOTIF_DATA = {!! json_encode($notif_data ?? []) !!};
+  let notifOpen = false;
+
+  function timeAgo(iso) {
+    try {
+      if (!iso) return '';
+      const then = new Date(iso);
+      const now = new Date();
+      const s = Math.floor((now - then) / 1000);
+      if (s < 5) return 'just now';
+      if (s < 60) return s + ' seconds ago';
+      const m = Math.floor(s/60);
+      if (m < 60) return m + (m===1 ? ' minute ago' : ' minutes ago');
+      const h = Math.floor(m/60);
+      if (h < 24) return h + (h===1 ? ' hour ago' : ' hours ago');
+      const d = Math.floor(h/24);
+      return d + (d===1 ? ' day ago' : ' days ago');
+    } catch(e) { return '' }
+  }
+
+  function renderNotifList() {
+    const list = document.getElementById('notif-list');
+    const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
+    const badge = document.getElementById('notif-badge');
+    if (unreadCount > 0) {
+      badge.classList.add('show');
+      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+      badge.setAttribute('title', unreadCount + ' unread notifications');
+    } else {
+      badge.classList.remove('show');
+      badge.textContent = '';
+      badge.removeAttribute('title');
+    }
+    if (NOTIF_DATA.length === 0) {
+      list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>';
+      return;
+    }
+    list.innerHTML = NOTIF_DATA.map(n => {
+      const t = n.ts ? timeAgo(n.ts) : (n.time || '');
+      return (`
+        <div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">
+          <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
+          <div class="notif-item-body">
+            <div class="notif-item-text">${n.text}</div>
+            <div class="notif-item-time">${t}</div>
+          </div>
+          ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
+        </div>
+      `);
+    }).join('');
+  }
+
+  function readNotif(id) {
+    const n = NOTIF_DATA.find(x => x.id === id);
+    if (n) n.unread = false;
+    renderNotifList();
+  }
+
+  function markAllRead() {
+    NOTIF_DATA.forEach(n => n.unread = false);
+    renderNotifList();
+  }
+
+  function toggleNotifDropdown(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('notif-dropdown');
+    notifOpen = !notifOpen;
+    if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); }
+    else dropdown.classList.remove('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const btn = document.getElementById('notif-btn');
+    const dropdown = document.getElementById('notif-dropdown');
+    if (notifOpen && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.remove('open');
+      notifOpen = false;
+    }
+  });
+
+  window.addEventListener('load', function() {
+    const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
+    const badge = document.getElementById('notif-badge');
+    if (unreadCount > 0) {
+      badge.classList.add('show');
+      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+    } else {
+      badge.classList.remove('show');
+    }
+  });
+</script>
+
+<!-- Removed remove-picture form and JS (display-only requested) -->
 
 </body>
 </html>

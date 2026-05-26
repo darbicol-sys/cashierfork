@@ -27,8 +27,10 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text-dark); }
 
+    /* ── TOP STRIPE ── */
     .top-stripe { height: 4px; background: linear-gradient(90deg, var(--green-accent), var(--gold), var(--red)); }
 
+    /* ── HEADER ── */
     .page-header {
       background: var(--green-deep);
       padding: 16px 32px;
@@ -39,7 +41,19 @@
       top: 0;
       z-index: 200;
     }
-    .header-seal { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+
+    /* ── LOGO FIX ── */
+    .header-seal {
+      width: 38px; height: 38px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-seal img {
+      width: 38px; height: 38px;
+      object-fit: cover; border-radius: 50%; display: block;
+    }
+
     .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
     .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
     .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
@@ -48,7 +62,7 @@
     /* ── HEADER ACTIONS ── */
     .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
 
-    /* ── NOTIFICATION ICON ── */
+    /* ── NOTIFICATION ── */
     .notif-btn {
       position: relative; display: flex; align-items: center; justify-content: center;
       width: 44px; height: 44px; border-radius: 10px;
@@ -60,13 +74,12 @@
     .notif-btn i { font-size: 1.25rem; }
     .notif-badge {
       position: absolute; top: 6px; right: 6px;
-        min-width: 18px; height: 18px; padding: 0 6px; border-radius: 12px; 
-        background: var(--red); color: #fff; font-size: .72rem; font-weight: 700; 
-        line-height: 18px; text-align: center; display: none; box-shadow: 0 1px 0 rgba(0,0,0,.08);
+      min-width: 18px; height: 18px; padding: 0 6px; border-radius: 12px;
+      background: var(--red); color: #fff; font-size: .72rem; font-weight: 700;
+      line-height: 18px; text-align: center; display: none; box-shadow: 0 1px 0 rgba(0,0,0,.08);
     }
-      .notif-badge.show { display: inline-block; }
+    .notif-badge.show { display: inline-block; }
 
-    /* Notification dropdown */
     .notif-dropdown {
       display: none; position: absolute; top: calc(100% + 10px); right: 0;
       width: 300px; background: var(--surface); border-radius: 12px;
@@ -110,8 +123,10 @@
     }
     .btn-logout:hover { background: linear-gradient(135deg, #d6a73b, #f0cf7b); transform: translateY(-1px); }
 
+    /* ── LAYOUT ── */
     .outer-wrapper { display: flex; min-height: calc(100vh - 72px); }
 
+    /* ── SIDEBAR ── */
     .sidebar {
       width: 260px; flex-shrink: 0; background: var(--green-deep);
       border-right: 1px solid rgba(255,255,255,.07);
@@ -140,22 +155,25 @@
     .nav-item.active .nav-icon { background: var(--gold); color: var(--green-deep); }
     .nav-label { font-size: .81rem; font-weight: 600; color: rgba(245,240,232,.7); }
     .nav-item.active .nav-label { color: var(--cream); }
-    .nav-badge { margin-left: auto; background: #c2640a; color: #fff; font-size: .6rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
     .sidebar-footer { padding: 14px 22px; border-top: 1px solid rgba(255,255,255,.07); flex-shrink: 0; }
     .sidebar-footer-label { font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: 4px; }
     .sidebar-footer-value { font-size: .73rem; color: rgba(245,240,232,.5); font-weight: 300; }
 
+    /* ── MAIN ── */
     .main-content { flex: 1; min-width: 0; }
     .page-body { max-width: 1100px; margin: 0 auto; padding: 36px 28px 60px; }
 
+    /* ── PAGE TITLE ── */
     .page-title-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
     .page-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; }
     .page-sub { font-size: .8rem; color: var(--muted); font-weight: 300; }
 
+    /* ── ALERTS ── */
     .alert-bar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; font-size: .84rem; font-weight: 500; }
     .alert-success { background: var(--green-light); color: var(--green-accent); border: 1px solid rgba(45,122,79,.2); }
     .alert-danger   { background: #fdf0ef; color: var(--red); border: 1px solid rgba(160,37,28,.2); }
 
+    /* ── STAT CARDS ── */
     .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
     .stat-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; }
     .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
@@ -166,6 +184,7 @@
     .stat-value { font-size: 1.35rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
     .stat-label { font-size: .7rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
 
+    /* ── TOOLBAR ── */
     .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .search-wrap { position: relative; flex: 1; min-width: 200px; }
     .search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .88rem; pointer-events: none; }
@@ -174,11 +193,13 @@
     .filter-select { padding: 9px 32px 9px 12px; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: .82rem; color: var(--text-dark); background: var(--surface); outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238a9e90' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; transition: border-color .2s; }
     .filter-select:focus { border-color: var(--green-accent); }
 
+    /* ── TABLE CARD ── */
     .table-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; }
     .table-card-header { padding: 14px 22px; background: linear-gradient(90deg, var(--green-mid), var(--green-deep)); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .table-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 700; color: var(--gold-light); display: flex; align-items: center; gap: 9px; }
     .table-record-count { font-size: .68rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(201,153,42,.2); color: var(--gold-light); border: 1px solid rgba(201,153,42,.25); }
 
+    /* ── TABLE ── */
     .approvals-table { width: 100%; border-collapse: collapse; }
     .approvals-table thead tr { background: #faf8f4; border-bottom: 1.5px solid var(--border); }
     .approvals-table thead th { padding: 11px 16px; font-size: .68rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-mid); white-space: nowrap; }
@@ -191,6 +212,7 @@
     .approvals-table tbody td:first-child { padding-left: 22px; }
     .approvals-table tbody td:last-child  { padding-right: 22px; }
 
+    /* ── CELL STYLES ── */
     .payor-cell { display: flex; align-items: center; gap: 10px; }
     .payor-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--green-mid); color: #fff; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .payor-name { font-weight: 600; font-size: .87rem; color: var(--text-dark); }
@@ -200,17 +222,21 @@
     .op-number { font-size: .78rem; color: var(--text-mid); font-weight: 500; }
     .date-main { font-size: .82rem; color: var(--text-dark); font-weight: 500; }
     .date-time  { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── STATUS BADGES ── */
     .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: .68rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; white-space: nowrap; }
     .sb-approved { background: var(--green-light); color: var(--green-accent); }
     .sb-waiting  { background: #fdf3dc; color: #a0700a; }
     .sb-rejected { background: #fdf0ef; color: var(--red); }
 
+    /* ── ACTION BUTTONS ── */
     .actions-cell { display: flex; align-items: center; gap: 6px; }
     .btn-approve { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border: none; border-radius: 7px; background: var(--green-accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s; }
     .btn-approve:hover { background: var(--green-mid); }
     .btn-reject  { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border: 1.5px solid #e8c5c5; border-radius: 7px; background: #fdf0ef; color: var(--red); font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s, border-color .15s; }
     .btn-reject:hover { background: #fde0de; border-color: #f0a8a8; }
 
+    /* ── TABLE FOOTER / PAGINATION ── */
     .table-footer { padding: 12px 22px; background: #faf8f4; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .table-footer-info { font-size: .75rem; color: var(--muted); }
     .table-footer-info strong { color: var(--text-mid); }
@@ -222,10 +248,12 @@
     .page-number.active { background: var(--gold); color: var(--green-deep); border-color: var(--gold); }
     .page-summary { font-size: .85rem; color: var(--muted); margin-left: 12px; }
 
+    /* ── EMPTY STATE ── */
     .empty-row td { padding: 60px 20px; text-align: center; }
     .empty-icon { font-size: 2.4rem; color: var(--border); margin-bottom: 12px; }
     .empty-text { font-size: .85rem; color: var(--muted); }
 
+    /* ── RESPONSIVE ── */
     @media (max-width: 1024px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) {
       .outer-wrapper { flex-direction: column; }
@@ -251,7 +279,9 @@
 <div class="top-stripe"></div>
 
 <header class="page-header">
-  <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:38px;height:38px;object-fit:cover;border-radius:50%;display:block;" /></div>
+  <div class="header-seal">
+    <img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" />
+  </div>
   <div class="header-text">
     <div class="t1">Republic of the Philippines</div>
     <div class="t2">Department of Agrarian Reform</div>
@@ -295,9 +325,16 @@
   <aside class="sidebar">
     <div class="sidebar-inner">
       <div class="sidebar-profile">
-        <div class="profile-avatar">AC</div>
+        @php
+          $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Accountant');
+        @endphp
+        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_picture))
+          <div class="profile-avatar"><img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
+        @else
+          <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
+        @endif
         <div>
-          <div class="profile-name">{{ auth()->user()->name ?? 'Accountant' }}</div>
+          <div class="profile-name">{{ $displayName }}</div>
           <div class="profile-role">Accountant</div>
         </div>
       </div>
@@ -353,6 +390,7 @@
         $rejected = \App\Models\Payment::where('status', 'accountant_rejected')->count();
       @endphp
 
+      <!-- STAT CARDS -->
       <div class="stat-row">
         <div class="stat-card">
           <div class="stat-icon si-green"><i class="bi bi-receipt"></i></div>
@@ -384,6 +422,7 @@
         </div>
       </div>
 
+      <!-- TOOLBAR -->
       <div class="toolbar">
         <div class="search-wrap">
           <i class="bi bi-search"></i>
@@ -392,8 +431,8 @@
         <select class="filter-select" id="filter-status" onchange="filterTable()">
           <option value="">All Statuses</option>
           <option value="approved">Approved</option>
-          <option value="waiting">Waiting</option>
-          <option value="rejected">Rejected</option>
+          <option value="forwarded">Waiting</option>
+          <option value="accountant_rejected">Rejected</option>
         </select>
         <select class="filter-select" id="filter-fund" onchange="filterTable()">
           <option value="">All Funds</option>
@@ -401,6 +440,7 @@
         </select>
       </div>
 
+      <!-- TABLE -->
       <div class="table-card">
         <div class="table-card-header">
           <div class="table-card-title">
@@ -543,9 +583,8 @@
 </div>
 
 <script>
-  /* ─── NOTIFICATION SYSTEM ─── */
+  /* ── NOTIFICATIONS ── */
   const NOTIF_DATA = {!! json_encode($notif_data ?? []) !!};
-
   let notifOpen = false;
 
   function timeAgo(iso) {
@@ -578,23 +617,20 @@
       badge.textContent = '';
       badge.removeAttribute('title');
     }
-
     if (NOTIF_DATA.length === 0) {
       list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>';
       return;
     }
     list.innerHTML = NOTIF_DATA.map(n => {
       const t = n.ts ? timeAgo(n.ts) : (n.time || '');
-      return (`
-      <div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">
         <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
         <div class="notif-item-body">
           <div class="notif-item-text">${n.text}</div>
           <div class="notif-item-time">${t}</div>
         </div>
         ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
-      </div>
-    `)
+      </div>`;
     }).join('');
   }
 
@@ -639,7 +675,7 @@
     }
   });
 
-  /* ─── TABLE FILTER ─── */
+  /* ── TABLE FILTER ── */
   function filterTable() {
     const q    = document.getElementById('tbl-search').value.toLowerCase();
     const sf   = document.getElementById('filter-status').value.toLowerCase();

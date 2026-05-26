@@ -39,12 +39,77 @@
       top: 0;
       z-index: 200;
     }
-    .header-seal { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+
+    /* ── LOGO FIX ── */
+    .header-seal {
+      width: 38px; height: 38px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-seal img {
+      width: 38px; height: 38px;
+      object-fit: cover; border-radius: 50%; display: block;
+    }
+
     .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
     .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
     .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
     .header-page { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
-    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
+
+    .notif-btn {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(255,255,255,.07); border: none;
+      color: rgba(245,240,232,.55); cursor: pointer;
+      transition: background .15s, color .15s; flex-shrink: 0;
+    }
+    .notif-btn:hover { background: rgba(255,255,255,.14); color: var(--cream); }
+    .notif-btn i { font-size: 1.25rem; }
+    .notif-badge {
+      position: absolute; top: 6px; right: 6px;
+      min-width: 18px; height: 18px; padding: 0 6px; border-radius: 12px;
+      background: var(--red); color: #fff; font-size: .72rem; font-weight: 700;
+      line-height: 18px; text-align: center; display: none; box-shadow: 0 1px 0 rgba(0,0,0,.08);
+    }
+    .notif-badge.show { display: inline-block; }
+
+    .notif-dropdown {
+      display: none; position: absolute; top: calc(100% + 10px); right: 0;
+      width: 300px; background: var(--surface); border-radius: 12px;
+      border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      z-index: 400; overflow: hidden;
+    }
+    .notif-dropdown.open { display: block; animation: dropIn .18s cubic-bezier(.16,1,.3,1); }
+    @keyframes dropIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform:none; } }
+    .notif-drop-head { padding: 12px 16px; background: var(--green-deep); display: flex; align-items: center; justify-content: space-between; }
+    .notif-drop-title { font-size: .78rem; font-weight: 600; color: var(--gold-light); letter-spacing: .5px; }
+    .notif-drop-mark { font-size: .68rem; color: rgba(245,240,232,.45); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; transition: color .15s; }
+    .notif-drop-mark:hover { color: var(--cream); }
+    .notif-list { max-height: 260px; overflow-y: auto; }
+    .notif-list::-webkit-scrollbar { width: 3px; }
+    .notif-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); transition: background .12s; cursor: pointer; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread { background: #f5fbf7; }
+    .notif-item:hover { background: #f0f7f3; }
+    .notif-item-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; margin-top: 1px; }
+    .ni-green { background: var(--green-light); color: var(--green-accent); }
+    .ni-gold  { background: #fdf3dc; color: var(--gold); }
+    .ni-red   { background: #fdf0ef; color: var(--red); }
+    .notif-item-body { flex: 1; min-width: 0; }
+    .notif-item-text { font-size: .78rem; color: var(--text-dark); line-height: 1.4; }
+    .notif-item-time { font-size: .67rem; color: var(--muted); margin-top: 3px; }
+    .notif-unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-accent); flex-shrink: 0; margin-top: 6px; }
+    .notif-empty { padding: 30px 16px; text-align: center; }
+    .notif-empty i { font-size: 1.6rem; color: var(--border); display: block; margin-bottom: 8px; }
+    .notif-empty p { font-size: .78rem; color: var(--muted); }
+    .notif-drop-foot { padding: 9px 16px; border-top: 1px solid var(--border); text-align: center; }
+    .notif-drop-foot a { font-size: .72rem; color: var(--green-accent); text-decoration: none; font-weight: 600; }
+    .notif-drop-foot a:hover { text-decoration: underline; }
+
     .btn-logout {
       display: flex; align-items: center; gap: 6px; padding: 8px 16px;
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
@@ -84,7 +149,6 @@
     .nav-item.active .nav-icon { background: var(--gold); color: var(--green-deep); }
     .nav-label { font-size: .81rem; font-weight: 600; color: rgba(245,240,232,.7); }
     .nav-item.active .nav-label { color: var(--cream); }
-    .nav-badge { margin-left: auto; background: #c2640a; color: #fff; font-size: .6rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
     .sidebar-footer { padding: 14px 22px; border-top: 1px solid rgba(255,255,255,.07); flex-shrink: 0; }
     .sidebar-footer-label { font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: 4px; }
     .sidebar-footer-value { font-size: .73rem; color: rgba(245,240,232,.5); font-weight: 300; }
@@ -100,7 +164,6 @@
     .alert-success { background: var(--green-light); color: var(--green-accent); border: 1px solid rgba(45,122,79,.2); }
     .alert-danger   { background: #fdf0ef; color: var(--red); border: 1px solid rgba(160,37,28,.2); }
 
-    /* ── SUMMARY STRIP ── */
     .approved-total-strip {
       display: flex; align-items: center; justify-content: space-between;
       background: var(--green-light); border: 1px solid rgba(45,122,79,.2);
@@ -152,7 +215,6 @@
     .table-footer-info { font-size: .75rem; color: var(--muted); }
     .table-footer-info strong { color: var(--text-mid); }
 
-    /* Pagination styles */
     .pagination-wrap { display:flex; align-items:center; gap:8px; margin-left:auto; }
     .page-link, .page-number { padding:6px 10px; border-radius:8px; text-decoration:none; font-weight:700; color:var(--green-accent); border:1px solid transparent; background:transparent; }
     .page-link.disabled { opacity:0.5; pointer-events:none; color:var(--muted); }
@@ -173,6 +235,7 @@
       .nav-item { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
       .nav-item.active { border-bottom-color: var(--gold); }
       .page-body { padding: 20px 16px 48px; }
+      .notif-dropdown { right: -60px; width: 280px; }
     }
     @media (max-width: 640px) {
       .approvals-table thead { display: none; }
@@ -187,15 +250,32 @@
 <div class="top-stripe"></div>
 
 <header class="page-header">
-  <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:38px;height:38px;object-fit:cover;border-radius:50%;display:block;" /></div>
+  <div class="header-seal">
+    <img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" />
+  </div>
   <div class="header-text">
     <div class="t1">Republic of the Philippines</div>
     <div class="t2">Department of Agrarian Reform</div>
   </div>
   <div class="header-sep"></div>
   <div class="header-page">Approved Records</div>
+
   <div class="header-actions">
-    <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+    <button class="notif-btn" id="notif-btn" title="Notifications" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
+      <i class="bi bi-bell" style="font-size:1.25rem;"></i>
+      <span class="notif-badge" id="notif-badge"></span>
+    </button>
+    <div class="notif-dropdown" id="notif-dropdown">
+      <div class="notif-drop-head">
+        <span class="notif-drop-title">Notifications</span>
+        <button class="notif-drop-mark" onclick="markAllRead()">Mark all as read</button>
+      </div>
+      <div class="notif-list" id="notif-list"></div>
+      <div class="notif-drop-foot">
+        <a href="#">View all notifications</a>
+      </div>
+    </div>
+    <form method="POST" action="{{ route('logout') }}" style="display:inline; margin:0;">
       @csrf
       <button type="submit" class="btn-logout">
         <i class="bi bi-box-arrow-right"></i> Logout
@@ -209,9 +289,16 @@
   <aside class="sidebar">
     <div class="sidebar-inner">
       <div class="sidebar-profile">
-        <div class="profile-avatar">AC</div>
+        @php
+          $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Accountant');
+        @endphp
+        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_picture))
+          <div class="profile-avatar"><img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
+        @else
+          <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
+        @endif
         <div>
-          <div class="profile-name">{{ auth()->user()->name ?? 'Accountant' }}</div>
+          <div class="profile-name">{{ $displayName }}</div>
           <div class="profile-role">Accountant</div>
         </div>
       </div>
@@ -390,15 +477,68 @@
 </div>
 
 <script>
+  const NOTIF_DATA = {!! json_encode($notif_data ?? []) !!};
+  let notifOpen = false;
+
+  function timeAgo(iso) {
+    try {
+      if (!iso) return '';
+      const then = new Date(iso); const now = new Date();
+      const s = Math.floor((now - then) / 1000);
+      if (s < 5) return 'just now';
+      if (s < 60) return s + ' seconds ago';
+      const m = Math.floor(s/60);
+      if (m < 60) return m + (m===1 ? ' minute ago' : ' minutes ago');
+      const h = Math.floor(m/60);
+      if (h < 24) return h + (h===1 ? ' hour ago' : ' hours ago');
+      const d = Math.floor(h/24);
+      return d + (d===1 ? ' day ago' : ' days ago');
+    } catch(e) { return '' }
+  }
+
+  function renderNotifList() {
+    const list = document.getElementById('notif-list');
+    const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
+    const badge = document.getElementById('notif-badge');
+    if (unreadCount > 0) { badge.classList.add('show'); badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount); }
+    else { badge.classList.remove('show'); badge.textContent = ''; }
+    if (NOTIF_DATA.length === 0) { list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>'; return; }
+    list.innerHTML = NOTIF_DATA.map(n => {
+      const t = n.ts ? timeAgo(n.ts) : (n.time || '');
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">
+        <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
+        <div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>
+        ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function readNotif(id) { const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList(); }
+  function markAllRead() { NOTIF_DATA.forEach(n => n.unread = false); renderNotifList(); }
+  function toggleNotifDropdown(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('notif-dropdown');
+    notifOpen = !notifOpen;
+    if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); } else dropdown.classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    const btn = document.getElementById('notif-btn'), dropdown = document.getElementById('notif-dropdown');
+    if (notifOpen && !btn.contains(e.target) && !dropdown.contains(e.target)) { dropdown.classList.remove('open'); notifOpen = false; }
+  });
+  window.addEventListener('load', function() {
+    const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
+    const badge = document.getElementById('notif-badge');
+    if (unreadCount > 0) { badge.classList.add('show'); badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount); }
+    else { badge.classList.remove('show'); }
+  });
+
   function filterApproved() {
-    const q    = document.getElementById('approved-search').value.toLowerCase();
-    const ff   = document.getElementById('approved-filter-fund').value.toLowerCase();
+    const q  = document.getElementById('approved-search').value.toLowerCase();
+    const ff = document.getElementById('approved-filter-fund').value.toLowerCase();
     const rows = document.querySelectorAll('#approved-body tr[data-search]');
     let visible = 0;
     rows.forEach(row => {
-      const show =
-        (!q  || row.dataset.search.includes(q)) &&
-        (!ff || row.dataset.fund.toLowerCase() === ff);
+      const show = (!q || row.dataset.search.includes(q)) && (!ff || row.dataset.fund.toLowerCase() === ff);
       row.style.display = show ? '' : 'none';
       if (show) visible++;
     });

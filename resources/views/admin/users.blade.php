@@ -7,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+   <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
   <style>
     :root {
       --green-deep:   #0e2a1a;
@@ -30,7 +31,15 @@
 
     /* ── HEADER ── */
     .page-header { background: var(--green-deep); padding: 16px 32px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 200; }
-    .header-seal { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .header-seal { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+
+    .header-seal img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
     .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
     .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
     .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
@@ -251,8 +260,8 @@
 
 <div class="top-stripe"></div>
 
-<header class="page-header">
-  <div class="header-seal">🌾</div>
+  <header class="page-header">
+    <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" /></div>
   <div class="header-text">
     <div class="t1">Republic of the Philippines</div>
     <div class="t2">Department of Agrarian Reform</div>
@@ -272,9 +281,16 @@
   <aside class="sidebar">
     <div class="sidebar-inner">
       <div class="sidebar-profile">
-        <div class="profile-avatar">AD</div>
+        @php
+          $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Administrator');
+        @endphp
+        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_picture))
+          <div class="profile-avatar"><img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
+        @else
+          <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AD', 0, 2)) }}</div>
+        @endif
         <div>
-          <div class="profile-name">{{ auth()->user()->name ?? 'Administrator' }}</div>
+          <div class="profile-name">{{ $displayName }}</div>
           <div class="profile-role">Admin</div>
         </div>
       </div>
