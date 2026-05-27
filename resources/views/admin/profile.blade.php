@@ -47,15 +47,72 @@
     .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
     .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
     .header-page { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
-    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-    .btn-logout {
-      display: flex; align-items: center; gap: 6px; padding: 8px 16px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      border: 1px solid rgba(201,153,42,.35); border-radius: 8px; color: var(--green-deep);
-      font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: .75rem; letter-spacing: .5px;
-      cursor: pointer; transition: all .18s ease; box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+    /* ── HEADER USER DROPDOWN ── */
+    .header-user-wrap { position: relative; }
+    .header-user {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 12px 6px 8px;
+      background: rgba(245,240,232,.07);
+      border: 1px solid rgba(245,240,232,.12);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      user-select: none;
     }
-    .btn-logout:hover { background: linear-gradient(135deg, #d6a73b, #f0cf7b); transform: translateY(-1px); }
+    .header-user:hover { background: rgba(245,240,232,.13); border-color: rgba(245,240,232,.22); }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 700; color: var(--green-deep);
+      overflow: hidden; flex-shrink: 0;
+      border: 2px solid rgba(201,153,42,.35);
+    }
+    .header-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+    .header-user-name { font-size: .76rem; font-weight: 600; color: var(--cream); line-height: 1.2; }
+    .header-user-role { font-size: .6rem; color: rgba(245,240,232,.4); letter-spacing: .8px; text-transform: uppercase; }
+    .header-user-caret { font-size: .65rem; color: rgba(245,240,232,.4); margin-left: 2px; transition: transform .2s; }
+    .header-user-wrap.open .header-user-caret { transform: rotate(180deg); }
+
+    /* Dropdown menu */
+    .header-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(14,42,26,.18);
+      overflow: hidden;
+      opacity: 0; pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 300;
+    }
+    .header-user-wrap.open .header-dropdown { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    .dropdown-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dropdown-header-name { font-size: .84rem; font-weight: 700; color: var(--text-dark); }
+    .dropdown-header-email { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+    .dropdown-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px;
+      font-size: .81rem; font-weight: 600; color: var(--text-mid);
+      text-decoration: none; cursor: pointer;
+      transition: background .13s;
+      border: none; background: none; width: 100%; text-align: left;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .dropdown-item:hover { background: var(--bg); }
+    .dropdown-item i { font-size: 1rem; flex-shrink: 0; }
+    .dropdown-item.danger { color: var(--red); }
+    .dropdown-item.danger:hover { background: #fdf0ef; }
+    .dropdown-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
     /* ── LAYOUT ── */
     .outer-wrapper { display: flex; min-height: calc(100vh - 72px); }
@@ -130,7 +187,6 @@
         transparent 1px, transparent 12px
       );
     }
-    /* Avatar wrapper straddles banner */
     .profile-hero-avatar-wrap {
       padding: 0 24px;
       margin-top: -36px;
@@ -306,10 +362,13 @@
       .form-section-sep, .form-section-label { grid-column: span 1; }
       .profile-hero-body { flex-direction: column; gap: 10px; }
       .profile-hero-since { margin-left: 0; }
+      .header-user-name, .header-user-role { display: none; }
     }
     @media (max-width: 540px) {
       .tab-btn { padding: 12px 14px; font-size: .72rem; }
       .tab-pane { padding: 20px 16px 24px; }
+      .page-header { padding: 12px 16px; gap: 10px; }
+      .header-text .t1 { display: none; }
     }
   </style>
 </head>
@@ -343,12 +402,41 @@
   <div class="header-sep"></div>
   <div class="header-page">Admin Panel</div>
   <div class="header-actions">
-    <form method="POST" action="{{ route('logout') }}" style="display:inline; margin:0;">
-      @csrf
-      <button type="submit" class="btn-logout">
-        <i class="bi bi-box-arrow-right"></i> Logout
-      </button>
-    </form>
+    <div class="header-user-wrap" id="headerUserWrap">
+      <!-- Trigger chip -->
+      <div class="header-user" onclick="toggleHeaderDropdown()">
+        <div class="header-avatar">
+          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
+            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+          @else
+            {{ $sidebarInitials }}
+          @endif
+        </div>
+        <div>
+          <div class="header-user-name">{{ $displayName }}</div>
+          <div class="header-user-role">{{ ucfirst($authUser->position ?? $authUser->role ?? 'Admin') }}</div>
+        </div>
+        <i class="bi bi-chevron-down header-user-caret"></i>
+      </div>
+
+      <!-- Dropdown -->
+      <div class="header-dropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-header-name">{{ $displayName }}</div>
+          <div class="dropdown-header-email">{{ $authUser->email ?? '' }}</div>
+        </div>
+        <a class="dropdown-item" href="{{ route('profile') }}">
+          <i class="bi bi-person-circle"></i> My Profile
+        </a>
+        <div class="dropdown-divider"></div>
+        <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+          @csrf
+          <button type="submit" class="dropdown-item danger">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -382,10 +470,7 @@
         <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
         <span class="nav-label">Users</span>
       </a>
-      <a class="nav-item active" href="{{ route('profile') }}">
-        <div class="nav-icon"><i class="bi bi-person-circle"></i></div>
-        <span class="nav-label">My Profile</span>
-      </a>
+      
 
       <div class="nav-section-label" style="margin-top:16px;">Monitoring</div>
       <a class="nav-item" href="{{ route('admin.auditlogs') }}">
@@ -703,6 +788,19 @@
 </div><!-- /.outer-wrapper -->
 
 <script>
+  /* ── HEADER DROPDOWN ── */
+  const headerWrap = document.getElementById('headerUserWrap');
+
+  function toggleHeaderDropdown() {
+    headerWrap.classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!headerWrap.contains(e.target)) {
+      headerWrap.classList.remove('open');
+    }
+  });
+
   /* ── HERO AVATAR PREVIEW ── */
   function previewHeroAvatar(input) {
     if (!input.files || !input.files[0]) return;
