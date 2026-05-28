@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-   <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
+  <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
   <style>
     :root {
       --green-deep:   #0e2a1a;
@@ -32,21 +32,73 @@
     /* ── HEADER ── */
     .page-header { background: var(--green-deep); padding: 16px 32px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 200; }
     .header-seal { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
-
-    .header-seal img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-      display: block;
-    }
+    .header-seal img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
     .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
     .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
     .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
     .header-page { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
     .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-    .btn-logout { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border: 1px solid rgba(201,153,42,.35); border-radius: 8px; color: var(--green-deep); font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: .75rem; letter-spacing: .5px; cursor: pointer; transition: all .18s ease; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
-    .btn-logout:hover { background: linear-gradient(135deg, #d6a73b, #f0cf7b); transform: translateY(-1px); }
+
+    /* ── HEADER USER DROPDOWN ── */
+    .header-user-wrap { position: relative; }
+    .header-user {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 12px 6px 8px;
+      background: rgba(245,240,232,.07);
+      border: 1px solid rgba(245,240,232,.12);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      user-select: none;
+    }
+    .header-user:hover { background: rgba(245,240,232,.13); border-color: rgba(245,240,232,.22); }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 700; color: var(--green-deep);
+      overflow: hidden; flex-shrink: 0;
+      border: 2px solid rgba(201,153,42,.35);
+    }
+    .header-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+    .header-user-name { font-size: .76rem; font-weight: 600; color: var(--cream); line-height: 1.2; }
+    .header-user-role { font-size: .6rem; color: rgba(245,240,232,.4); letter-spacing: .8px; text-transform: uppercase; }
+    .header-user-caret { font-size: .65rem; color: rgba(245,240,232,.4); margin-left: 2px; transition: transform .2s; }
+    .header-user-wrap.open .header-user-caret { transform: rotate(180deg); }
+
+    .header-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 28px rgba(14,42,26,.18);
+      overflow: hidden;
+      opacity: 0; pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 300;
+    }
+    .header-user-wrap.open .header-dropdown { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    .dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .dropdown-header-name { font-size: .84rem; font-weight: 700; color: var(--text-dark); }
+    .dropdown-header-email { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+    .dropdown-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px;
+      font-size: .81rem; font-weight: 600; color: var(--text-mid);
+      text-decoration: none; cursor: pointer;
+      transition: background .13s;
+      border: none; background: none; width: 100%; text-align: left;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .dropdown-item:hover { background: var(--bg); }
+    .dropdown-item i { font-size: 1rem; flex-shrink: 0; }
+    .dropdown-item.danger { color: var(--red); }
+    .dropdown-item.danger:hover { background: #fdf0ef; }
+    .dropdown-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
     /* ── LAYOUT ── */
     .outer-wrapper { display: flex; min-height: calc(100vh - 72px); }
@@ -57,7 +109,7 @@
     .sidebar-inner::-webkit-scrollbar { width: 3px; }
     .sidebar-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
     .sidebar-profile { padding: 0 22px 20px; display: flex; align-items: center; gap: 11px; }
-    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: .85rem; font-weight: 700; color: var(--green-deep); flex-shrink: 0; }
+    .profile-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: .85rem; font-weight: 700; color: var(--green-deep); flex-shrink: 0; overflow: hidden; }
     .profile-name { font-size: .83rem; font-weight: 600; color: var(--cream); }
     .profile-role { font-size: .63rem; color: rgba(245,240,232,.35); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
     .sidebar-divider { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: 0 22px 16px; }
@@ -121,8 +173,6 @@
     .data-table tbody td { padding: 13px 16px; font-size: .85rem; color: var(--text-dark); vertical-align: middle; }
     .data-table tbody td:first-child { padding-left: 22px; }
     .data-table tbody td:last-child  { padding-right: 22px; }
-    .row-id { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; background: var(--green-light); color: var(--green-accent); font-size: .72rem; font-weight: 700; }
-    .user-cell { display: flex; align-items: center; gap: 10px; }
     .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--green-mid); color: #fff; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .user-name  { font-weight: 600; font-size: .87rem; color: var(--text-dark); }
     .user-email { font-size: .72rem; color: var(--muted); margin-top: 1px; }
@@ -138,7 +188,6 @@
     .action-btn:hover { background: var(--green-light); border-color: var(--green-accent); color: var(--green-accent); }
     .action-btn.danger:hover { background: #fdf0ef; border-color: #f0a8a8; color: var(--red); }
     .date-main { font-size: .82rem; color: var(--text-dark); font-weight: 500; }
-    .date-time  { font-size: .7rem; color: var(--muted); margin-top: 2px; }
     .empty-row td { padding: 60px 20px; text-align: center; }
     .empty-icon { font-size: 2.4rem; color: var(--border); margin-bottom: 12px; }
     .empty-text { font-size: .85rem; color: var(--muted); }
@@ -149,7 +198,7 @@
     /* ── ALERT ── */
     .alert-bar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; font-size: .84rem; font-weight: 500; }
     .alert-success { background: var(--green-light); color: var(--green-accent); border: 1px solid rgba(45,122,79,.2); }
-    .alert-danger   { background: #fdf0ef; color: var(--red); border: 1px solid rgba(160,37,28,.2); }
+    .alert-danger  { background: #fdf0ef; color: var(--red); border: 1px solid rgba(160,37,28,.2); }
 
     /* ── MODAL BASE ── */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
@@ -164,25 +213,13 @@
     .modal-foot { padding: 14px 22px; background: #faf8f4; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
     .btn-cancel { padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 8px; background: #faf8f4; color: var(--text-mid); font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600; cursor: pointer; }
 
-    /* ── FORM SECTIONS (Add User) ── */
-    .modal-box-wide { max-width: 560px; }
+    /* ── FORM SECTIONS ── */
+    .modal-box-wide   { max-width: 560px; }
     .modal-box-narrow { max-width: 480px; }
 
     .section-block { margin-bottom: 20px; }
     .section-block:last-child { margin-bottom: 0; }
-    .section-label {
-      font-size: .62rem;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
+    .section-label { font-size: .62rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
     .section-label i { font-size: .8rem; color: var(--green-accent); }
 
     .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -196,48 +233,22 @@
     .form-field input,
     .form-field select,
     .form-field textarea {
-      width: 100%;
-      padding: 9px 13px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: .87rem;
-      color: var(--text-dark);
-      background: #faf8f4;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      appearance: none;
+      width: 100%; padding: 9px 13px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: .87rem; color: var(--text-dark);
+      background: #faf8f4; outline: none; transition: border-color .2s, box-shadow .2s; appearance: none;
     }
     .form-field input:focus,
     .form-field select:focus,
-    .form-field textarea:focus {
-      border-color: var(--green-accent);
-      box-shadow: 0 0 0 3px rgba(45,122,79,.1);
-      background: #fff;
-    }
+    .form-field textarea:focus { border-color: var(--green-accent); box-shadow: 0 0 0 3px rgba(45,122,79,.1); background: #fff; }
     .form-field textarea { resize: none; }
 
     .select-wrap { position: relative; }
     .select-wrap select { padding-right: 32px; cursor: pointer; }
-    .select-wrap::after {
-      content: '';
-      pointer-events: none;
-      position: absolute;
-      right: 11px; top: 50%;
-      transform: translateY(-50%);
-      border: 4px solid transparent;
-      border-top-color: var(--muted);
-      margin-top: 2px;
-    }
+    .select-wrap::after { content: ''; pointer-events: none; position: absolute; right: 11px; top: 50%; transform: translateY(-50%); border: 4px solid transparent; border-top-color: var(--muted); margin-top: 2px; }
 
     .pw-wrap { position: relative; }
     .pw-wrap input { padding-right: 38px; }
-    .pw-toggle {
-      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); font-size: .9rem; padding: 0;
-      display: flex; align-items: center;
-    }
+    .pw-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); font-size: .9rem; padding: 0; display: flex; align-items: center; }
     .pw-toggle:hover { color: var(--green-accent); }
 
     /* ── RESPONSIVE ── */
@@ -252,27 +263,68 @@
       .page-body { padding: 20px 16px 48px; }
       .field-grid { grid-template-columns: 1fr; }
       .field-grid .col-full { grid-column: 1; }
+      .header-user-name, .header-user-role { display: none; }
     }
-    @media (max-width: 560px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) {
+      .stat-row { grid-template-columns: 1fr 1fr; }
+      .page-header { padding: 12px 16px; gap: 10px; }
+      .header-text .t1 { display: none; }
+    }
   </style>
 </head>
 <body>
 
+@php
+  $authUser    = auth()->user();
+  $displayName = trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: ($authUser->name ?? 'Administrator');
+  $sidebarInitials = strtoupper(substr($displayName, 0, 2));
+@endphp
+
 <div class="top-stripe"></div>
 
-  <header class="page-header">
-    <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" /></div>
+<header class="page-header">
+  <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" /></div>
   <div class="header-text">
     <div class="t1">Republic of the Philippines</div>
     <div class="t2">Department of Agrarian Reform</div>
   </div>
   <div class="header-sep"></div>
   <div class="header-page">Admin Panel</div>
+
   <div class="header-actions">
-    <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-      @csrf
-      <button type="submit" class="btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</button>
-    </form>
+    <div class="header-user-wrap" id="headerUserWrap">
+      <div class="header-user" onclick="toggleHeaderDropdown()">
+        <div class="header-avatar">
+          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
+            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+          @else
+            {{ $sidebarInitials }}
+          @endif
+        </div>
+        <div>
+          <div class="header-user-name">{{ $displayName }}</div>
+          <div class="header-user-role">{{ ucfirst($authUser->position ?? $authUser->role ?? 'Admin') }}</div>
+        </div>
+        <i class="bi bi-chevron-down header-user-caret"></i>
+      </div>
+
+      <div class="header-dropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-header-name">{{ $displayName }}</div>
+          <div class="dropdown-header-email">{{ $authUser->email ?? '' }}</div>
+        </div>
+        <a class="dropdown-item" href="{{ route('profile') }}">
+          <i class="bi bi-person-circle"></i> My Profile
+        </a>
+        <div class="dropdown-divider"></div>
+        <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+          @csrf
+          <button type="submit" class="dropdown-item danger">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -280,35 +332,36 @@
 
   <aside class="sidebar">
     <div class="sidebar-inner">
+
       <div class="sidebar-profile">
-        @php
-          $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Administrator');
-        @endphp
-        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_picture))
-          <div class="profile-avatar"><img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
+        @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
+          <div class="profile-avatar">
+            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}"
+                 style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
+          </div>
         @else
-          <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AD', 0, 2)) }}</div>
+          <div class="profile-avatar">{{ $sidebarInitials }}</div>
         @endif
         <div>
           <div class="profile-name">{{ $displayName }}</div>
           <div class="profile-role">Admin</div>
         </div>
       </div>
+
       <hr class="sidebar-divider">
+
       <div class="nav-section-label">Main</div>
       <a class="nav-item" href="{{ route('admin.dashboard') }}">
         <div class="nav-icon"><i class="bi bi-grid-1x2-fill"></i></div>
         <span class="nav-label">Dashboard</span>
       </a>
+
       <div class="nav-section-label" style="margin-top:16px;">Management</div>
       <a class="nav-item active" href="{{ route('admin.users') }}">
         <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
         <span class="nav-label">Users</span>
       </a>
-      <a class="nav-item" href="{{ route('profile') }}">
-        <div class="nav-icon"><i class="bi bi-person-circle"></i></div>
-        <span class="nav-label">My Profile</span>
-      </a>
+
       <div class="nav-section-label" style="margin-top:16px;">Monitoring</div>
       <a class="nav-item" href="{{ route('admin.auditlogs') }}">
         <div class="nav-icon"><i class="bi bi-journal-text"></i></div>
@@ -318,6 +371,7 @@
         <div class="nav-icon"><i class="bi bi-receipt"></i></div>
         <span class="nav-label">Transaction History</span>
       </a>
+
     </div>
     <div class="sidebar-footer">
       <div class="sidebar-footer-label">System</div>
@@ -326,207 +380,242 @@
   </aside>
 
   <main class="main-content">
-  <div class="page-body">
+    <div class="page-body">
 
-    {{-- Session messages are shown via SweetAlert2 toasts/modal. --}}
+      <div class="page-title-row">
+        <div>
+          <div class="page-title">Users</div>
+          <div class="page-sub">Manage system accounts and role assignments</div>
+        </div>
+        <button class="btn-action btn-primary" onclick="openAddUserModal()">
+          <i class="bi bi-person-plus-fill"></i> Add User
+        </button>
+      </div>
 
-    <div class="page-title-row">
-      <div>
-        <div class="page-title">Users</div>
-        <div class="page-sub">Manage system accounts and role assignments</div>
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-icon si-green"><i class="bi bi-people-fill"></i></div>
+          <div><div class="stat-value">{{ $totalUsers ?? '—' }}</div><div class="stat-label">Total Users</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-gold"><i class="bi bi-person-badge-fill"></i></div>
+          <div><div class="stat-value">{{ $makerCount ?? '—' }}</div><div class="stat-label">Makers</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-amber"><i class="bi bi-person-check-fill"></i></div>
+          <div><div class="stat-value">{{ $reviewerCount ?? '—' }}</div><div class="stat-label">Reviewers</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-red"><i class="bi bi-person-gear"></i></div>
+          <div><div class="stat-value">{{ $accountantCount ?? '—' }}</div><div class="stat-label">Accountants</div></div>
+        </div>
       </div>
-      <button class="btn-action btn-primary" onclick="openAddUserModal()">
-        <i class="bi bi-person-plus-fill"></i> Add User
-      </button>
-    </div>
 
-    <div class="stat-row">
-      <div class="stat-card">
-        <div class="stat-icon si-green"><i class="bi bi-people-fill"></i></div>
-        <div><div class="stat-value">{{ $totalUsers ?? '—' }}</div><div class="stat-label">Total Users</div></div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" id="user-search" placeholder="Search by name or email…" oninput="filterUsers()" />
+        </div>
+        <select class="filter-select" id="filter-role" onchange="filterUsers()">
+          <option value="">All Roles</option>
+          <option value="admin">Admin</option>
+          <option value="maker">Maker</option>
+          <option value="reviewer">Reviewer</option>
+          <option value="accountant">Accountant</option>
+        </select>
+        <select class="filter-select" id="filter-user-status" onchange="filterUsers()">
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon si-gold"><i class="bi bi-person-badge-fill"></i></div>
-        <div><div class="stat-value">{{ $makerCount ?? '—' }}</div><div class="stat-label">Makers</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon si-amber"><i class="bi bi-person-check-fill"></i></div>
-        <div><div class="stat-value">{{ $reviewerCount ?? '—' }}</div><div class="stat-label">Reviewers</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon si-red"><i class="bi bi-person-gear"></i></div>
-        <div><div class="stat-value">{{ $accountantCount ?? '—' }}</div><div class="stat-label">Accountants</div></div>
-      </div>
-    </div>
 
-    <div class="toolbar">
-      <div class="search-wrap">
-        <i class="bi bi-search"></i>
-        <input type="text" id="user-search" placeholder="Search by name or email…" oninput="filterUsers()" />
-      </div>
-      <select class="filter-select" id="filter-role" onchange="filterUsers()">
-        <option value="">All Roles</option>
-        <option value="admin">Admin</option>
-        <option value="maker">Maker</option>
-        <option value="reviewer">Reviewer</option>
-        <option value="accountant">Accountant</option>
-      </select>
-      <select class="filter-select" id="filter-user-status" onchange="filterUsers()">
-        <option value="">All Statuses</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
-      </select>
-    </div>
-
-    <div class="table-card">
-      <div class="table-card-header">
-        <div class="table-card-title"><i class="bi bi-people-fill"></i> System Users</div>
-        <span class="table-record-count" id="users-count">{{ count($users ?? []) }} record{{ count($users ?? []) !== 1 ? 's' : '' }}</span>
-      </div>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Profile</th><th>Name</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="users-tbody">
-          @forelse(collect($users ?? [])->take(5) as $u)
-            @php
-              $initials = strtoupper(substr($u->name,0,1)) . (str_contains($u->name,' ') ? strtoupper(substr(strrchr($u->name,' '),1,1)) : '');
-              $roleCls  = match($u->role ?? '') { 'admin'=>'rb-admin','maker'=>'rb-cashier','reviewer'=>'rb-reviewer','accountant'=>'rb-accountant', default=>'rb-cashier' };
-              $uStatus  = ($u->is_active ?? true) ? 'active' : 'inactive';
-            @endphp
-            <tr data-id="{{ $u->id }}" data-search="{{ strtolower($u->name.' '.$u->email) }}" data-email="{{ $u->email ?? '' }}" data-role="{{ strtolower($u->role ?? '') }}" data-status="{{ $uStatus }}" data-first="{{ $u->first_name ?? '' }}" data-middle="{{ $u->middle_name ?? '' }}" data-last="{{ $u->last_name ?? '' }}" data-username="{{ $u->username ?? '' }}" data-phone_number="{{ $u->phone_number ?? '' }}" data-address="{{ $u->address ?? '' }}" data-position="{{ $u->position ?? '' }}" data-created="{{ $u->created_at }}">
-              <td style="width:56px;text-align:center;">
-                <div class="user-avatar">{{ $initials }}</div>
-              </td>
-              <td>
-                <div>
-                  <div class="user-name">{{ $u->name }}</div>
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="table-card-title"><i class="bi bi-people-fill"></i> System Users</div>
+          <span class="table-record-count" id="users-count">
+            {{ count($users ?? []) }} record{{ count($users ?? []) !== 1 ? 's' : '' }}
+          </span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            @forelse($users ?? [] as $u)
+              @php
+                $initials = strtoupper(substr($u->first_name ?? $u->name ?? 'U', 0, 1))
+                          . strtoupper(substr($u->last_name ?? '', 0, 1));
+                $roleCls  = match($u->role ?? '') {
+                  'admin'      => 'rb-admin',
+                  'maker'      => 'rb-cashier',
+                  'reviewer'   => 'rb-reviewer',
+                  'accountant' => 'rb-accountant',
+                  default      => 'rb-cashier'
+                };
+                $uStatus = ($u->is_active ?? true) ? 'active' : 'inactive';
+              @endphp
+              <tr
+                data-id="{{ $u->id }}"
+                data-search="{{ strtolower(($u->first_name ?? '') . ' ' . ($u->last_name ?? '') . ' ' . ($u->email ?? '')) }}"
+                data-email="{{ $u->email ?? '' }}"
+                data-role="{{ strtolower($u->role ?? '') }}"
+                data-status="{{ $uStatus }}"
+                data-first="{{ $u->first_name ?? '' }}"
+                data-middle="{{ $u->middle_name ?? '' }}"
+                data-last="{{ $u->last_name ?? '' }}"
+                data-username="{{ $u->username ?? '' }}"
+                data-phone_number="{{ $u->phone_number ?? '' }}"
+                data-address="{{ $u->address ?? '' }}"
+                data-position="{{ $u->position ?? $u->role ?? '' }}"
+                data-created="{{ $u->created_at }}"
+              >
+                <td style="width:56px;text-align:center;">
+                  <div class="user-avatar">{{ $initials }}</div>
+                </td>
+                <td>
+                  <div class="user-name">{{ trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')) ?: ($u->name ?? '—') }}</div>
                   <div class="user-email">{{ $u->email }}</div>
-                </div>
-              </td>
-              <td><span class="role-badge {{ $roleCls }}">{{ ucfirst($u->role ?? '—') }}</span></td>
-              <td>
-                <span class="status-badge {{ $uStatus === 'active' ? 'sb-active' : 'sb-inactive' }}">
-                  <i class="bi {{ $uStatus === 'active' ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
-                  {{ ucfirst($uStatus) }}
-                </span>
-              </td>
-              <td><div class="date-main">{{ $u->created_at->format('M d, Y') }}</div></td>
-              <td>
-                <div style="display:flex;gap:6px;">
-                  <a href="#" class="action-btn" title="Edit" onclick="openEditUserModal({{ $u->id }}); return false;"><i class="bi bi-pencil"></i></a>
-                  <a href="#" class="action-btn" title="View" onclick="openViewUserModal({{ $u->id }}); return false;"><i class="bi bi-eye"></i></a>
-                  <form method="POST" action="{{ route('admin.users.destroy', $u->id) }}" style="display:inline;" class="confirm-delete" data-name="{{ addslashes($u->name) }}">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="action-btn danger" title="Delete"><i class="bi bi-trash3"></i></button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-          @empty
-            <tr class="empty-row">
-              <td colspan="6">
-                <div class="empty-icon"><i class="bi bi-people"></i></div>
-                <div class="empty-text">No users found.</div>
-              </td>
-            </tr>
-          @endforelse
-        </tbody>
-      </table>
-      <div class="table-footer">
-        <span class="table-footer-info" id="users-footer">Showing <strong>{{ min(count($users ?? []), 5) }}</strong> of <strong>{{ count($users ?? []) }}</strong> records</span>
-        @if(method_exists($users ?? collect(), 'links'))
-          <div>{{ $users->links() }}</div>
-        @endif
+                </td>
+                <td><span class="role-badge {{ $roleCls }}">{{ ucfirst($u->role ?? '—') }}</span></td>
+                <td>
+                  <span class="status-badge {{ $uStatus === 'active' ? 'sb-active' : 'sb-inactive' }}">
+                    <i class="bi {{ $uStatus === 'active' ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
+                    {{ ucfirst($uStatus) }}
+                  </span>
+                </td>
+                <td><div class="date-main">{{ $u->created_at->format('M d, Y') }}</div></td>
+                <td>
+                  <div style="display:flex;gap:6px;">
+                    <a href="#" class="action-btn" title="Edit"
+                       onclick="openEditUserModal({{ $u->id }}); return false;">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="#" class="action-btn" title="View"
+                       onclick="openViewUserModal({{ $u->id }}); return false;">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    <form method="POST" action="{{ route('admin.users.destroy', $u->id) }}"
+                          style="display:inline;" class="confirm-delete"
+                          data-name="{{ addslashes(trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')) ?: ($u->name ?? '')) }}">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="action-btn danger" title="Delete">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr class="empty-row">
+                <td colspan="6">
+                  <div class="empty-icon"><i class="bi bi-people"></i></div>
+                  <div class="empty-text">No users found.</div>
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+        <div class="table-footer">
+          <span class="table-footer-info" id="users-footer">
+            Showing <strong>{{ count($users ?? []) }}</strong> of <strong>{{ count($users ?? []) }}</strong> records
+          </span>
+          @if(method_exists($users ?? collect(), 'links'))
+            <div>{{ $users->links() }}</div>
+          @endif
+        </div>
       </div>
-    </div>
 
-  </div>
+    </div>
   </main>
 </div>
 
-  {{-- ══════════════════════════════
-       VIEW USER MODAL
-       ══════════════════════════════ --}}
-  <div class="modal-overlay" id="view-user-modal" onclick="closeModalOutside(event,'view-user-modal')">
-    <div class="modal-box modal-box-wide">
-      <div class="modal-head">
-        <div class="modal-head-title"><i class="bi bi-person-circle" style="margin-right:7px;font-size:.9rem;"></i>User Profile</div>
-        <button class="modal-close" onclick="closeModal('view-user-modal')"><i class="bi bi-x-lg"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="section-block">
-          <div class="section-label"><i class="bi bi-person-fill"></i> Profile</div>
-          <div style="display:flex;gap:12px;align-items:center;">
-            <div style="width:64px;height:64px;border-radius:8px;background:var(--green-mid);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;" id="view-avatar">JD</div>
-            <div>
-              <div style="font-weight:700;font-size:1.05rem;" id="view-fullname">Juan Dela Cruz</div>
-              <div style="color:var(--muted);" id="view-email">user@dar.gov.ph</div>
-            </div>
+{{-- ══════════════════════════════
+     VIEW USER MODAL
+══════════════════════════════ --}}
+<div class="modal-overlay" id="view-user-modal" onclick="closeModalOutside(event,'view-user-modal')">
+  <div class="modal-box modal-box-wide">
+    <div class="modal-head">
+      <div class="modal-head-title"><i class="bi bi-person-circle" style="margin-right:7px;font-size:.9rem;"></i>User Profile</div>
+      <button class="modal-close" onclick="closeModal('view-user-modal')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="section-block">
+        <div class="section-label"><i class="bi bi-person-fill"></i> Profile</div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="width:64px;height:64px;border-radius:8px;background:var(--green-mid);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;" id="view-avatar">JD</div>
+          <div>
+            <div style="font-weight:700;font-size:1.05rem;" id="view-fullname">—</div>
+            <div style="color:var(--muted);font-size:.85rem;" id="view-email">—</div>
           </div>
         </div>
+      </div>
 
-        <div class="section-block">
-          <div class="section-label"><i class="bi bi-gear-fill"></i> Account</div>
-          <div class="field-grid">
-            <div class="form-field">
-              <label>Username</label>
-              <div id="view-username" class="field-hint"></div>
-            </div>
-            <div class="form-field">
-              <label>Role</label>
-              <div id="view-position" class="field-hint"></div>
-            </div>
-            <div class="form-field">
-              <label>Status</label>
-              <div id="view-status" class="field-hint"></div>
-            </div>
-            <div class="form-field">
-              <label>Created</label>
-              <div id="view-created" class="field-hint"></div>
-            </div>
+      <div class="section-block">
+        <div class="section-label"><i class="bi bi-gear-fill"></i> Account</div>
+        <div class="field-grid">
+          <div class="form-field">
+            <label>Username</label>
+            <div id="view-username" class="field-hint">—</div>
+          </div>
+          <div class="form-field">
+            <label>Role</label>
+            <div id="view-position" class="field-hint">—</div>
+          </div>
+          <div class="form-field">
+            <label>Status</label>
+            <div id="view-status" class="field-hint">—</div>
+          </div>
+          <div class="form-field">
+            <label>Created</label>
+            <div id="view-created" class="field-hint">—</div>
           </div>
         </div>
+      </div>
 
-        <div class="section-block">
-          <div class="section-label"><i class="bi bi-telephone-fill"></i> Contact</div>
-          <div class="field-grid">
-            <div class="form-field">
-              <label>Phone</label>
-              <div id="view-phone_number" class="field-hint"></div>
-            </div>
-            <div class="form-field col-full">
-              <label>Address</label>
-              <div id="view-address" class="field-hint"></div>
-            </div>
+      <div class="section-block">
+        <div class="section-label"><i class="bi bi-telephone-fill"></i> Contact</div>
+        <div class="field-grid">
+          <div class="form-field">
+            <label>Phone</label>
+            <div id="view-phone_number" class="field-hint">—</div>
+          </div>
+          <div class="form-field col-full">
+            <label>Address</label>
+            <div id="view-address" class="field-hint">—</div>
           </div>
         </div>
+      </div>
 
-      </div>
-      <div class="modal-foot">
-        <button type="button" class="btn-cancel" onclick="closeModal('view-user-modal')">Close</button>
-        <button type="button" class="btn-action btn-primary" onclick="openEditUserModal(currentViewUserId)">Edit</button>
-      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn-cancel" onclick="closeModal('view-user-modal')">Close</button>
+      <button type="button" class="btn-action btn-primary" onclick="openEditUserModal(currentViewUserId)">Edit</button>
     </div>
   </div>
+</div>
 
-{{-- ══════════════════════════════════════════
-     ADD USER MODAL — Organized with sections
-     ══════════════════════════════════════════ --}}
+{{-- ══════════════════════════════
+     ADD USER MODAL
+══════════════════════════════ --}}
 <div class="modal-overlay" id="add-user-modal" onclick="closeModalOutside(event,'add-user-modal')">
   <div class="modal-box modal-box-wide">
     <div class="modal-head">
       <div class="modal-head-title"><i class="bi bi-person-plus-fill" style="margin-right:7px;font-size:.9rem;"></i>Add New User</div>
       <button class="modal-close" onclick="closeModal('add-user-modal')"><i class="bi bi-x-lg"></i></button>
     </div>
-
     <form method="POST" action="{{ route('admin.users.store') }}">
       @csrf
       <div class="modal-body">
 
-        {{-- SECTION 1: Personal Information --}}
         <div class="section-block">
           <div class="section-label"><i class="bi bi-person-fill"></i> Personal Information</div>
           <div class="field-grid">
@@ -553,7 +642,6 @@
           </div>
         </div>
 
-        {{-- SECTION 2: Account Details --}}
         <div class="section-block">
           <div class="section-label"><i class="bi bi-envelope-fill"></i> Account Details</div>
           <div class="field-grid">
@@ -590,7 +678,6 @@
           </div>
         </div>
 
-        {{-- SECTION 3: Security --}}
         <div class="section-block">
           <div class="section-label"><i class="bi bi-shield-lock-fill"></i> Security</div>
           <div style="padding:10px 4px;">
@@ -601,8 +688,7 @@
           </div>
         </div>
 
-      </div>{{-- /modal-body --}}
-
+      </div>
       <div class="modal-foot">
         <button type="button" class="btn-cancel" onclick="closeModal('add-user-modal')">Cancel</button>
         <button type="submit" class="btn-action btn-primary"><i class="bi bi-person-check-fill"></i> Create User</button>
@@ -613,7 +699,7 @@
 
 {{-- ══════════════════════════════
      EDIT USER MODAL
-     ══════════════════════════════ --}}
+══════════════════════════════ --}}
 <div class="modal-overlay" id="edit-user-modal" onclick="closeModalOutside(event,'edit-user-modal')">
   <div class="modal-box modal-box-wide">
     <div class="modal-head">
@@ -624,7 +710,6 @@
       @csrf @method('PATCH')
       <div class="modal-body">
 
-        {{-- Personal Information --}}
         <div class="section-block">
           <div class="section-label"><i class="bi bi-person-fill"></i> Personal Information</div>
           <div class="field-grid">
@@ -651,7 +736,6 @@
           </div>
         </div>
 
-        {{-- Account Details --}}
         <div class="section-block">
           <div class="section-label"><i class="bi bi-envelope-fill"></i> Account Details</div>
           <div class="field-grid">
@@ -688,7 +772,6 @@
           </div>
         </div>
 
-        {{-- Security --}}
         <div class="section-block">
           <div class="section-label"><i class="bi bi-shield-lock-fill"></i> Security</div>
           <div class="field-grid">
@@ -711,7 +794,9 @@
               </div>
             </div>
           </div>
-          <p style="font-size:.72rem;color:var(--muted);margin-top:8px;"><i class="bi bi-info-circle" style="margin-right:4px;"></i>Password must be at least 8 characters long.</p>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:8px;">
+            <i class="bi bi-info-circle" style="margin-right:4px;"></i>Password must be at least 8 characters long.
+          </p>
         </div>
 
       </div>
@@ -723,28 +808,64 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  /* ── Filter ── */
+  /* ── HEADER DROPDOWN ── */
+  const headerWrap = document.getElementById('headerUserWrap');
+
+  function toggleHeaderDropdown() {
+    headerWrap.classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!headerWrap.contains(e.target)) {
+      headerWrap.classList.remove('open');
+    }
+  });
+
+  /* ── FILTER ── */
   function filterUsers() {
-    const q  = document.getElementById('user-search').value.toLowerCase();
-    const r  = document.getElementById('filter-role').value.toLowerCase();
-    const s  = document.getElementById('filter-user-status').value.toLowerCase();
+    const q    = document.getElementById('user-search').value.toLowerCase();
+    const r    = document.getElementById('filter-role').value.toLowerCase();
+    const s    = document.getElementById('filter-user-status').value.toLowerCase();
     const rows = document.querySelectorAll('#users-tbody tr[data-search]');
-    let v = 0;
+    let visible = 0;
     rows.forEach(row => {
       const show = (!q || row.dataset.search.includes(q))
                 && (!r || row.dataset.role === r)
                 && (!s || row.dataset.status === s);
       row.style.display = show ? '' : 'none';
-      if (show) v++;
+      if (show) visible++;
     });
-    document.getElementById('users-count').textContent = v + (v === 1 ? ' record' : ' records');
-    document.getElementById('users-footer').innerHTML = 'Showing <strong>' + v + '</strong> of <strong>' + rows.length + '</strong> records';
+    document.getElementById('users-count').textContent = visible + (visible === 1 ? ' record' : ' records');
+    document.getElementById('users-footer').innerHTML =
+      'Showing <strong>' + visible + '</strong> of <strong>' + rows.length + '</strong> records';
   }
 
-  /* ── Modals ── */
+  /* ── MODALS ── */
   function openAddUserModal() {
     document.getElementById('add-user-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  let currentViewUserId = null;
+
+  function openViewUserModal(id) {
+    const row = document.querySelector(`#users-tbody tr[data-id="${id}"]`);
+    if (!row) return;
+    currentViewUserId = id;
+    const ds      = row.dataset;
+    const initials = (ds.first?.charAt(0) || '') + (ds.last?.charAt(0) || '');
+    document.getElementById('view-avatar').textContent    = initials.toUpperCase() || '?';
+    document.getElementById('view-fullname').textContent  = [ds.first, ds.middle, ds.last].filter(Boolean).join(' ') || '—';
+    document.getElementById('view-email').textContent     = ds.email     || '—';
+    document.getElementById('view-username').textContent  = ds.username  || '—';
+    document.getElementById('view-position').textContent  = ds.position  || ds.role || '—';
+    document.getElementById('view-status').textContent    = ds.status    || '—';
+    document.getElementById('view-phone_number').textContent = ds.phone_number || '—';
+    document.getElementById('view-address').textContent   = ds.address   || '—';
+    document.getElementById('view-created').textContent   = ds.created   || '—';
+    document.getElementById('view-user-modal').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 
@@ -753,42 +874,18 @@
     if (!row) return;
     const ds = row.dataset;
     document.getElementById('edit-user-form').action = '/admin/users/' + id;
-    document.getElementById('edit-first_name').value = ds.first || '';
-    document.getElementById('edit-middle_name').value = ds.middle || '';
-    document.getElementById('edit-last_name').value = ds.last || '';
-    document.getElementById('edit-username').value = ds.username || '';
-    document.getElementById('edit-email').value = ds.email || '';
-    // prefer explicit position dataset if present
-    if (document.getElementById('edit-position')) document.getElementById('edit-position').value = ds.position || ds.role || '';
-    if (document.getElementById('edit-status')) document.getElementById('edit-status').value = ds.status || '';
-    if (document.getElementById('edit-phone_number')) document.getElementById('edit-phone_number').value = ds.phone_number || '';
-    if (document.getElementById('edit-address')) document.getElementById('edit-address').value = ds.address || '';
-    document.getElementById('edit-pw').value = '';
-    document.getElementById('edit-pw-confirm').value = '';
+    document.getElementById('edit-first_name').value  = ds.first    || '';
+    document.getElementById('edit-middle_name').value = ds.middle   || '';
+    document.getElementById('edit-last_name').value   = ds.last     || '';
+    document.getElementById('edit-username').value    = ds.username || '';
+    document.getElementById('edit-email').value       = ds.email    || '';
+    document.getElementById('edit-position').value    = ds.position || ds.role || '';
+    document.getElementById('edit-status').value      = ds.status   || 'active';
+    document.getElementById('edit-phone_number').value = ds.phone_number || '';
+    document.getElementById('edit-address').value     = ds.address  || '';
+    document.getElementById('edit-pw').value          = '';
+    document.getElementById('edit-pw-confirm').value  = '';
     document.getElementById('edit-user-modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  let currentViewUserId = null;
-  function openViewUserModal(id) {
-    const row = document.querySelector(`#users-tbody tr[data-id="${id}"]`);
-    if (!row) return;
-    currentViewUserId = id;
-    const ds = row.dataset;
-    const avatarEl = document.getElementById('view-avatar');
-    const first = ds.first || '';
-    const last = ds.last || '';
-    const initials = (first.charAt(0) || '') + (last.charAt(0) || '');
-    if (avatarEl) avatarEl.textContent = initials.toUpperCase();
-    document.getElementById('view-fullname').textContent = [ds.first, ds.middle, ds.last].filter(Boolean).join(' ');
-    document.getElementById('view-email').textContent = ds.email || '';
-    document.getElementById('view-username').textContent = ds.username || '';
-    document.getElementById('view-position').textContent = ds.position || ds.role || '';
-    document.getElementById('view-status').textContent = ds.status || '';
-    document.getElementById('view-phone_number').textContent = ds.phone_number || '';
-    document.getElementById('view-address').textContent = ds.address || '';
-    document.getElementById('view-created').textContent = ds.created || '';
-    document.getElementById('view-user-modal').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 
@@ -801,20 +898,20 @@
     if (e.target === document.getElementById(id)) closeModal(id);
   }
 
-  /* ── Password toggle ── */
+  /* ── PASSWORD TOGGLE ── */
   function togglePw(inputId, btn) {
     const input = document.getElementById(inputId);
     const icon  = btn.querySelector('i');
     if (input.type === 'password') {
-      input.type = 'text';
+      input.type    = 'text';
       icon.className = 'bi bi-eye-slash';
     } else {
-      input.type = 'password';
+      input.type    = 'password';
       icon.className = 'bi bi-eye';
     }
   }
 
-  /* ── Escape key ── */
+  /* ── ESCAPE KEY ── */
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       document.querySelectorAll('.modal-overlay.open').forEach(m => {
@@ -823,54 +920,46 @@
       });
     }
   });
+
+  /* ── SWEETALERT ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    @if(session('success'))
+      Swal.fire({ icon: 'success', title: 'Success', text: {!! json_encode(session('success')) !!}, timer: 2500, showConfirmButton: false });
+    @endif
+    @if(session('error'))
+      Swal.fire({ icon: 'error', title: 'Error', text: {!! json_encode(session('error')) !!} });
+    @endif
+
+    document.querySelectorAll('.confirm-delete').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = this.dataset.name || 'this user';
+        Swal.fire({
+          title: 'Delete user?',
+          text: `Delete ${name}? This cannot be undone.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Delete',
+        }).then(result => { if (result.isConfirmed) this.submit(); });
+      });
+    });
+
+    document.querySelectorAll('.confirm-toggle').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = this.dataset.name || 'this user';
+        Swal.fire({
+          title: 'Change status?',
+          text: `Toggle status for ${name}?`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, toggle',
+        }).then(result => { if (result.isConfirmed) this.submit(); });
+      });
+    });
+  });
 </script>
 
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Show SweetAlert for session messages
-  @if(session('success'))
-    Swal.fire({icon: 'success', title: 'Success', text: {!! json_encode(session('success')) !!}, timer: 2500, showConfirmButton: false});
-  @endif
-  @if(session('error'))
-    Swal.fire({icon: 'error', title: 'Error', text: {!! json_encode(session('error')) !!}});
-  @endif
-
-  // Confirm delete
-  document.querySelectorAll('.confirm-delete').forEach(form => {
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      const name = this.dataset.name || 'this user';
-      Swal.fire({
-        title: 'Delete user?',
-        text: `Delete ${name}? This cannot be undone.`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Delete',
-      }).then(result => {
-        if (result.isConfirmed) this.submit();
-      });
-    });
-  });
-
-  // Confirm toggle
-  document.querySelectorAll('.confirm-toggle').forEach(form => {
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      const name = this.dataset.name || 'this user';
-      Swal.fire({
-        title: 'Change status?',
-        text: `Toggle status for ${name}?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, toggle',
-      }).then(result => {
-        if (result.isConfirmed) this.submit();
-      });
-    });
-  });
-});
-</script>
