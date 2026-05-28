@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>New Transaction — DAR Cashier</title>
   <script>
     (function(){
@@ -51,13 +52,83 @@
       display: flex; align-items: center; gap: 14px;
       position: sticky; top: 0; z-index: 200;
     }
-    .header-seal { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .header-seal { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .header-seal img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
     .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
     .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
     .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
     .header-page { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
     .header-back { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: .78rem; color: rgba(245,240,232,.45); text-decoration: none; transition: color .18s; }
     .header-back:hover { color: var(--cream); }
+
+    /* Header actions (notifications + user) */
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
+    .notif-btn {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(255,255,255,.07); border: none;
+      color: rgba(245,240,232,.55); cursor: pointer;
+      transition: background .15s, color .15s; flex-shrink: 0;
+    }
+    .notif-btn:hover { background: rgba(255,255,255,.14); color: var(--cream); }
+    .notif-btn i { font-size: 1.25rem; }
+    .notif-badge {
+      position: absolute; top: 6px; right: 6px;
+      min-width: 18px; height: 18px; padding: 0 6px; border-radius: 12px;
+      background: var(--red); color: #fff; font-size: .72rem; font-weight: 700;
+      line-height: 18px; text-align: center; display: none; box-shadow: 0 1px 0 rgba(0,0,0,.08);
+    }
+    .notif-badge.show { display: inline-block; }
+    .notif-dropdown {
+      display: none; position: absolute; top: calc(100% + 10px); right: 0;
+      width: 300px; background: var(--surface); border-radius: 12px;
+      border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,.18);
+      z-index: 400; overflow: hidden;
+    }
+    .notif-dropdown.open { display: block; animation: dropIn .18s cubic-bezier(.16,1,.3,1); }
+    .notif-list { max-height: 260px; overflow-y: auto; }
+    .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); transition: background .12s; cursor: pointer; }
+    .notif-item.unread { background: #f5fbf7; }
+    .notif-item:hover { background: #f0f7f3; }
+    .notif-unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-accent); flex-shrink: 0; margin-top: 6px; }
+
+    .notif-drop-head { padding: 12px 16px; background: var(--green-deep); display: flex; align-items: center; justify-content: space-between; }
+    .notif-drop-title { font-size: .78rem; font-weight: 600; color: var(--gold-light); letter-spacing: .5px; }
+    .notif-drop-mark { font-size: .68rem; color: rgba(245,240,232,.45); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; transition: color .15s; }
+    .notif-drop-mark:hover { color: var(--cream); }
+    .notif-drop-mark:focus { outline: none; box-shadow: none; }
+    .notif-btn:focus { outline: none; box-shadow: none; }
+    .notif-item-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; margin-top: 1px; }
+    .notif-item-body { flex: 1; min-width: 0; }
+    .notif-item-text { font-size: .78rem; color: var(--text-dark); line-height: 1.4; }
+    .notif-item-time { font-size: .67rem; color: var(--muted); margin-top: 3px; }
+    .notif-empty { padding: 30px 16px; text-align: center; }
+    .notif-empty i { font-size: 1.6rem; color: var(--border); display: block; margin-bottom: 8px; }
+    .notif-empty p { font-size: .78rem; color: var(--muted); }
+    .notif-drop-foot { padding: 9px 16px; border-top: 1px solid var(--border); text-align: center; }
+    .notif-drop-foot a { font-size: .72rem; color: var(--green-accent); text-decoration: none; font-weight: 600; }
+    .notif-drop-foot a:hover { text-decoration: underline; }
+
+    .header-user-wrap { position: relative; }
+    .header-user { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 8px; background: rgba(245,240,232,.07); border: 1px solid rgba(245,240,232,.12); border-radius: 10px; cursor: pointer; transition: background .15s, border-color .15s; user-select: none; }
+    .header-user:hover { background: rgba(245,240,232,.13); border-color: rgba(245,240,232,.22); }
+    .header-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; color: var(--green-deep); overflow: hidden; flex-shrink: 0; border: 2px solid rgba(201,153,42,.35); }
+    .header-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+    .header-user-name { font-size: .76rem; font-weight: 600; color: var(--cream); line-height: 1.2; }
+    .header-user-role { font-size: .6rem; color: rgba(245,240,232,.4); letter-spacing: .8px; text-transform: uppercase; }
+    .header-user-caret { font-size: .65rem; color: rgba(245,240,232,.4); margin-left: 2px; transition: transform .2s; }
+    .header-user-wrap.open .header-user-caret { transform: rotate(180deg); }
+    .header-dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 200px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: 0 8px 28px rgba(14,42,26,.18); overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(-6px); transition: opacity .18s ease, transform .18s ease; z-index: 300; }
+    .header-user-wrap.open .header-dropdown { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .dropdown-header-name { font-size: .84rem; font-weight: 700; color: var(--text-dark); }
+    .dropdown-header-email { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+    .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: .81rem; font-weight: 600; color: var(--text-mid); text-decoration: none; cursor: pointer; transition: background .13s; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
+    .dropdown-item:hover { background: var(--bg); }
+    .dropdown-item i { font-size: 1rem; flex-shrink: 0; }
+    .dropdown-item.danger { color: var(--red); }
+    .dropdown-item.danger:hover { background: #fdf0ef; }
+    .dropdown-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 
     /* ── LAYOUT ── */
     .outer-wrapper { display: flex; min-height: calc(100vh - 72px); }
@@ -340,20 +411,115 @@
 
 <div class="top-stripe"></div>
 
+@php
+  $authUser    = auth()->user();
+  $displayName = trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: ($authUser->name ?? 'Maker');
+  $sidebarInitials = strtoupper(substr($displayName, 0, 2));
+@endphp
+
 <header class="page-header">
-  <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:38px;height:38px;object-fit:cover;border-radius:50%;display:block;" /></div>
+  <div class="header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo"  /></div>
   <div class="header-text">
     <div class="t1">Republic of the Philippines</div>
     <div class="t2">Department of Agrarian Reform</div>
   </div>
   <div class="header-sep"></div>
-  <div class="header-page">New Transaction</div>
-  <form method="POST" action="{{ route('logout') }}" class="header-back">
-    @csrf
-    <button type="submit" style="background:none;border:none;color:inherit;font-size:inherit;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;">
-      <i class="bi bi-box-arrow-right"></i> Logout
-    </button>
-  </form>
+    <div class="header-page">New Transaction</div>
+    <div class="header-actions">
+
+    <!-- Notification -->
+    <div class="notif-wrapper">
+      <button 
+        class="notif-btn" 
+        id="notif-btn"
+        onclick="toggleNotifDropdown(event)"
+        title="Notifications"
+      >
+        <i class="bi bi-bell"></i>
+        <span class="notif-badge" id="notif-badge">0</span>
+      </button>
+
+      <!-- Notification Dropdown -->
+      <div class="notif-dropdown" id="notif-dropdown">
+
+        <div class="notif-drop-head">
+          <span class="notif-drop-title">Notifications</span>
+
+          <button 
+            class="notif-drop-mark"
+            onclick="markAllRead()"
+          >
+            Mark all as read
+          </button>
+        </div>
+
+        <div class="notif-list" id="notif-list">
+          <div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>
+        </div>
+
+        <div class="notif-drop-foot">
+          <a href="#">View all notifications</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- User -->
+    <div class="header-user-wrap" id="headerUserWrap">
+
+      <!-- Trigger chip -->
+      <div class="header-user" onclick="toggleHeaderDropdown()">
+
+        <div class="header-avatar">
+          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
+            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+          @else
+            {{ $sidebarInitials }}
+          @endif
+        </div>
+
+        <div>
+          <div class="header-user-name">{{ $displayName }}</div>
+
+          <div class="header-user-role">
+            {{ ucfirst($authUser->position ?? $authUser->role ?? 'Maker') }}
+          </div>
+        </div>
+
+        <i class="bi bi-chevron-down header-user-caret"></i>
+      </div>
+
+      <!-- Dropdown -->
+      <div class="header-dropdown">
+
+        <div class="dropdown-header">
+          <div class="dropdown-header-name">{{ $displayName }}</div>
+
+          <div class="dropdown-header-email">
+            {{ $authUser->email ?? '' }}
+          </div>
+        </div>
+
+        <a class="dropdown-item" href="{{ route('maker.profile') }}">
+          <i class="bi bi-person-circle"></i>
+          My Profile
+        </a>
+
+        <div class="dropdown-divider"></div>
+
+        <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+          @csrf
+
+          <button type="submit" class="dropdown-item danger">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    </div>
 </header>
 
 <div class="outer-wrapper">
@@ -2038,5 +2204,166 @@
   @if(session('success'))
   <script>try{ localStorage.removeItem('maker_form_draft_v1'); }catch(e){} </script>
   @endif
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const headerWrap = document.getElementById('headerUserWrap');
+
+  function toggleHeaderDropdown() {
+    headerWrap.classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!headerWrap.contains(e.target)) {
+      headerWrap.classList.remove('open');
+    }
+  });
+
+  /* ── NOTIFICATIONS ── */
+  const NOTIF_DATA = {!! json_encode($notif_data ?? []) !!};
+  let notifOpen = false;
+
+  function timeAgo(iso) {
+    try {
+      if (!iso) return '';
+      const then = new Date(iso);
+      const now = new Date();
+      const s = Math.floor((now - then) / 1000);
+      if (s < 5) return 'just now';
+      if (s < 60) return s + ' seconds ago';
+      const m = Math.floor(s/60);
+      if (m < 60) return m + (m===1 ? ' minute ago' : ' minutes ago');
+      const h = Math.floor(m/60);
+      if (h < 24) return h + (h===1 ? ' hour ago' : ' hours ago');
+      const d = Math.floor(h/24);
+      return d + (d===1 ? ' day ago' : ' days ago');
+    } catch(e) { return '' }
+  }
+
+  function renderNotifList() {
+    const list = document.getElementById('notif-list');
+    const unreadCount = (Array.isArray(NOTIF_DATA) ? NOTIF_DATA.filter(n => n.unread) : []).length;
+    const badge = document.getElementById('notif-badge');
+    if (unreadCount > 0) {
+      badge.classList.add('show');
+      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+      badge.setAttribute('title', unreadCount + ' unread notifications');
+    } else {
+      badge.classList.remove('show');
+      badge.textContent = '';
+      badge.removeAttribute('title');
+    }
+    if (!Array.isArray(NOTIF_DATA) || NOTIF_DATA.length === 0) {
+      list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>';
+      return;
+    }
+    list.innerHTML = NOTIF_DATA.map(n => {
+      const t = n.ts ? timeAgo(n.ts) : (n.time || '');
+      const text = (n.text || n.title || 'Notification');
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">` +
+        `<div class="notif-item-body"><div class="notif-item-text">${text}</div><div class="notif-item-time">${t}</div></div>` +
+        `${n.unread ? '<div class="notif-unread-dot"></div>' : ''}` +
+      `</div>`;
+    }).join('');
+  }
+
+  function readNotif(id) {
+    if (!Array.isArray(NOTIF_DATA)) return;
+    fetch('{{ url('/maker/notifications') }}/' + id + '/read', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      credentials: 'same-origin'
+    }).then(r => {
+      if (!r.ok) throw new Error('network');
+      return r.json();
+    }).then(data => {
+      const n = NOTIF_DATA.find(x => x.id === id);
+      if (n) n.unread = false;
+      renderNotifList();
+    }).catch(err => {
+      console.warn('Failed to mark notif read', err);
+      const n = NOTIF_DATA.find(x => x.id === id);
+      if (n) n.unread = false;
+      renderNotifList();
+    });
+  }
+
+  function markAllRead() {
+    if (!Array.isArray(NOTIF_DATA)) return;
+    fetch('{{ route('maker.notifications.mark_all') }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      credentials: 'same-origin'
+    }).then(r => {
+      if (!r.ok) throw new Error('network');
+      return r.json();
+    }).then(json => {
+      if (json && json.ok) {
+        NOTIF_DATA.forEach(n => n.unread = false);
+        renderNotifList();
+      }
+    }).catch(err => {
+      console.warn('Failed to mark all read', err);
+      NOTIF_DATA.forEach(n => n.unread = false);
+      renderNotifList();
+    });
+  }
+
+  function toggleNotifDropdown(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('notif-dropdown');
+    notifOpen = !notifOpen;
+    if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); }
+    else dropdown.classList.remove('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const btn = document.getElementById('notif-btn');
+    const dropdown = document.getElementById('notif-dropdown');
+    if (notifOpen && btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.remove('open');
+      notifOpen = false;
+    }
+  });
+
+  window.addEventListener('load', function() {
+    try {
+      const unreadCount = Array.isArray(NOTIF_DATA) ? NOTIF_DATA.filter(n => n.unread).length : 0;
+      const badge = document.getElementById('notif-badge');
+      if (unreadCount > 0) {
+        badge.classList.add('show');
+        badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+        badge.setAttribute('title', unreadCount + ' unread notifications');
+      } else {
+        badge.classList.remove('show');
+        badge.textContent = '';
+      }
+    } catch(e){}
+  });
+
+  // Logout confirmation (SweetAlert2)
+  try {
+    const logoutForms = document.querySelectorAll('form[action="{{ route('logout') }}"]');
+    logoutForms.forEach(f => {
+      f.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        Swal.fire({
+          title: 'Log out?',
+          text: 'Are you sure you want to log out?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, log out',
+          cancelButtonText: 'Cancel'
+        }).then(result => { if (result.isConfirmed) f.submit(); });
+      });
+    });
+  } catch(e) {}
+</script>
 </body>
 </html>

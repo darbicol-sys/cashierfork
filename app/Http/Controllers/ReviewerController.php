@@ -103,6 +103,18 @@ class ReviewerController extends Controller
         } catch (\Throwable $e) {
             Log::warning('Failed to notify accountants on forward: ' . $e->getMessage());
         }
+        // Also notify makers about the forward action
+        try {
+            $makerRoleId = DB::table('roles')->where('name', 'maker')->value('id');
+            if ($makerRoleId) {
+                $makers = User::where('role_id', $makerRoleId)->get();
+                foreach ($makers as $m) {
+                    $m->notify(new NewMessageNotification($payment));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to notify makers on forward: ' . $e->getMessage());
+        }
         return redirect()->route('reviewer')->with('success', 'Payment forwarded.');
     }
 
@@ -244,6 +256,19 @@ class ReviewerController extends Controller
 
         $payment->meta = $meta;
         $payment->save();
+
+        // Notify makers that the payment was modified
+        try {
+            $makerRoleId = DB::table('roles')->where('name', 'maker')->value('id');
+            if ($makerRoleId) {
+                $makers = User::where('role_id', $makerRoleId)->get();
+                foreach ($makers as $m) {
+                    $m->notify(new NewMessageNotification($payment));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to notify makers on modify: ' . $e->getMessage());
+        }
 
         return redirect()->route('reviewer')->with('success', 'Payment record updated successfully.');
     }

@@ -38,6 +38,8 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':maker'])->group(function () {
 	// Maker dashboard (protected)
 	Route::get('/maker', [MakerController::class, 'index'])->name('dashboard');
+	// Maker profile
+	Route::get('/maker/profile', [MakerController::class, 'profile'])->name('maker.profile');
 	// Handle payment form submissions from the dashboard (now served at /maker)
 	Route::post('/maker', [MakerController::class, 'store'])->name('dashboard.store')->middleware(\App\Http\Middleware\LogUserActivity::class);
 
@@ -47,6 +49,43 @@ Route::get('/payments', [MakerController::class, 'listPayments'])->name('payment
 Route::get('/payments.json', [MakerController::class, 'paymentsJson'])->name('payments.json');
 Route::get('/payments/create', [MakerController::class, 'createPayment'])->name('payments.create');
 Route::post('/payments', [MakerController::class, 'store'])->name('payments.store')->middleware(\App\Http\Middleware\LogUserActivity::class);
+
+	// Maker notifications (JSON + mark read)
+	Route::get('/maker/notifications', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		$notes = $user->notifications()->orderBy('created_at', 'desc')->take(50)->get()->map(function ($n) {
+			return [
+				'id' => $n->id,
+				'data' => $n->data,
+				'read' => $n->read_at ? true : false,
+				'created_at' => $n->created_at ? $n->created_at->toIso8601String() : null,
+			];
+		});
+		return response()->json($notes);
+	})->name('maker.notifications.list');
+
+	Route::post('/maker/notifications/{id}/read', function ($id) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		$note = $user->notifications()->where('id', $id)->first();
+		if ($note) {
+			$note->markAsRead();
+			return response()->json(['ok' => true]);
+		}
+		return response()->json(['ok' => false], 404);
+	})->name('maker.notifications.read');
+
+	Route::post('/maker/notifications/mark-all', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		try {
+			$user->unreadNotifications->markAsRead();
+			return response()->json(['ok' => true]);
+		} catch (\Throwable $e) {
+			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+		}
+	})->name('maker.notifications.mark_all');
 });
 
 // Accountant routes (require authenticated accountant)
@@ -61,6 +100,43 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':accountan
 	Route::post('/accountant/profile/picture/remove', [AccountantController::class, 'removeProfilePicture'])->name('accountant.profile.remove_picture');
 	Route::post('/accountant/approval/{id}/approve', [AccountantController::class, 'approve'])->name('accountant.approve');
 	Route::post('/accountant/approval/{id}/reject', [AccountantController::class, 'reject'])->name('accountant.reject');
+
+	// Accountant notifications (JSON + mark read)
+	Route::get('/accountant/notifications', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		$notes = $user->notifications()->orderBy('created_at', 'desc')->take(50)->get()->map(function ($n) {
+			return [
+				'id' => $n->id,
+				'data' => $n->data,
+				'read' => $n->read_at ? true : false,
+				'created_at' => $n->created_at ? $n->created_at->toIso8601String() : null,
+			];
+		});
+		return response()->json($notes);
+	})->name('accountant.notifications.list');
+
+	Route::post('/accountant/notifications/{id}/read', function ($id) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		$note = $user->notifications()->where('id', $id)->first();
+		if ($note) {
+			$note->markAsRead();
+			return response()->json(['ok' => true]);
+		}
+		return response()->json(['ok' => false], 404);
+	})->name('accountant.notifications.read');
+
+	Route::post('/accountant/notifications/mark-all', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		try {
+			$user->unreadNotifications->markAsRead();
+			return response()->json(['ok' => true]);
+		} catch (\Throwable $e) {
+			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+		}
+	})->name('accountant.notifications.mark_all');
 });
 
 
@@ -139,6 +215,18 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':reviewer'
 		return response()->json(['ok' => false], 404);
 	})->name('notifications.read');
 
+	// Reviewer: mark all notifications as read
+	Route::post('/notifications/mark-all', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		try {
+			$user->unreadNotifications->markAsRead();
+			return response()->json(['ok' => true]);
+		} catch (\Throwable $e) {
+			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+		}
+	})->name('notifications.mark_all');
+
 	// Page: view all notifications (reviewer)
 	Route::get('/notifications/all', function (\Illuminate\Http\Request $request) {
 		$user = auth()->user();
@@ -146,6 +234,61 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':reviewer'
 		$notes = $user->notifications()->orderBy('created_at', 'desc')->paginate(25);
 		return view('reviewer.notifications.index', compact('notes'));
 	})->name('notifications.page');
+
+	// Reviewer: profile page
+	Route::get('/reviewer/profile', function () {
+		$user = auth()->user();
+		return view('reviewer.profile', compact('user'));
+	})->name('reviewer.profile');
+
+	// Reviewer: update profile
+	Route::patch('/reviewer/profile', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+
+		$validated = $request->validate([
+			'first_name' => ['required','string','max:191'],
+			'last_name'  => ['required','string','max:191'],
+			'middle_name'=> ['nullable','string','max:191'],
+			'username'   => ['nullable','string','max:100'],
+			'phone_number' => ['nullable','string','max:50'],
+			'address'    => ['nullable','string','max:1000'],
+			'profile_picture' => ['nullable','image','max:4096'],
+		]);
+
+		if ($request->hasFile('profile_picture')) {
+			$path = $request->file('profile_picture')->store('profiles', 'public');
+			// remove old picture if present
+			if (!empty($user->profile_picture)) {
+				\Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_picture);
+			}
+			$user->profile_picture = $path;
+		}
+
+		$user->first_name = $validated['first_name'];
+		$user->last_name  = $validated['last_name'];
+		$user->middle_name = $validated['middle_name'] ?? null;
+		$user->username   = $validated['username'] ?? $user->username;
+		$user->phone_number = $validated['phone_number'] ?? $user->phone_number;
+		$user->address    = $validated['address'] ?? $user->address;
+		$user->save();
+
+		return redirect()->route('reviewer.profile')->with('success', 'Profile updated.');
+	})->name('reviewer.profile.update');
+
+	// Reviewer: change password
+	Route::patch('/reviewer/profile/password', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		$validated = $request->validate([
+			'current_password' => ['required','string'],
+			'password' => ['required','string','min:8','confirmed'],
+		]);
+		if (!\Illuminate\Support\Facades\Hash::check($validated['current_password'], $user->password)) {
+			return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+		}
+		$user->password = \Illuminate\Support\Facades\Hash::make($validated['password']);
+		$user->save();
+		return redirect()->route('reviewer.profile')->with('success', 'Password updated.');
+	})->name('reviewer.profile.password');
 });
 
 

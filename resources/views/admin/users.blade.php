@@ -963,3 +963,22 @@
 
 </body>
 </html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  (function(){
+    try {
+      const logoutForms = document.querySelectorAll('form[action="{{ route('logout') }}"]');
+      logoutForms.forEach(f => f.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        Swal.fire({
+          title: 'Log out?',
+          text: 'Are you sure you want to log out?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, log out',
+          cancelButtonText: 'Cancel'
+        }).then(result => { if (result.isConfirmed) f.submit(); });
+      }));
+    } catch (e) {}
+  })();
+</script>

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>My Profile — DAR Accountant</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -825,176 +826,103 @@
 
 </div><!-- /.outer-wrapper -->
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-   const headerWrap = document.getElementById('headerUserWrap');
+document.addEventListener('DOMContentLoaded', function() {
+  const headerWrap = document.getElementById('headerUserWrap');
 
-  function toggleHeaderDropdown() {
-    headerWrap.classList.toggle('open');
-  }
+  function toggleHeaderDropdown() { headerWrap.classList.toggle('open'); }
+  window.toggleHeaderDropdown = toggleHeaderDropdown;
 
   document.addEventListener('click', function(e) {
-    if (!headerWrap.contains(e.target)) {
-      headerWrap.classList.remove('open');
-    }
+    if (headerWrap && !headerWrap.contains(e.target)) headerWrap.classList.remove('open');
   });
-  /* ── HERO AVATAR PREVIEW ── */
-  function previewHeroAvatar(input) {
+
+  // Logout confirmation (SweetAlert2)
+  try {
+    const logoutForms = document.querySelectorAll('form[action="{{ route('logout') }}"]');
+    logoutForms.forEach(f => {
+      f.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        Swal.fire({
+          title: 'Log out?',
+          text: 'Are you sure you want to log out?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, log out',
+          cancelButtonText: 'Cancel'
+        }).then(result => { if (result.isConfirmed) f.submit(); });
+      });
+    });
+  } catch (e) {}
+
+  // Avatar preview
+  window.previewHeroAvatar = function(input) {
     if (!input.files || !input.files[0]) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-      const container = document.querySelector(".profile-hero-avatar");
-      container.innerHTML = '<img src="' + e.target.result + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+      const container = document.querySelector('.profile-hero-avatar');
+      if (container) container.innerHTML = '<img src="' + e.target.result + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;' + '">';
       const tabInput = document.querySelector('input[name="profile_picture"]');
       if (tabInput) {
-        const dt = new DataTransfer();
-        dt.items.add(input.files[0]);
-        tabInput.files = dt.files;
+        const dt = new DataTransfer(); dt.items.add(input.files[0]); tabInput.files = dt.files;
       }
-      switchTab("personal", document.querySelectorAll(".tab-btn")[1]);
+      const btns = document.querySelectorAll('.tab-btn'); if (btns && btns[1]) switchTab('personal', btns[1]);
     };
     reader.readAsDataURL(input.files[0]);
-  }
+  };
 
-  /* ── TAB SWITCHER ── */
-  function switchTab(id, btn) {
+  // Tab switcher
+  window.switchTab = function(id, btn) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + id).classList.add('active');
-    btn.classList.add('active');
-  }
+    const pane = document.getElementById('tab-' + id); if (pane) pane.classList.add('active');
+    if (btn) btn.classList.add('active');
+  };
 
-  /* Auto-open correct tab on validation errors */
-  @if($errors->hasAny(['first_name','last_name','middle_name','username','phone_number','address']))
-    switchTab('personal', document.querySelectorAll('.tab-btn')[1]);
-  @elseif($errors->hasAny(['current_password','password']))
-    switchTab('password', document.querySelectorAll('.tab-btn')[2]);
-  @endif
-
-  /* ── PASSWORD STRENGTH ── */
-  const pwInput     = document.getElementById('new-password');
-  const segs        = [1,2,3,4].map(i => document.getElementById('seg' + i));
+  // Password strength
+  const pwInput = document.getElementById('new-password');
+  const segs = [1,2,3,4].map(i => document.getElementById('seg' + i));
   const strengthTxt = document.getElementById('strength-text');
-
   function scorePassword(pw) {
-    if (!pw) return 0;
-    let score = 0;
-    if (pw.length >= 8)  score++;
-    if (pw.length >= 12) score++;
-    if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-    return Math.min(score, 4);
+    if (!pw) return 0; let score = 0; if (pw.length >= 8) score++; if (pw.length >= 12) score++; if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++; if (/[0-9]/.test(pw)) score++; if (/[^A-Za-z0-9]/.test(pw)) score++; return Math.min(score,4);
   }
+  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong']; const cls = ['', 'weak','fair','good','strong'];
+  if (pwInput) pwInput.addEventListener('input', () => { const score = scorePassword(pwInput.value); segs.forEach((seg,i)=>{ if(seg) { seg.className='strength-seg'; if (i<score) seg.classList.add(cls[score]); }}); if (strengthTxt) { strengthTxt.textContent = pwInput.value ? (labels[score]||'Enter a password') : 'Enter a password'; strengthTxt.style.color = score <=1 ? 'var(--red)' : score===2 ? '#c2640a' : score===3 ? 'var(--gold)' : 'var(--green-accent)'; } });
 
-  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  const cls    = ['', 'weak', 'fair', 'good', 'strong'];
-
-  if (pwInput) {
-    pwInput.addEventListener('input', () => {
-      const score = scorePassword(pwInput.value);
-      segs.forEach((seg, i) => {
-        seg.className = 'strength-seg';
-        if (i < score) seg.classList.add(cls[score]);
-      });
-      strengthTxt.textContent = pwInput.value ? (labels[score] || 'Enter a password') : 'Enter a password';
-      strengthTxt.style.color = score <= 1 ? 'var(--red)' : score === 2 ? '#c2640a' : score === 3 ? 'var(--gold)' : 'var(--green-accent)';
-    });
-  }
-
-  /* ── NOTIFICATIONS ── */
+  // Notifications data and rendering
   const NOTIF_DATA = {!! json_encode($notif_data ?? []) !!};
+  window.NOTIF_DATA = NOTIF_DATA;
   let notifOpen = false;
 
   function timeAgo(iso) {
-    try {
-      if (!iso) return '';
-      const then = new Date(iso);
-      const now = new Date();
-      const s = Math.floor((now - then) / 1000);
-      if (s < 5) return 'just now';
-      if (s < 60) return s + ' seconds ago';
-      const m = Math.floor(s/60);
-      if (m < 60) return m + (m===1 ? ' minute ago' : ' minutes ago');
-      const h = Math.floor(m/60);
-      if (h < 24) return h + (h===1 ? ' hour ago' : ' hours ago');
-      const d = Math.floor(h/24);
-      return d + (d===1 ? ' day ago' : ' days ago');
-    } catch(e) { return '' }
+    try { if (!iso) return ''; const then = new Date(iso); const now = new Date(); const s = Math.floor((now - then) / 1000); if (s < 5) return 'just now'; if (s < 60) return s + ' seconds ago'; const m = Math.floor(s/60); if (m < 60) return m + (m===1 ? ' minute ago' : ' minutes ago'); const h = Math.floor(m/60); if (h < 24) return h + (h===1 ? ' hour ago' : ' hours ago'); const d = Math.floor(h/24); return d + (d===1 ? ' day ago' : ' days ago'); } catch(e) { return ''; }
   }
 
   function renderNotifList() {
-    const list = document.getElementById('notif-list');
-    const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
-    const badge = document.getElementById('notif-badge');
-    if (unreadCount > 0) {
-      badge.classList.add('show');
-      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
-      badge.setAttribute('title', unreadCount + ' unread notifications');
-    } else {
-      badge.classList.remove('show');
-      badge.textContent = '';
-      badge.removeAttribute('title');
-    }
-    if (NOTIF_DATA.length === 0) {
-      list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>';
-      return;
-    }
-    list.innerHTML = NOTIF_DATA.map(n => {
-      const t = n.ts ? timeAgo(n.ts) : (n.time || '');
-      return (`
-        <div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">
-          <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
-          <div class="notif-item-body">
-            <div class="notif-item-text">${n.text}</div>
-            <div class="notif-item-time">${t}</div>
-          </div>
-          ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
-        </div>
-      `);
-    }).join('');
+    const list = document.getElementById('notif-list'); if (!list) return; const badge = document.getElementById('notif-badge'); const unreadCount = NOTIF_DATA.filter(n=>n.unread).length; if (badge) { if (unreadCount>0) { badge.classList.add('show'); badge.textContent = unreadCount>99?'99+':String(unreadCount); badge.setAttribute('title', unreadCount + ' unread notifications'); } else { badge.classList.remove('show'); badge.textContent=''; badge.removeAttribute('title'); } }
+    if (NOTIF_DATA.length===0) { list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>'; return; }
+    list.innerHTML = NOTIF_DATA.map(n=>{ const t = n.ts ? timeAgo(n.ts) : (n.time||''); return `<div class="notif-item${n.unread?' unread':''}" onclick="readNotif('${n.id}')"><div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div><div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>${n.unread?'<div class="notif-unread-dot"></div>':''}</div>`; }).join('');
   }
 
-  function readNotif(id) {
-    const n = NOTIF_DATA.find(x => x.id === id);
-    if (n) n.unread = false;
-    renderNotifList();
-  }
+  window.readNotif = function(id) {
+    const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList();
+    fetch('{{ url('/accountant/notifications') }}/' + id + '/read', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }, credentials: 'same-origin' }).catch(()=>{});
+  };
 
-  function markAllRead() {
-    NOTIF_DATA.forEach(n => n.unread = false);
-    renderNotifList();
-  }
+  window.markAllRead = function() {
+    NOTIF_DATA.forEach(n=>n.unread=false); renderNotifList(); fetch('{{ route('accountant.notifications.mark_all') }}', { method:'POST', headers: { 'Content-Type':'application/json','X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }, credentials:'same-origin' }).catch(()=>{});
+  };
 
-  function toggleNotifDropdown(e) {
-    e.stopPropagation();
-    const dropdown = document.getElementById('notif-dropdown');
-    notifOpen = !notifOpen;
-    if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); }
-    else dropdown.classList.remove('open');
-  }
+  window.toggleNotifDropdown = function(e) { e.stopPropagation(); const dropdown = document.getElementById('notif-dropdown'); notifOpen = !notifOpen; if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); } else dropdown.classList.remove('open'); };
 
-  document.addEventListener('click', function(e) {
-    const btn = document.getElementById('notif-btn');
-    const dropdown = document.getElementById('notif-dropdown');
-    if (notifOpen && !btn.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.remove('open');
-      notifOpen = false;
-    }
-  });
+  document.addEventListener('click', function(e){ const btn = document.getElementById('notif-btn'); const dropdown = document.getElementById('notif-dropdown'); if (notifOpen && btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) { dropdown.classList.remove('open'); notifOpen=false; } });
 
-  window.addEventListener('load', function() {
-    const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
-    const badge = document.getElementById('notif-badge');
-    if (unreadCount > 0) {
-      badge.classList.add('show');
-      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
-    } else {
-      badge.classList.remove('show');
-    }
-  });
+  // initialize badge
+  const unreadCountInit = NOTIF_DATA.filter(n=>n.unread).length; const badgeInit = document.getElementById('notif-badge'); if (badgeInit) { if (unreadCountInit>0) { badgeInit.classList.add('show'); badgeInit.textContent = unreadCountInit>99?'99+':String(unreadCountInit); } else { badgeInit.classList.remove('show'); } }
+
+});
 </script>
-
-<!-- Removed remove-picture form and JS (display-only requested) -->
 
 </body>
 </html>

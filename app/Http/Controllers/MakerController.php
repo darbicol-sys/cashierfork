@@ -16,20 +16,74 @@ class MakerController extends Controller
      */
     public function index()
     {
-        return view('maker.maker.maker');
+        $user = auth()->user();
+        $notifications = $user ? $user->notifications()->orderBy('created_at', 'desc')->take(50)->get() : collect();
+        $notif_data = $notifications->map(function($n){
+            $d = $n->data ?? [];
+            return [
+                'id' => $n->id,
+                'icon' => $d['icon'] ?? 'bi-bell',
+                'cls' => $d['cls'] ?? 'ni-gold',
+                'text' => $d['message'] ?? ($d['text'] ?? ''),
+                'time' => $d['time'] ?? ($n->created_at ? $n->created_at->diffForHumans() : ''),
+                'ts' => $n->created_at ? $n->created_at->toIso8601String() : null,
+                'unread' => $n->read_at ? false : true,
+                'data' => $d,
+            ];
+        })->toArray();
+
+        return view('maker.maker.maker', compact('notif_data'));
+    }
+
+    // Maker profile page
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('maker.profile.profile', compact('user'));
     }
 
     // Show payment creation form (reuses payments.create view)
     public function createPayment()
     {
-        // Render the Maker "New Transaction" page for Maker users
-        return view('maker.maker.maker');
+        $user = auth()->user();
+        $notifications = $user ? $user->notifications()->orderBy('created_at', 'desc')->take(50)->get() : collect();
+        $notif_data = $notifications->map(function($n){
+            $d = $n->data ?? [];
+            return [
+                'id' => $n->id,
+                'icon' => $d['icon'] ?? 'bi-bell',
+                'cls' => $d['cls'] ?? 'ni-gold',
+                'text' => $d['message'] ?? ($d['text'] ?? ''),
+                'time' => $d['time'] ?? ($n->created_at ? $n->created_at->diffForHumans() : ''),
+                'ts' => $n->created_at ? $n->created_at->toIso8601String() : null,
+                'unread' => $n->read_at ? false : true,
+                'data' => $d,
+            ];
+        })->toArray();
+
+        return view('maker.maker.maker', compact('notif_data'));
     }
 
     // Show payment creation form for Reviewer inside reviewer layout (route guarded by reviewer middleware)
     public function createForReviewer(Request $request)
     {
-        return view('maker.maker.maker');
+        $user = auth()->user();
+        $notifications = $user ? $user->notifications()->orderBy('created_at', 'desc')->take(50)->get() : collect();
+        $notif_data = $notifications->map(function($n){
+            $d = $n->data ?? [];
+            return [
+                'id' => $n->id,
+                'icon' => $d['icon'] ?? 'bi-bell',
+                'cls' => $d['cls'] ?? 'ni-gold',
+                'text' => $d['message'] ?? ($d['text'] ?? ''),
+                'time' => $d['time'] ?? ($n->created_at ? $n->created_at->diffForHumans() : ''),
+                'ts' => $n->created_at ? $n->created_at->toIso8601String() : null,
+                'unread' => $n->read_at ? false : true,
+                'data' => $d,
+            ];
+        })->toArray();
+
+        return view('maker.maker.maker', compact('notif_data'));
     }
 
     // List saved payments

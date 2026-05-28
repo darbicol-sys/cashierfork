@@ -235,6 +235,18 @@ class AccountantController extends Controller
         } catch (\Throwable $e) {
             Log::warning('Failed to notify reviewers on approve: ' . $e->getMessage());
         }
+        // Notify makers about approval
+        try {
+            $makerRoleId = DB::table('roles')->where('name', 'maker')->value('id');
+            if ($makerRoleId) {
+                $makers = User::where('role_id', $makerRoleId)->get();
+                foreach ($makers as $m) {
+                    $m->notify(new NewMessageNotification($p));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to notify makers on approve: ' . $e->getMessage());
+        }
 
         return redirect()->route('accountant.approval')->with('success', 'Payment approved.');
     }
@@ -272,6 +284,19 @@ class AccountantController extends Controller
             }
         } catch (\Throwable $e) {
             Log::warning('Failed to notify reviewers on reject: ' . $e->getMessage());
+        }
+
+        // Notify makers about rejection
+        try {
+            $makerRoleId = DB::table('roles')->where('name', 'maker')->value('id');
+            if ($makerRoleId) {
+                $makers = User::where('role_id', $makerRoleId)->get();
+                foreach ($makers as $m) {
+                    $m->notify(new NewMessageNotification($p));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to notify makers on reject: ' . $e->getMessage());
         }
 
         return redirect()->route('accountant.approval')->with('success', 'Payment rejected and returned to Reviewer.');

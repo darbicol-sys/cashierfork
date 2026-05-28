@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Accountant — For Review</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -742,14 +743,34 @@
   }
 
   function readNotif(id) {
-    const n = NOTIF_DATA.find(x => x.id === id);
-    if (n) n.unread = false;
-    renderNotifList();
+    fetch('{{ url('/accountant/notifications') }}/' + id + '/read', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      credentials: 'same-origin'
+    }).then(r => { if (!r.ok) throw new Error('network'); return r.json(); }).then(data => {
+      const n = NOTIF_DATA.find(x => x.id === id);
+      if (n) n.unread = false;
+      renderNotifList();
+    }).catch(err => { console.warn('Failed to mark notif read', err); const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList(); });
   }
 
   function markAllRead() {
-    NOTIF_DATA.forEach(n => n.unread = false);
-    renderNotifList();
+    fetch('{{ route('accountant.notifications.mark_all') }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      credentials: 'same-origin'
+    }).then(r => { if (!r.ok) throw new Error('network'); return r.json(); }).then(json => {
+      if (json && json.ok) {
+        NOTIF_DATA.forEach(n => n.unread = false);
+        renderNotifList();
+      }
+    }).catch(err => { console.warn('Failed to mark all read', err); NOTIF_DATA.forEach(n => n.unread = false); renderNotifList(); });
   }
 
   function toggleNotifDropdown(e) {
@@ -786,6 +807,26 @@
   function filterTable() {
     const form = document.getElementById('filter-form'); if (form) form.submit();
   }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  (function(){
+    try {
+      const logoutForms = document.querySelectorAll('form[action="{{ route('logout') }}"]');
+      logoutForms.forEach(f => f.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        Swal.fire({
+          title: 'Log out?',
+          text: 'Are you sure you want to log out?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, log out',
+          cancelButtonText: 'Cancel'
+        }).then(result => { if (result.isConfirmed) f.submit(); });
+      }));
+    } catch (e) {}
+  })();
 </script>
 
 </body>

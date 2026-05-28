@@ -36,21 +36,33 @@ class NewMessageNotification extends Notification
     public function toArray(object $notifiable): array
     {
         $raw = $this->payment->status ?? 'waiting';
+        $payer = $this->payment->name ?? '—';
+
         if (in_array($raw, ['approved'])) {
             $status = 'approved';
             $icon = 'bi-check-circle-fill';
             $cls = 'ni-green';
-            $message = 'Payment by ' . ($this->payment->name ?? '—') . ' has been approved.';
+            $message = "The transaction for {$payer} has been approved.";
         } elseif (in_array($raw, ['rejected', 'accountant_rejected'])) {
             $status = 'rejected';
             $icon = 'bi-x-circle-fill';
             $cls = 'ni-red';
-            $message = 'Payment by ' . ($this->payment->name ?? '—') . ' was rejected.';
+            $message = "The transaction for {$payer} has been rejected.";
+        } elseif (in_array($raw, ['forwarded'])) {
+            $status = 'forwarded';
+            $icon = 'bi-arrow-right-circle';
+            $cls = 'ni-gold';
+            $message = "The transaction for {$payer} has been forwarded.";
+        } elseif (in_array($raw, ['under_review'])) {
+            $status = 'modified';
+            $icon = 'bi-pencil-square';
+            $cls = 'ni-gold';
+            $message = "The transaction for {$payer} has been modified.";
         } else {
             $status = 'waiting';
             $icon = 'bi-hourglass-split';
             $cls = 'ni-gold';
-            $message = 'New transaction from ' . ($this->payment->name ?? '—') . ' forwarded for your approval.';
+            $message = "New transaction from {$payer} has been submitted.";
         }
 
         return [
