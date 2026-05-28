@@ -1219,10 +1219,27 @@
       wrap.style.display = 'block';
       if (amountInput) amountInput.readOnly = true;
       if (!filingEventsAttached) attachFilingFeeEvents();
+      // enable inputs inside section so preview picks them only when visible
+      wrap.querySelectorAll('input,select,button').forEach(i => i.disabled = false);
+      // set initial enable/disable for qty inputs based on checks
+      const filingCheck = document.getElementById('fee-filing-check');
+      const inspectionCheck = document.getElementById('fee-inspection-check');
+      if (filingCheck) document.getElementById('filing-qty').disabled = !filingCheck.checked;
+      const inspectionOptionsWrap = document.getElementById('inspection-options');
+      if (inspectionOptionsWrap) Array.from(inspectionOptionsWrap.querySelectorAll('.inspection-option')).forEach(opt=>{
+        const chk = opt.querySelector('.insp-opt-chk'); const qty = opt.querySelector('.insp-qty-input');
+        if (chk) chk.disabled = !inspectionCheck.checked;
+        if (qty) qty.disabled = !inspectionCheck.checked || !chk.checked;
+      });
       computeFilingTotal();
     } else {
+      // hide and disable all inputs so they are not included in preview
       wrap.style.display = 'none';
       if (amountInput) amountInput.readOnly = false;
+      wrap.querySelectorAll('input,select').forEach(i => { i.disabled = true; if (i.type === 'checkbox') i.checked = false; });
+      // reset displayed subtotals
+      wrap.querySelectorAll('.svc-sub, .opt-sub').forEach(el => el.textContent = formatPeso(0));
+      computeFilingTotal();
     }
   }
 
