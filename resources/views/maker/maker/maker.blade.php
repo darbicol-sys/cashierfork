@@ -551,8 +551,62 @@
               </div>
 
               <div class="field">
+                <!-- New Filing Fee / Inspection Cost selection (shown only for filing_fee txn) -->
+                <div id="filing-inspection-fees" style="display:none; margin-bottom:10px;">
+                  <label>Fees :</label>
+                  <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+                    <div class="cert-cart-row" data-service="filing_fee" style="display:flex;align-items:center;gap:12px;">
+                      <div class="svc-check"><label class="svc-check-label"><input type="checkbox" id="fee-filing-check" name="fee_filing_check" class="svc-chk" /></label></div>
+                      <div class="svc-name">Filing Fee</div>
+                      <div class="svc-price">₱2,000.00</div>
+                      <div class="svc-qty">
+                        <button type="button" class="qty-decr" id="filing-qty-decr">−</button>
+                        <input type="number" min="1" value="1" id="filing-qty" name="filing_qty" class="qty-input" data-service="filing_fee" />
+                        <button type="button" class="qty-incr" id="filing-qty-incr">+</button>
+                      </div>
+                      <div class="svc-sub" data-service="filing_fee">₱0.00</div>
+                    </div>
+
+                    <div class="cert-cart-row" data-service="inspection_cost" style="display:flex;align-items:flex-start;gap:12px;">
+                      <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                          <div class="svc-check"><label class="svc-check-label"><input type="checkbox" id="fee-inspection-check" name="fee_inspection_check" class="svc-chk" /></label></div>
+                          <div class="svc-name">Inspection Cost</div>
+                        </div>
+                        <div id="inspection-options" style="display:none; flex-direction:column; gap:8px; margin-left:36px;">
+                          <div class="inspection-option" data-price="10000" style="display:flex;align-items:center;gap:8px; width:100%; justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                              <div class="svc-check"><label class="svc-check-label"><input type="checkbox" class="insp-opt-chk" name="inspection_option[]" value="10000" /></label></div>
+                              <div class="svc-name">₱10,000</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                              <button type="button" class="qty-decr insp-qty-decr">−</button>
+                              <input type="number" min="1" value="1" class="insp-qty-input" name="inspection_qty_10000" />
+                              <button type="button" class="qty-incr insp-qty-incr">+</button>
+                              <div class="opt-sub" style="margin-left:12px;">₱0.00</div>
+                            </div>
+                          </div>
+                          <div class="inspection-option" data-price="15000" style="display:flex;align-items:center;gap:8px; width:100%; justify-content:space-between;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                              <div class="svc-check"><label class="svc-check-label"><input type="checkbox" class="insp-opt-chk" name="inspection_option[]" value="15000" /></label></div>
+                              <div class="svc-name">₱15,000</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                              <button type="button" class="qty-decr insp-qty-decr">−</button>
+                              <input type="number" min="1" value="1" class="insp-qty-input" name="inspection_qty_15000" />
+                              <button type="button" class="qty-incr insp-qty-incr">+</button>
+                              <div class="opt-sub" style="margin-left:12px;">₱0.00</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="svc-sub" data-service="inspection_cost">₱0.00</div>
+                    </div>
+                  </div>
+                </div>
+
                 <label>Amount : <span class="req">*</span></label>
-                <div class="amount-wrap"><span>₱</span><input name="amount" type="number" min="0" step="0.01" placeholder="0.00" required data-validate="numeric" /></div>
+                <div class="amount-wrap"><span>₱</span><input id="amount-input" name="amount" type="number" min="0" step="0.01" placeholder="0.00" required data-validate="numeric" /></div>
               </div>
               <div id="cash-bond-formula" style="display:none; font-size:.79rem; color:var(--muted); margin-top:6px;">Formula: Area x Zonal Value x 2.5%</div>
               <div class="field">
@@ -996,6 +1050,8 @@
     }, 80);
     // initialize or teardown cart-style service section for certification/copy/repro
     try { initCertCartSection(val); } catch(e) {}
+    // initialize or teardown filing/inspection fee section
+    try { initFilingFeeSection(val); } catch(e) {}
   });
 
   // update payment mode options based on selected transaction
@@ -1090,7 +1146,12 @@
         const chk = q('.svc-chk[data-service="'+svc+'"]', r);
         if (!chk) return;
         chk.checked = !chk.checked;
+        // enable/disable associated qty input to ensure preview captures quantity
+        const qtyInp = q('.qty-input[data-service="'+svc+'"]', r);
+        if (qtyInp) qtyInp.disabled = !chk.checked;
         toggleCheckItem(chk);
+        // trigger change handlers if present
+        try { chk.dispatchEvent(new Event('change')); } catch(e) {}
         computeCartTotal();
       }));
       // qty buttons
@@ -1148,6 +1209,135 @@
   /* ════════════════════════════════════════
      CHECKBOX STYLING
   ════════════════════════════════════════ */
+  // Filing/Inspection fee UI handlers
+  let filingEventsAttached = false;
+  function initFilingFeeSection(txnVal) {
+    const wrap = document.getElementById('filing-inspection-fees');
+    const amountInput = document.getElementById('amount-input');
+    if (!wrap) return;
+    if (String(txnVal) === 'filing_fee') {
+      wrap.style.display = 'block';
+      if (amountInput) amountInput.readOnly = true;
+      if (!filingEventsAttached) attachFilingFeeEvents();
+      computeFilingTotal();
+    } else {
+      wrap.style.display = 'none';
+      if (amountInput) amountInput.readOnly = false;
+    }
+  }
+
+  function attachFilingFeeEvents() {
+    filingEventsAttached = true;
+    const filingCheck = document.getElementById('fee-filing-check');
+    const filingQty = document.getElementById('filing-qty');
+    const filingDecr = document.getElementById('filing-qty-decr');
+    const filingIncr = document.getElementById('filing-qty-incr');
+    const inspectionCheck = document.getElementById('fee-inspection-check');
+    const inspectionOptionsWrap = document.getElementById('inspection-options');
+    const inspOptions = inspectionOptionsWrap ? Array.from(inspectionOptionsWrap.querySelectorAll('.inspection-option')) : [];
+    const amountInput = document.getElementById('amount-input');
+    if (!filingCheck || !filingQty || !inspectionCheck || !inspectionOptionsWrap || !amountInput) return;
+
+    filingCheck.addEventListener('change', function(){ filingQty.disabled = !this.checked; toggleCheckItem(this); computeFilingTotal(); });
+    filingQty.addEventListener('input', function(){ this.value = Math.max(1, parseInt(this.value||1,10)); computeFilingTotal(); });
+    filingDecr.addEventListener('click', function(){ filingQty.value = Math.max(1, parseInt(filingQty.value||1,10)-1); computeFilingTotal(); });
+    filingIncr.addEventListener('click', function(){ filingQty.value = Math.max(1, parseInt(filingQty.value||1,10)+1); computeFilingTotal(); });
+
+    inspectionCheck.addEventListener('change', function(){
+      inspectionOptionsWrap.style.display = this.checked ? 'flex' : 'none';
+      inspOptions.forEach(opt=>{
+        const chk = opt.querySelector('.insp-opt-chk');
+        const qty = opt.querySelector('.insp-qty-input');
+        if (chk) chk.disabled = !this.checked;
+        if (qty) { qty.disabled = !this.checked || !chk.checked; }
+        if (!this.checked) { if (chk) chk.checked = false; opt.classList.remove('checked'); }
+      });
+      toggleCheckItem(this); computeFilingTotal();
+    });
+    // attach events per inspection option
+    inspOptions.forEach(opt=>{
+      const chk = opt.querySelector('.insp-opt-chk');
+      const qty = opt.querySelector('.insp-qty-input');
+      const decr = opt.querySelector('.insp-qty-decr');
+      const incr = opt.querySelector('.insp-qty-incr');
+      if (chk) chk.addEventListener('change', function(){ if (qty) qty.disabled = !this.checked; toggleCheckItem(this); computeFilingTotal(); });
+      if (qty) qty.addEventListener('input', function(){ this.value = Math.max(1, parseInt(this.value||1,10)); computeFilingTotal(); });
+      if (decr) decr.addEventListener('click', function(){ if (qty) { qty.value = Math.max(1, parseInt(qty.value||1,10)-1); computeFilingTotal(); } });
+      if (incr) incr.addEventListener('click', function(){ if (qty) { qty.value = Math.max(1, parseInt(qty.value||1,10)+1); computeFilingTotal(); } });
+    });
+
+    // initialize states
+    filingQty.disabled = !filingCheck.checked;
+    inspOptions.forEach(opt=>{
+      const chk = opt.querySelector('.insp-opt-chk');
+      const qty = opt.querySelector('.insp-qty-input');
+      if (chk) chk.disabled = !inspectionCheck.checked;
+      if (qty) qty.disabled = !inspectionCheck.checked || !chk.checked;
+    });
+    inspectionOptionsWrap.style.display = inspectionCheck.checked ? 'flex' : 'none';
+    // update displayed subtotals
+    updateFilingSubtotals();
+  }
+
+  function computeFilingTotal() {
+    const filingCheck = document.getElementById('fee-filing-check');
+    const filingQty = document.getElementById('filing-qty');
+    const inspectionCheck = document.getElementById('fee-inspection-check');
+    const inspectionOptionsWrap = document.getElementById('inspection-options');
+    const inspOptions = inspectionOptionsWrap ? Array.from(inspectionOptionsWrap.querySelectorAll('.inspection-option')) : [];
+    const amountInput = document.getElementById('amount-input');
+    let total = 0;
+    if (filingCheck && filingCheck.checked) {
+      const fq = Math.max(1, parseInt(filingQty.value||1,10));
+      const sub = 2000 * fq;
+      total += sub;
+      const filingSubEl = document.querySelector('.svc-sub[data-service="filing_fee"]');
+      if (filingSubEl) filingSubEl.textContent = formatPeso(sub);
+    } else {
+      const filingSubEl = document.querySelector('.svc-sub[data-service="filing_fee"]');
+      if (filingSubEl) filingSubEl.textContent = formatPeso(0);
+    }
+    if (inspectionCheck && inspectionCheck.checked) {
+      let inspSum = 0;
+      inspOptions.forEach(opt=>{
+        const chk = opt.querySelector('.insp-opt-chk');
+        const price = parseFloat(opt.dataset.price || 0);
+        const qtyEl = opt.querySelector('.insp-qty-input');
+        const q = Math.max(1, parseInt(qtyEl ? qtyEl.value||1 : 1,10));
+        let sub = 0;
+        if (chk && chk.checked) { sub = price * q; inspSum += sub; }
+        const optSubEl = opt.querySelector('.opt-sub'); if (optSubEl) optSubEl.textContent = formatPeso(sub);
+      });
+      total += inspSum;
+      const inspSubEl = document.querySelector('.svc-sub[data-service="inspection_cost"]');
+      if (inspSubEl) inspSubEl.textContent = formatPeso(inspSum);
+    } else {
+      inspOptions.forEach(opt=>{ const optSubEl = opt.querySelector('.opt-sub'); if (optSubEl) optSubEl.textContent = formatPeso(0); });
+      const inspSubEl = document.querySelector('.svc-sub[data-service="inspection_cost"]');
+      if (inspSubEl) inspSubEl.textContent = formatPeso(0);
+    }
+    if (amountInput) amountInput.value = total.toFixed(2);
+  }
+
+  function formatPeso(num){ return '₱' + Number(num || 0).toFixed(2); }
+
+  function updateFilingSubtotals(){
+    // ensure initial sub displays follow current selections
+    const fChk = document.getElementById('fee-filing-check');
+    const fQty = document.getElementById('filing-qty');
+    const iChk = document.getElementById('fee-inspection-check');
+    const iQty = document.getElementById('inspection-qty');
+    const iSel = document.getElementById('inspection-select');
+    if (fChk && fQty) {
+      const subEl = document.querySelector('.svc-sub[data-service="filing_fee"]');
+      if (subEl) subEl.textContent = fChk.checked ? formatPeso(2000 * Math.max(1, parseInt(fQty.value||1,10))) : formatPeso(0);
+    }
+    if (iChk && iQty && iSel) {
+      const subEl = document.querySelector('.svc-sub[data-service="inspection_cost"]');
+      if (subEl) subEl.textContent = iChk.checked ? formatPeso(parseFloat(iSel.value || 0) * Math.max(1, parseInt(iQty.value||1,10))) : formatPeso(0);
+    }
+  }
+
   function toggleCheckItem(el) {
     const wrap = el.closest('.check-item, .remit-check-item, .svc-check, .svc-check-label');
     if (wrap && wrap.classList) wrap.classList.toggle('checked', el.checked);
@@ -1629,6 +1819,34 @@
     });
     rendered.add('cert_type');
     rendered.add('copy_count');
+
+    // Render Filing Fee aggregate (if selected)
+    if (data.fee_filing_check) {
+      const fq = (data.filing_qty !== undefined) ? Number(data.filing_qty) : 1;
+      const filingTotal = fq * 2000;
+      renderRow('Filing Fee', fq + ' — ' + fmtAmount(filingTotal));
+      rendered.add('fee_filing_check'); rendered.add('filing_qty');
+    }
+
+    // Render aggregated Inspection Cost (if any) then breakdown
+    if (Array.isArray(data.inspection_option) && data.inspection_option.length) {
+      let totQty = 0, totPrice = 0;
+      data.inspection_option.forEach(val => {
+        const qn = 'inspection_qty_' + String(val);
+        const q = data[qn] !== undefined ? Number(data[qn]) : 1;
+        totQty += q;
+        totPrice += Number(val) * q;
+      });
+      renderRow('Inspection Cost', totQty + ' — ' + fmtAmount(totPrice));
+      // breakdown per selected option
+      data.inspection_option.forEach(val => {
+        const qn = 'inspection_qty_' + String(val);
+        const q = data[qn] !== undefined ? Number(data[qn]) : 1;
+        renderRow('  • ' + fmtAmount(Number(val)), q + ' — ' + fmtAmount(Number(val) * q));
+        rendered.add(qn);
+      });
+      rendered.add('inspection_option');
+    }
 
     Object.keys(data).forEach(k => {
       if (rendered.has(k)) return;
