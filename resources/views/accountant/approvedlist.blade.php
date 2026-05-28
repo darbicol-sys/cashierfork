@@ -342,7 +342,7 @@
 
       @php
         $approvedPayments = $approvedPayments ?? \App\Models\Payment::where('status', 'approved')->orderByDesc('updated_at')->get();
-        $approvedTotal    = $approvedPayments->sum('amount');
+        $approvedTotal    = $totalSum ?? ($approvedPayments->sum('amount') ?? 0);
       @endphp
 
       <div class="page-title-row">
@@ -359,16 +359,16 @@
         <div class="approved-total-amount">₱{{ number_format($approvedTotal, 2) }}</div>
       </div>
 
-      <div class="toolbar">
+      <form id="filter-form" class="toolbar" method="GET" action="{{ route('accountant.approved') }}">
         <div class="search-wrap">
           <i class="bi bi-search"></i>
-          <input type="text" id="approved-search" placeholder="Search approved transactions…" oninput="filterApproved()"/>
+          <input type="text" id="approved-search" name="search" value="{{ request('search','') }}" placeholder="Search approved transactions…" onkeydown="if(event.key==='Enter'){this.form.submit();}"/>
         </div>
-        <select class="filter-select" id="approved-filter-fund" onchange="filterApproved()">
+        <select class="filter-select" id="approved-filter-fund" name="fund" onchange="this.form.submit()">
           <option value="">All Funds</option>
-          <option value="F01">Fund 01 — Regular</option>
+          <option value="F01" {{ request('fund')=='F01' ? 'selected' : '' }}>Fund 01 — Regular</option>
         </select>
-      </div>
+      </form>
 
       <div class="table-card">
         <div class="table-card-header-approved">
@@ -376,7 +376,7 @@
             <i class="bi bi-check2-all"></i> Approved Payment Records
           </div>
           <span class="approved-count-badge" id="approved-record-count">
-            {{ $approvedPayments->count() }} record{{ $approvedPayments->count() !== 1 ? 's' : '' }}
+            {{ $total ?? ($approvedPayments->total() ?? $approvedPayments->count()) }} record{{ ($total ?? ($approvedPayments->total() ?? $approvedPayments->count())) !== 1 ? 's' : '' }}
           </span>
         </div>
 
@@ -441,7 +441,8 @@
 
         <div class="table-footer">
           <span class="table-footer-info" id="approved-footer-info">
-            Showing <strong>{{ $approvedPayments->count() }}</strong> approved records
+            Showing <strong>{{ $approvedPayments->count() }}</strong>
+            of <strong>{{ $total ?? ($approvedPayments->total() ?? $approvedPayments->count()) }}</strong> approved records
           </span>
 
           @if(method_exists($approvedPayments, 'lastPage'))
@@ -520,6 +521,10 @@
     const dropdown = document.getElementById('notif-dropdown');
     notifOpen = !notifOpen;
     if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); } else dropdown.classList.remove('open');
+  }
+
+  function filterApproved() {
+    const form = document.getElementById('filter-form'); if (form) form.submit();
   }
   document.addEventListener('click', function(e) {
     const btn = document.getElementById('notif-btn'), dropdown = document.getElementById('notif-dropdown');

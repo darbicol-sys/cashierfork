@@ -662,49 +662,49 @@
       <div class="stat-row">
         <div class="stat-card">
           <div class="stat-icon si-green"><i class="bi bi-receipt"></i></div>
-          <div><div id="stat-total-count" class="stat-value">{{ $payments->total() ?? count($payments) }}</div><div class="stat-label">Total Transactions</div></div>
+          <div><div id="stat-total-count" class="stat-value">{{ $totalCount ?? $payments->total() ?? count($payments) }}</div><div class="stat-label">Total Transactions</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon si-gold"><i class="bi bi-cash-coin"></i></div>
-          <div><div id="stat-total-amount" class="stat-value">₱{{ number_format($payments->sum('amount'), 2) }}</div><div class="stat-label">Total Collected</div></div>
+          <div><div id="stat-total-amount" class="stat-value">₱{{ number_format($totalSum ?? ($payments->sum('amount') ?? 0), 2) }}</div><div class="stat-label">Total Collected</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon si-amber"><i class="bi bi-hourglass-split"></i></div>
-          <div><div id="stat-awaiting-count" class="stat-value">{{ $payments->whereIn('status', ['submitted','under_review','accountant_rejected','waiting'])->count() }}</div><div class="stat-label">Awaiting Review</div></div>
+          <div><div id="stat-awaiting-count" class="stat-value">{{ $awaitingCount ?? 0 }}</div><div class="stat-label">Awaiting Review</div></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon si-green"><i class="bi bi-check-circle"></i></div>
-          <div><div id="stat-approved-count" class="stat-value">{{ $payments->where('status', 'approved')->count() }}</div><div class="stat-label">Approved</div></div>
+          <div><div id="stat-approved-count" class="stat-value">{{ $approvedCount ?? 0 }}</div><div class="stat-label">Approved</div></div>
         </div>
       </div>
 
       <!-- TOOLBAR -->
-      <div class="toolbar">
+      <form id="filter-form" class="toolbar" method="GET" action="{{ route('reviewer') }}">
         <div class="search-wrap">
           <i class="bi bi-search"></i>
-          <input type="text" id="tbl-search" placeholder="Search by name, O.P. number, or transaction type…" oninput="filterTable()" />
+          <input type="text" id="tbl-search" name="search" value="{{ request('search','') }}" placeholder="Search by name, O.P. number, or transaction type…" onkeydown="if(event.key==='Enter'){this.form.submit();}" />
         </div>
-        <select class="filter-select" id="filter-status" onchange="filterTable()">
+        <select class="filter-select" id="filter-status" name="status" onchange="this.form.submit()">
           <option value="">All Statuses</option>
-          <option value="approved">Approved</option>
-          <option value="waiting">Waiting</option>
-          <option value="rejected">Rejected</option>
+          <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+          <option value="waiting" {{ request('status') == 'waiting' ? 'selected' : '' }}>Waiting</option>
+          <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
         </select>
-        <select class="filter-select" id="filter-fund" onchange="filterTable()">
+        <select class="filter-select" id="filter-fund" name="fund" onchange="this.form.submit()">
           <option value="">All Funds</option>
-          <option value="F01">Fund 01 — Regular</option>
-          <option value="F03">Fund 03 — ARF</option>
-          <option value="F07">Fund 07 — Trust</option>
-          <option value="F02-LP">LP Split — Fund 02</option>
-          <option value="F02-GOP">GOP Split — Fund 02</option>
+          <option value="F01" {{ request('fund')=='F01' ? 'selected' : '' }}>Fund 01 — Regular</option>
+          <option value="F03" {{ request('fund')=='F03' ? 'selected' : '' }}>Fund 03 — ARF</option>
+          <option value="F07" {{ request('fund')=='F07' ? 'selected' : '' }}>Fund 07 — Trust</option>
+          <option value="F02-LP" {{ request('fund')=='F02-LP' ? 'selected' : '' }}>LP Split — Fund 02</option>
+          <option value="F02-GOP" {{ request('fund')=='F02-GOP' ? 'selected' : '' }}>GOP Split — Fund 02</option>
         </select>
-      </div>
+      </form>
 
       <!-- TABLE -->
       <div class="table-card">
         <div class="table-card-header">
           <div class="table-card-title"><i class="bi bi-table"></i> Transactions Log</div>
-          <span class="table-record-count" id="record-count">{{ count($payments) }} record{{ count($payments) !== 1 ? 's' : '' }}</span>
+          <span class="table-record-count" id="record-count">{{ $totalCount ?? $payments->total() ?? count($payments) }} record{{ ($totalCount ?? $payments->total() ?? count($payments)) !== 1 ? 's' : '' }}</span>
         </div>
         <table class="payments-table" id="payments-table">
           <colgroup>
@@ -854,7 +854,7 @@
 
         <div class="table-footer">
           <div class="table-footer-info" id="footer-info">
-            Showing <strong>{{ count($payments) }}</strong> records
+            Showing <strong>{{ $payments->count() }}</strong> of <strong>{{ $totalCount ?? $payments->total() ?? count($payments) }}</strong> records
           </div>
           @if(method_exists($payments, 'lastPage'))
             <div class="pagination-wrap">
@@ -1440,18 +1440,9 @@
 
   /* ─── TABLE FILTER ─── */
   function filterTable() {
-    const q = document.getElementById('tbl-search')?.value.toLowerCase() || '';
-    const s = document.getElementById('filter-status')?.value.toLowerCase() || '';
-    const f = document.getElementById('filter-fund')?.value.toLowerCase() || '';
-    const rows = document.querySelectorAll('#table-body tr[data-search]');
-    let v = 0;
-    rows.forEach(r => {
-      const show = (!q || r.dataset.search.includes(q)) && (!s || r.dataset.status === s) && (!f || r.dataset.fund.toLowerCase() === f);
-      r.style.display = show ? '' : 'none';
-      if (show) v++;
-    });
-    const rc = document.getElementById('record-count'); if (rc) rc.textContent = v + (v === 1 ? ' record' : ' records');
-    const fi = document.getElementById('footer-info'); if (fi) fi.innerHTML = 'Showing <strong>' + v + '</strong> of <strong>' + rows.length + '</strong> records';
+    // Submit the filter form to perform server-side filtering across all records
+    const form = document.getElementById('filter-form');
+    if (form) form.submit();
   }
 
   /* ─── DRAWER ─── */

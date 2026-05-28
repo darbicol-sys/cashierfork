@@ -21,10 +21,44 @@ class AccountantController extends Controller
      */
     public function approval()
     {
-        // Show only transactions forwarded to accountant or previously rejected by accountant
-        $payments = Payment::whereIn('status', ['forwarded', 'accountant_rejected'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        // Base filter: forwarded to accountant or previously rejected by accountant
+        $statusParam = request()->query('status', '');
+        $fundParam   = request()->query('fund', '');
+        $q           = request()->query('search', '');
+
+        $query = Payment::whereIn('status', ['forwarded', 'accountant_rejected'])->orderBy('created_at', 'desc');
+
+        if ($statusParam) {
+            $s = strtolower($statusParam);
+            if ($s === 'approved') {
+                $query->where('status', 'approved');
+            } elseif ($s === 'waiting' || $s === 'forwarded') {
+                $query->whereIn('status', ['forwarded','submitted','under_review','waiting']);
+            } elseif ($s === 'rejected') {
+                $query->whereIn('status', ['accountant_rejected','rejected']);
+            } else {
+                $query->where('status', $s);
+            }
+        }
+
+        if ($fundParam) {
+            $query->where('fund_type', $fundParam);
+        }
+
+        if ($q) {
+            $query->where(function($qr) use ($q) {
+                $qr->where('name', 'like', '%' . $q . '%')
+                   ->orWhere('op_number', 'like', '%' . $q . '%')
+                   ->orWhere('transaction_type', 'like', '%' . $q . '%');
+            });
+        }
+
+        $total = (clone $query)->count();
+        $waiting = (clone $query)->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
+        $approved = (clone $query)->where('status', 'approved')->count();
+        $rejected = (clone $query)->where('status', 'accountant_rejected')->count();
+
+        $payments = (clone $query)->paginate(10)->withQueryString();
         // Load recent notifications for the authenticated accountant to render in the header
         $notifications = Auth::user()->notifications()->latest()->take(20)->get();
         $notif_data = $notifications->map(function($n) {
@@ -41,7 +75,7 @@ class AccountantController extends Controller
             ];
         });
 
-        return view('accountant.approval', compact('payments', 'notif_data'));
+        return view('accountant.approval', compact('payments', 'notif_data', 'total', 'waiting', 'approved', 'rejected'));
     }
 
     /**
@@ -49,9 +83,22 @@ class AccountantController extends Controller
      */
     public function approved()
     {
-        $approvedPayments = Payment::where('status', 'approved')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $fundParam = request()->query('fund', '');
+        $q         = request()->query('search', '');
+
+        $query = Payment::where('status', 'approved')->orderBy('created_at', 'desc');
+        if ($fundParam) $query->where('fund_type', $fundParam);
+        if ($q) {
+            $query->where(function($qr) use ($q) {
+                $qr->where('name', 'like', '%' . $q . '%')
+                   ->orWhere('op_number', 'like', '%' . $q . '%')
+                   ->orWhere('transaction_type', 'like', '%' . $q . '%');
+            });
+        }
+
+        $total = (clone $query)->count();
+        $totalSum = (clone $query)->sum('amount');
+        $approvedPayments = (clone $query)->paginate(10)->withQueryString();
 
         // Load recent notifications for the authenticated accountant to render in the header
         $notifications = Auth::user() ? Auth::user()->notifications()->latest()->take(20)->get() : collect([]);
@@ -69,7 +116,7 @@ class AccountantController extends Controller
             ];
         });
 
-        return view('accountant.approvedlist', compact('approvedPayments', 'notif_data'));
+        return view('accountant.approvedlist', compact('approvedPayments', 'notif_data', 'total', 'totalSum'));
     }
 
     /**

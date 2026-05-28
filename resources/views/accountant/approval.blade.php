@@ -384,10 +384,10 @@
       </div>
 
       @php
-        $total    = $payments->total() ?? count($payments);
-        $waiting  = $payments->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
-        $approved = \App\Models\Payment::where('status', 'approved')->count();
-        $rejected = \App\Models\Payment::where('status', 'accountant_rejected')->count();
+        $total    = $total ?? ($payments->total() ?? count($payments));
+        $waiting  = $waiting ?? $payments->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
+        $approved = $approved ?? \App\Models\Payment::where('status', 'approved')->count();
+        $rejected = $rejected ?? $rejected ?? 0;
       @endphp
 
       <!-- STAT CARDS -->
@@ -423,22 +423,22 @@
       </div>
 
       <!-- TOOLBAR -->
-      <div class="toolbar">
+      <form id="filter-form" class="toolbar" method="GET" action="{{ route('accountant.approval') }}">
         <div class="search-wrap">
           <i class="bi bi-search"></i>
-          <input type="text" id="tbl-search" placeholder="Search by payor name or O.P. number…" oninput="filterTable()"/>
+          <input type="text" id="tbl-search" name="search" value="{{ request('search','') }}" placeholder="Search by payor name or O.P. number…" onkeydown="if(event.key==='Enter'){this.form.submit();}"/>
         </div>
-        <select class="filter-select" id="filter-status" onchange="filterTable()">
+        <select class="filter-select" id="filter-status" name="status" onchange="this.form.submit()">
           <option value="">All Statuses</option>
-          <option value="approved">Approved</option>
-          <option value="forwarded">Waiting</option>
-          <option value="accountant_rejected">Rejected</option>
+          <option value="approved" {{ request('status')=='approved' ? 'selected' : '' }}>Approved</option>
+          <option value="forwarded" {{ request('status')=='forwarded' ? 'selected' : '' }}>Waiting</option>
+          <option value="accountant_rejected" {{ request('status')=='accountant_rejected' ? 'selected' : '' }}>Rejected</option>
         </select>
-        <select class="filter-select" id="filter-fund" onchange="filterTable()">
+        <select class="filter-select" id="filter-fund" name="fund" onchange="this.form.submit()">
           <option value="">All Funds</option>
-          <option value="F01">Fund 01 — Regular</option>
+          <option value="F01" {{ request('fund')=='F01' ? 'selected' : '' }}>Fund 01 — Regular</option>
         </select>
-      </div>
+      </form>
 
       <!-- TABLE -->
       <div class="table-card">
@@ -446,9 +446,7 @@
           <div class="table-card-title">
             <i class="bi bi-clipboard2-check"></i> Transactions for Review
           </div>
-          <span class="table-record-count" id="record-count">
-            {{ count($payments) }} record{{ count($payments) !== 1 ? 's' : '' }}
-          </span>
+          <span class="table-record-count" id="record-count">{{ $total ?? ($payments->total() ?? count($payments)) }} record{{ ($total ?? ($payments->total() ?? count($payments))) !== 1 ? 's' : '' }}</span>
         </div>
 
         <table class="approvals-table" id="approvals-table">
@@ -543,11 +541,8 @@
 
         <div class="table-footer">
           <span class="table-footer-info" id="footer-info">
-            Showing <strong>{{ count($payments) }}</strong>
-            @if(method_exists($payments, 'total') && $payments->total() > count($payments))
-              of <strong>{{ $payments->total() }}</strong>
-            @endif
-            records
+            Showing <strong>{{ $payments->count() }}</strong>
+            of <strong>{{ $total ?? ($payments->total() ?? count($payments)) }}</strong> records
           </span>
 
           @if(method_exists($payments, 'lastPage'))
@@ -677,21 +672,8 @@
 
   /* ── TABLE FILTER ── */
   function filterTable() {
-    const q    = document.getElementById('tbl-search').value.toLowerCase();
-    const sf   = document.getElementById('filter-status').value.toLowerCase();
-    const ff   = document.getElementById('filter-fund').value.toLowerCase();
-    const rows = document.querySelectorAll('#table-body tr[data-search]');
-    let visible = 0;
-    rows.forEach(row => {
-      const show =
-        (!q  || row.dataset.search.includes(q))  &&
-        (!sf || row.dataset.status === sf)        &&
-        (!ff || row.dataset.fund.toLowerCase() === ff);
-      row.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    document.getElementById('record-count').textContent = visible + (visible === 1 ? ' record' : ' records');
-    document.getElementById('footer-info').innerHTML = 'Showing <strong>' + visible + '</strong> of <strong>' + rows.length + '</strong> records';
+    // Submit the filter form so filtering is applied server-side across all records
+    const form = document.getElementById('filter-form'); if (form) form.submit();
   }
 </script>
 

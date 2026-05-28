@@ -19,9 +19,53 @@ class ReviewerController extends Controller
      */
     public function index()
     {
-        $payments = Payment::orderBy('created_at', 'desc')->paginate(10);
         $openFunds = request()->query('open_funds') ? true : false;
-        return view('reviewer.reviewer', compact('payments', 'openFunds'));
+
+        $status = request()->query('status', '');
+        $fund   = request()->query('fund', '');
+        $q      = request()->query('search', '');
+
+        $query = Payment::orderBy('created_at', 'desc');
+
+        // Apply status filter (map friendly keys to actual status values)
+        if ($status) {
+            $s = strtolower($status);
+            if ($s === 'approved') {
+                $query->where('status', 'approved');
+            } elseif ($s === 'waiting') {
+                $query->whereIn('status', ['submitted','under_review','waiting']);
+            } elseif ($s === 'rejected') {
+                $query->whereIn('status', ['rejected','accountant_rejected']);
+            } else {
+                // direct match for any other status string
+                $query->where('status', $s);
+            }
+        }
+
+        // Apply fund filter
+        if ($fund) {
+            $query->where('fund_type', $fund);
+        }
+
+        // Apply search across name, op_number and transaction_type
+        if ($q) {
+            $query->where(function($qr) use ($q) {
+                $qr->where('name', 'like', '%' . $q . '%')
+                   ->orWhere('op_number', 'like', '%' . $q . '%')
+                   ->orWhere('transaction_type', 'like', '%' . $q . '%');
+            });
+        }
+
+        // Compute aggregates for the filtered dataset before pagination
+        $totalCount    = (clone $query)->count();
+        $totalSum      = (clone $query)->sum('amount');
+        $awaitingCount = (clone $query)->whereIn('status', ['submitted','under_review','waiting'])->count();
+        $approvedCount = (clone $query)->where('status', 'approved')->count();
+
+        // Paginate the filtered query; keep query string for links
+        $payments = (clone $query)->paginate(10)->withQueryString();
+
+        return view('reviewer.reviewer', compact('payments', 'openFunds', 'totalCount', 'totalSum', 'awaitingCount', 'approvedCount'));
     }
 
     /**

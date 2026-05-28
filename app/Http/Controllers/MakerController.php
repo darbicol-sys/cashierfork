@@ -35,8 +35,43 @@ class MakerController extends Controller
     // List saved payments
     public function listPayments()
     {
-        $payments = Payment::orderBy('created_at', 'desc')->paginate(25);
-        return view('maker.payments.payments', compact('payments'));
+        $status = request()->query('status', '');
+        $fund   = request()->query('fund', '');
+        $q      = request()->query('search', '');
+
+        $query = Payment::orderBy('created_at', 'desc');
+
+        if ($status) {
+            $s = strtolower($status);
+            if ($s === 'waiting') {
+                $query->whereIn('status', ['submitted','under_review','accountant_rejected','waiting']);
+            } elseif ($s === 'rejected') {
+                $query->whereIn('status', ['rejected','accountant_rejected']);
+            } else {
+                $query->where('status', $s);
+            }
+        }
+
+        if ($fund) {
+            $query->where('fund_type', $fund);
+        }
+
+        if ($q) {
+            $query->where(function($qr) use ($q) {
+                $qr->where('name', 'like', '%' . $q . '%')
+                   ->orWhere('op_number', 'like', '%' . $q . '%')
+                   ->orWhere('transaction_type', 'like', '%' . $q . '%');
+            });
+        }
+
+        $totalCount = (clone $query)->count();
+        $totalSum   = (clone $query)->sum('amount');
+        $awaiting   = (clone $query)->whereIn('status', ['submitted','under_review','accountant_rejected','waiting'])->count();
+        $approved   = (clone $query)->where('status', 'approved')->count();
+
+        $payments = (clone $query)->paginate(25)->withQueryString();
+
+        return view('maker.payments.payments', compact('payments','totalCount','totalSum','awaiting','approved'));
     }
 
     /**

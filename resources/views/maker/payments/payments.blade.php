@@ -200,56 +200,56 @@
     <div class="stat-card">
       <div class="stat-icon si-green"><i class="bi bi-receipt"></i></div>
       <div class="stat-info">
-        <div id="stat-total-count" class="stat-value">{{ $payments->total() ?? count($payments) }}</div>
+        <div id="stat-total-count" class="stat-value">{{ $totalCount ?? $payments->total() ?? count($payments) }}</div>
         <div class="stat-label">Total Transactions</div>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon si-gold"><i class="bi bi-cash-coin"></i></div>
       <div class="stat-info">
-        <div id="stat-total-amount" class="stat-value">₱{{ number_format($payments->sum('amount'), 2) }}</div>
+        <div id="stat-total-amount" class="stat-value">₱{{ number_format($totalSum ?? ($payments->sum('amount') ?? 0), 2) }}</div>
         <div class="stat-label">Total Amount Collected</div>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon si-amber"><i class="bi bi-hourglass-split"></i></div>
       <div class="stat-info">
-        <div id="stat-awaiting-count" class="stat-value">{{ $payments->where('status', 'waiting')->count() }}</div>
+        <div id="stat-awaiting-count" class="stat-value">{{ $awaiting ?? 0 }}</div>
         <div class="stat-label">Awaiting Approval</div>
       </div>
     </div>
     <div class="stat-card">
       <div class="stat-icon si-green"><i class="bi bi-check-circle"></i></div>
       <div class="stat-info">
-        <div id="stat-approved-count" class="stat-value">{{ $payments->where('status', 'approved')->count() }}</div>
+        <div id="stat-approved-count" class="stat-value">{{ $approved ?? 0 }}</div>
         <div class="stat-label">Approved</div>
       </div>
     </div>
   </div>
 
   <!-- TOOLBAR -->
-  <div class="toolbar">
+  <form id="filter-form" class="toolbar" method="GET" action="{{ route('payments.index') }}">
     <div class="search-wrap">
       <i class="bi bi-search"></i>
-      <input type="text" id="tbl-search" placeholder="Search by name, O.P. number, or transaction type…" oninput="filterTable()" />
+      <input type="text" id="tbl-search" name="search" value="{{ request('search','') }}" placeholder="Search by name, O.P. number, or transaction type…" onkeydown="if(event.key==='Enter'){this.form.submit();}" />
     </div>
-    <select class="filter-select" id="filter-status" onchange="filterTable()">
+    <select class="filter-select" id="filter-status" name="status" onchange="this.form.submit()">
       <option value="">All Statuses</option>
-      <option value="approved">Approved</option>
-      <option value="waiting">Waiting</option>
-      <option value="rejected">Rejected</option>
+      <option value="approved" {{ request('status')=='approved' ? 'selected' : '' }}>Approved</option>
+      <option value="waiting" {{ request('status')=='waiting' ? 'selected' : '' }}>Waiting</option>
+      <option value="rejected" {{ request('status')=='rejected' ? 'selected' : '' }}>Rejected</option>
     </select>
-    <select class="filter-select" id="filter-fund" onchange="filterTable()">
+    <select class="filter-select" id="filter-fund" name="fund" onchange="this.form.submit()">
       <option value="">All Funds</option>
-      <option value="F01">Fund 01 — Regular</option>
+      <option value="F01" {{ request('fund')=='F01' ? 'selected' : '' }}>Fund 01 — Regular</option>
     </select>
-  </div>
+  </form>
 
   <!-- TABLE CARD -->
   <div class="table-card">
     <div class="table-card-header">
       <div class="table-card-title"><i class="bi bi-table"></i> Transactions Log</div>
-      <span class="table-record-count" id="record-count">{{ count($payments) }} record{{ count($payments) !== 1 ? 's' : '' }}</span>
+      <span class="table-record-count" id="record-count">{{ $totalCount ?? $payments->total() ?? count($payments) }} record{{ ($totalCount ?? $payments->total() ?? count($payments)) !== 1 ? 's' : '' }}</span>
     </div>
 
     <table class="payments-table" id="payments-table">
@@ -371,8 +371,8 @@
 
     <div class="table-footer">
       <span class="table-footer-info" id="footer-info">
-        Showing <strong>{{ count($payments) }}</strong>
-        {{ isset($payments->total) ? 'of <strong>'.$payments->total().'</strong>' : '' }} records
+        Showing <strong>{{ $payments->count() }}</strong>
+        of <strong>{{ $totalCount ?? $payments->total() ?? count($payments) }}</strong> records
       </span>
       @if(method_exists($payments,'links'))
         <div class="pagination-wrap">{{ $payments->links() }}</div>
@@ -404,20 +404,9 @@
 <script>
   /* ── Filter ── */
   function filterTable() {
-    const q = document.getElementById('tbl-search').value.toLowerCase();
-    const s = document.getElementById('filter-status').value.toLowerCase();
-    const f = document.getElementById('filter-fund').value.toLowerCase();
-    const rows = document.querySelectorAll('#table-body tr[data-search]');
-    let v = 0;
-    rows.forEach(r => {
-      const show = (!q || r.dataset.search.includes(q))
-                && (!s || r.dataset.status === s)
-                && (!f || r.dataset.fund.toLowerCase() === f);
-      r.style.display = show ? '' : 'none';
-      if (show) v++;
-    });
-    document.getElementById('record-count').textContent = v + (v === 1 ? ' record' : ' records');
-    document.getElementById('footer-info').innerHTML = 'Showing <strong>' + v + '</strong> of <strong>' + rows.length + '</strong> records';
+    // Submit the filter form to let the server apply filters across all records
+    const form = document.getElementById('filter-form');
+    if (form) form.submit();
   }
 
   /* ── Drawer ── */
