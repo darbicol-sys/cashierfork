@@ -42,7 +42,6 @@
       z-index: 200;
     }
 
-    /* ── LOGO FIX ── */
     .header-seal {
       width: 38px; height: 38px; border-radius: 50%;
       overflow: hidden; flex-shrink: 0;
@@ -59,10 +58,8 @@
     .header-sep { width: 1px; height: 30px; background: rgba(245,240,232,.15); margin: 0 4px; }
     .header-page { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
 
-    /* ── HEADER ACTIONS ── */
     .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; }
 
-    /* ── NOTIFICATION ── */
     .notif-btn {
       position: relative; display: flex; align-items: center; justify-content: center;
       width: 44px; height: 44px; border-radius: 10px;
@@ -161,7 +158,9 @@
 
     /* ── MAIN ── */
     .main-content { flex: 1; min-width: 0; }
-    .page-body { max-width: 1100px; margin: 0 auto; padding: 36px 28px 60px; }
+
+    /* FIX 1: Remove max-width constraint so table uses full available space */
+    .page-body { width: 100%; padding: 36px 36px 60px; }
 
     /* ── PAGE TITLE ── */
     .page-title-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
@@ -194,13 +193,15 @@
     .filter-select:focus { border-color: var(--green-accent); }
 
     /* ── TABLE CARD ── */
+    /* FIX 2: overflow-x: auto so table can scroll horizontally if needed, never clip */
     .table-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .table-card-scroll { overflow-x: auto; }
     .table-card-header { padding: 14px 22px; background: linear-gradient(90deg, var(--green-mid), var(--green-deep)); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .table-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 700; color: var(--gold-light); display: flex; align-items: center; gap: 9px; }
     .table-record-count { font-size: .68rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(201,153,42,.2); color: var(--gold-light); border: 1px solid rgba(201,153,42,.25); }
 
     /* ── TABLE ── */
-    .approvals-table { width: 100%; border-collapse: collapse; }
+    .approvals-table { width: 100%; border-collapse: collapse; min-width: 860px; }
     .approvals-table thead tr { background: #faf8f4; border-bottom: 1.5px solid var(--border); }
     .approvals-table thead th { padding: 11px 16px; font-size: .68rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-mid); white-space: nowrap; }
     .approvals-table thead th:first-child { padding-left: 22px; }
@@ -230,10 +231,11 @@
     .sb-rejected { background: #fdf0ef; color: var(--red); }
 
     /* ── ACTION BUTTONS ── */
-    .actions-cell { display: flex; align-items: center; gap: 6px; }
-    .btn-approve { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border: none; border-radius: 7px; background: var(--green-accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s; }
+    /* FIX 3: actions cell never wraps, always shows both buttons */
+    .actions-cell { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+    .btn-approve { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border: none; border-radius: 7px; background: var(--green-accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s; white-space: nowrap; }
     .btn-approve:hover { background: var(--green-mid); }
-    .btn-reject  { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border: 1.5px solid #e8c5c5; border-radius: 7px; background: #fdf0ef; color: var(--red); font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s, border-color .15s; }
+    .btn-reject  { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border: 1.5px solid #e8c5c5; border-radius: 7px; background: #fdf0ef; color: var(--red); font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s, border-color .15s; white-space: nowrap; }
     .btn-reject:hover { background: #fde0de; border-color: #f0a8a8; }
 
     /* ── TABLE FOOTER / PAGINATION ── */
@@ -267,10 +269,6 @@
     }
     @media (max-width: 640px) {
       .stat-row { grid-template-columns: 1fr 1fr; }
-      .approvals-table thead { display: none; }
-      .approvals-table tbody td { display: block; padding: 6px 16px; }
-      .approvals-table tbody td:first-child { padding-top: 14px; }
-      .approvals-table tbody td:last-child  { padding-bottom: 14px; }
     }
   </style>
 </head>
@@ -290,33 +288,26 @@
   <div class="header-page">For Review</div>
 
   <div class="header-actions">
-
-    <!-- Notification Button -->
     <button class="notif-btn" id="notif-btn" title="Notifications" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
       <i class="bi bi-bell" style="font-size:1.25rem;"></i>
       <span class="notif-badge" id="notif-badge"></span>
     </button>
 
-    <!-- Notification Dropdown -->
     <div class="notif-dropdown" id="notif-dropdown">
       <div class="notif-drop-head">
         <span class="notif-drop-title">Notifications</span>
         <button class="notif-drop-mark" onclick="markAllRead()">Mark all as read</button>
       </div>
       <div class="notif-list" id="notif-list"></div>
-      <div class="notif-drop-foot">
-        <a href="#">View all notifications</a>
-      </div>
+      <div class="notif-drop-foot"><a href="#">View all notifications</a></div>
     </div>
 
-    <!-- Logout -->
     <form method="POST" action="{{ route('logout') }}" style="display:inline; margin:0;">
       @csrf
       <button type="submit" class="btn-logout">
         <i class="bi bi-box-arrow-right"></i> Logout
       </button>
     </form>
-
   </div>
 </header>
 
@@ -325,16 +316,9 @@
   <aside class="sidebar">
     <div class="sidebar-inner">
       <div class="sidebar-profile">
-        @php
-          $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Accountant');
-        @endphp
-        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_picture))
-          <div class="profile-avatar"><img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
-        @else
-          <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
-        @endif
+        <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
         <div>
-          <div class="profile-name">{{ $displayName }}</div>
+          <div class="profile-name">{{ $displayName ?? 'Accountant User' }}</div>
           <div class="profile-role">Accountant</div>
         </div>
       </div>
@@ -384,10 +368,11 @@
       </div>
 
       @php
+        $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Accountant');
         $total    = $total ?? ($payments->total() ?? count($payments));
         $waiting  = $waiting ?? $payments->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
         $approved = $approved ?? \App\Models\Payment::where('status', 'approved')->count();
-        $rejected = $rejected ?? $rejected ?? 0;
+        $rejected = $rejected ?? 0;
       @endphp
 
       <!-- STAT CARDS -->
@@ -436,7 +421,9 @@
         </select>
         <select class="filter-select" id="filter-fund" name="fund" onchange="this.form.submit()">
           <option value="">All Funds</option>
-          <option value="F01" {{ request('fund')=='F01' ? 'selected' : '' }}>Fund 01 — Regular</option>
+          @foreach(($funds ?? []) as $f)
+            <option value="{{ $f }}" {{ request('fund') == $f ? 'selected' : '' }}>{{ $f }}</option>
+          @endforeach
         </select>
       </form>
 
@@ -449,95 +436,97 @@
           <span class="table-record-count" id="record-count">{{ $total ?? ($payments->total() ?? count($payments)) }} record{{ ($total ?? ($payments->total() ?? count($payments))) !== 1 ? 's' : '' }}</span>
         </div>
 
-        <table class="approvals-table" id="approvals-table">
-          <thead>
-            <tr>
-              <th>Payor</th>
-              <th>Amount</th>
-              <th>Fund</th>
-              <th>O.P. Number</th>
-              <th>Date Submitted</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            @forelse($payments as $p)
-              @php
-                $status    = $p->status ?? 'submitted';
-                $statusMap = [
-                  'approved'            => 'sb-approved',
-                  'forwarded'           => 'sb-waiting',
-                  'under_review'        => 'sb-waiting',
-                  'submitted'           => 'sb-waiting',
-                  'accountant_rejected' => 'sb-rejected',
-                  'rejected'            => 'sb-rejected',
-                ];
-                $statusCls  = $statusMap[$status] ?? 'sb-waiting';
-                $statusIcon = match($status) {
-                  'approved'                        => 'bi-check-circle-fill',
-                  'accountant_rejected', 'rejected' => 'bi-x-circle-fill',
-                  default                           => 'bi-hourglass-split',
-                };
-                $nameParts = explode(' ', trim($p->name));
-                $initials  = strtoupper(substr($nameParts[0], 0, 1)) . (isset($nameParts[1]) ? strtoupper(substr($nameParts[1], 0, 1)) : '');
-              @endphp
-              <tr
-                data-search="{{ strtolower($p->name . ' ' . ($p->op_number ?? '')) }}"
-                data-status="{{ $status }}"
-                data-fund="{{ $p->fund_type ?? '' }}"
-              >
-                <td>
-                  <div class="payor-cell">
-                    <div class="payor-avatar">{{ $initials }}</div>
-                    <div>
-                      <div class="payor-name">{{ $p->name }}</div>
-                      <div class="payor-contact">{{ $p->email ?? ($p->contact ?? '—') }}</div>
+        <div class="table-card-scroll">
+          <table class="approvals-table" id="approvals-table">
+            <thead>
+              <tr>
+                <th>Payor</th>
+                <th>Amount</th>
+                <th>Fund</th>
+                <th>O.P. Number</th>
+                <th>Date Submitted</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              @forelse($payments as $p)
+                @php
+                  $status    = $p->status ?? 'submitted';
+                  $statusMap = [
+                    'approved'            => 'sb-approved',
+                    'forwarded'           => 'sb-waiting',
+                    'under_review'        => 'sb-waiting',
+                    'submitted'           => 'sb-waiting',
+                    'accountant_rejected' => 'sb-rejected',
+                    'rejected'            => 'sb-rejected',
+                  ];
+                  $statusCls  = $statusMap[$status] ?? 'sb-waiting';
+                  $statusIcon = match($status) {
+                    'approved'                        => 'bi-check-circle-fill',
+                    'accountant_rejected', 'rejected' => 'bi-x-circle-fill',
+                    default                           => 'bi-hourglass-split',
+                  };
+                  $nameParts = explode(' ', trim($p->name));
+                  $initials  = strtoupper(substr($nameParts[0], 0, 1)) . (isset($nameParts[1]) ? strtoupper(substr($nameParts[1], 0, 1)) : '');
+                @endphp
+                <tr
+                  data-search="{{ strtolower($p->name . ' ' . ($p->op_number ?? '')) }}"
+                  data-status="{{ $status }}"
+                  data-fund="{{ $p->fund_type ?? '' }}"
+                >
+                  <td>
+                    <div class="payor-cell">
+                      <div class="payor-avatar">{{ $initials }}</div>
+                      <div>
+                        <div class="payor-name">{{ $p->name }}</div>
+                        <div class="payor-contact">{{ $p->email ?? ($p->contact ?? '—') }}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td><span class="amount-cell">₱{{ number_format($p->amount, 2) }}</span></td>
-                <td><span class="fund-badge">{{ $p->fund_type ?? '—' }}</span></td>
-                <td><span class="op-number">{{ $p->op_number ?? '—' }}</span></td>
-                <td>
-                  <div class="date-main">{{ $p->created_at->format('M d, Y') }}</div>
-                  <div class="date-time">{{ $p->created_at->format('h:i A') }}</div>
-                </td>
-                <td>
-                  <span class="status-badge {{ $statusCls }}">
-                    <i class="bi {{ $statusIcon }}"></i> {{ ucwords(str_replace('_', ' ', $status)) }}
-                  </span>
-                </td>
-                <td>
-                  <div class="actions-cell">
-                    @if($status !== 'approved')
-                      <form method="POST" action="{{ route('accountant.approve', $p->id) }}"
-                        onsubmit="return confirm('Approve payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
-                        @csrf
-                        <button type="submit" class="btn-approve"><i class="bi bi-check-lg"></i> Approve</button>
-                      </form>
-                    @endif
-                    @if($status !== 'accountant_rejected')
-                      <form method="POST" action="{{ route('accountant.reject', $p->id) }}"
-                        onsubmit="var r=prompt('Enter rejection remarks (optional):');if(r===null)return false;this.querySelector('input[name=remarks]').value=r;return confirm('Reject payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
-                        @csrf
-                        <input type="hidden" name="remarks" value=""/>
-                        <button type="submit" class="btn-reject"><i class="bi bi-x-lg"></i> Reject</button>
-                      </form>
-                    @endif
-                  </div>
-                </td>
-              </tr>
-            @empty
-              <tr class="empty-row">
-                <td colspan="7">
-                  <div class="empty-icon"><i class="bi bi-inbox"></i></div>
-                  <div class="empty-text">No payment records found.</div>
-                </td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
+                  </td>
+                  <td><span class="amount-cell">₱{{ number_format($p->amount, 2) }}</span></td>
+                  <td><span class="fund-badge">{{ $p->fund_type ?? '—' }}</span></td>
+                  <td><span class="op-number">{{ $p->op_number ?? '—' }}</span></td>
+                  <td>
+                    <div class="date-main">{{ $p->created_at->format('M d, Y') }}</div>
+                    <div class="date-time">{{ $p->created_at->format('h:i A') }}</div>
+                  </td>
+                  <td>
+                    <span class="status-badge {{ $statusCls }}">
+                      <i class="bi {{ $statusIcon }}"></i> {{ ucwords(str_replace('_', ' ', $status)) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="actions-cell">
+                      @if($status !== 'approved')
+                        <form method="POST" action="{{ route('accountant.approve', $p->id) }}"
+                          onsubmit="return confirm('Approve payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
+                          @csrf
+                          <button type="submit" class="btn-approve"><i class="bi bi-check-lg"></i> Approve</button>
+                        </form>
+                      @endif
+                      @if($status !== 'accountant_rejected')
+                        <form method="POST" action="{{ route('accountant.reject', $p->id) }}"
+                          onsubmit="var r=prompt('Enter rejection remarks (optional):');if(r===null)return false;this.querySelector('input[name=remarks]').value=r;return confirm('Reject payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
+                          @csrf
+                          <input type="hidden" name="remarks" value=""/>
+                          <button type="submit" class="btn-reject"><i class="bi bi-x-lg"></i> Reject</button>
+                        </form>
+                      @endif
+                    </div>
+                  </td>
+                </tr>
+              @empty
+                <tr class="empty-row">
+                  <td colspan="7">
+                    <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                    <div class="empty-text">No payment records found.</div>
+                  </td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
 
         <div class="table-footer">
           <span class="table-footer-info" id="footer-info">
@@ -672,7 +661,6 @@
 
   /* ── TABLE FILTER ── */
   function filterTable() {
-    // Submit the filter form so filtering is applied server-side across all records
     const form = document.getElementById('filter-form'); if (form) form.submit();
   }
 </script>

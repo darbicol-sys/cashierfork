@@ -366,7 +366,9 @@
         </div>
         <select class="filter-select" id="approved-filter-fund" name="fund" onchange="this.form.submit()">
           <option value="">All Funds</option>
-          <option value="F01" {{ request('fund')=='F01' ? 'selected' : '' }}>Fund 01 — Regular</option>
+          @foreach(($funds ?? []) as $f)
+            <option value="{{ $f }}" {{ request('fund') == $f ? 'selected' : '' }}>{{ $f }}</option>
+          @endforeach
         </select>
       </form>
 
@@ -537,19 +539,7 @@
     else { badge.classList.remove('show'); }
   });
 
-  function filterApproved() {
-    const q  = document.getElementById('approved-search').value.toLowerCase();
-    const ff = document.getElementById('approved-filter-fund').value.toLowerCase();
-    const rows = document.querySelectorAll('#approved-body tr[data-search]');
-    let visible = 0;
-    rows.forEach(row => {
-      const show = (!q || row.dataset.search.includes(q)) && (!ff || row.dataset.fund.toLowerCase() === ff);
-      row.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    document.getElementById('approved-record-count').textContent = visible + (visible === 1 ? ' record' : ' records');
-    document.getElementById('approved-footer-info').innerHTML = 'Showing <strong>' + visible + '</strong> approved records';
-  }
+  // Client-side filtering removed; form submits to apply server-side filters.
 </script>
 
 </body>

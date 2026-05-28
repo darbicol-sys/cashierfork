@@ -57,8 +57,8 @@ class AccountantController extends Controller
         $waiting = (clone $query)->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
         $approved = (clone $query)->where('status', 'approved')->count();
         $rejected = (clone $query)->where('status', 'accountant_rejected')->count();
-
         $payments = (clone $query)->paginate(10)->withQueryString();
+        $funds = Payment::whereNotNull('fund_type')->select('fund_type')->distinct()->orderBy('fund_type')->pluck('fund_type');
         // Load recent notifications for the authenticated accountant to render in the header
         $notifications = Auth::user()->notifications()->latest()->take(20)->get();
         $notif_data = $notifications->map(function($n) {
@@ -75,7 +75,7 @@ class AccountantController extends Controller
             ];
         });
 
-        return view('accountant.approval', compact('payments', 'notif_data', 'total', 'waiting', 'approved', 'rejected'));
+        return view('accountant.approval', compact('payments', 'notif_data', 'total', 'waiting', 'approved', 'rejected', 'funds'));
     }
 
     /**
@@ -99,6 +99,7 @@ class AccountantController extends Controller
         $total = (clone $query)->count();
         $totalSum = (clone $query)->sum('amount');
         $approvedPayments = (clone $query)->paginate(10)->withQueryString();
+        $funds = Payment::whereNotNull('fund_type')->select('fund_type')->distinct()->orderBy('fund_type')->pluck('fund_type');
 
         // Load recent notifications for the authenticated accountant to render in the header
         $notifications = Auth::user() ? Auth::user()->notifications()->latest()->take(20)->get() : collect([]);
@@ -116,7 +117,7 @@ class AccountantController extends Controller
             ];
         });
 
-        return view('accountant.approvedlist', compact('approvedPayments', 'notif_data', 'total', 'totalSum'));
+        return view('accountant.approvedlist', compact('approvedPayments', 'notif_data', 'total', 'totalSum', 'funds'));
     }
 
     /**
