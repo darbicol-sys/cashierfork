@@ -356,8 +356,6 @@
           <span class="nav-label">Transaction History</span>
         </a>
 
-        <div class="nav-section-label" style="margin-top:16px;">Account</div>
-
       </div>
 
       <div class="sidebar-footer">

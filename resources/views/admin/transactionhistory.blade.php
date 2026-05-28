@@ -737,7 +737,7 @@
       <div class="t2">Department of Agrarian Reform</div>
     </div>
     <div class="header-sep"></div>
-    <div class="header-page">Transaction History</div>
+    <div class="header-page">Admin Panel</div>
    <div class="header-actions">
     <div class="header-user-wrap" id="headerUserWrap">
       <div class="header-user" onclick="toggleHeaderDropdown()">

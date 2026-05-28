@@ -363,9 +363,35 @@
       .tab-btn { padding: 12px 14px; font-size: .72rem; }
       .tab-pane { padding: 20px 16px 24px; }
     }
+     .header-user-wrap { position: relative; }
+.header-user { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 8px; background: rgba(245,240,232,.07); border: 1px solid rgba(245,240,232,.12); border-radius: 10px; cursor: pointer; transition: background .15s, border-color .15s; user-select: none; }
+.header-user:hover { background: rgba(245,240,232,.13); border-color: rgba(245,240,232,.22); }
+.header-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; color: var(--green-deep); overflow: hidden; flex-shrink: 0; border: 2px solid rgba(201,153,42,.35); }
+.header-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.header-user-name { font-size: .76rem; font-weight: 600; color: var(--cream); line-height: 1.2; }
+.header-user-role { font-size: .6rem; color: rgba(245,240,232,.4); letter-spacing: .8px; text-transform: uppercase; }
+.header-user-caret { font-size: .65rem; color: rgba(245,240,232,.4); margin-left: 2px; transition: transform .2s; }
+.header-user-wrap.open .header-user-caret { transform: rotate(180deg); }
+.header-dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 200px; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; box-shadow: 0 8px 28px rgba(14,42,26,.18); overflow: hidden; opacity: 0; pointer-events: none; transform: translateY(-6px); transition: opacity .18s ease, transform .18s ease; z-index: 300; }
+.header-user-wrap.open .header-dropdown { opacity: 1; pointer-events: all; transform: translateY(0); }
+.dropdown-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+.dropdown-header-name { font-size: .84rem; font-weight: 700; color: var(--text-dark); }
+.dropdown-header-email { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+.dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: .81rem; font-weight: 600; color: var(--text-mid); text-decoration: none; cursor: pointer; transition: background .13s; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
+.dropdown-item:hover { background: var(--bg); }
+.dropdown-item i { font-size: 1rem; flex-shrink: 0; }
+.dropdown-item.danger { color: var(--red); }
+.dropdown-item.danger:hover { background: #fdf0ef; }
+.dropdown-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+
   </style>
 </head>
 <body>
+   @php
+  $authUser    = auth()->user();
+  $displayName = trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: ($authUser->name ?? 'Administrator');
+  $sidebarInitials = strtoupper(substr($displayName, 0, 2));
+@endphp
 
 @php
   $user = auth()->user();
@@ -391,28 +417,112 @@
   <div class="header-page">Accountant Panel</div>
 
   <div class="header-actions">
-    <button class="notif-btn" id="notif-btn" title="Notifications" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
-      <i class="bi bi-bell" style="font-size:1.25rem;"></i>
-      <span class="notif-badge" id="notif-badge"></span>
-    </button>
-    <div class="notif-dropdown" id="notif-dropdown">
-      <div class="notif-drop-head">
-        <span class="notif-drop-title">Notifications</span>
-        <button class="notif-drop-mark" onclick="markAllRead()">Mark all as read</button>
-      </div>
-      <div class="notif-list" id="notif-list"></div>
-      <div class="notif-drop-foot">
-        <a href="#">View all notifications</a>
-      </div>
+
+    <!-- Notification -->
+    <div class="notif-wrapper">
+        <button 
+            class="notif-btn" 
+            id="notif-btn"
+            onclick="toggleNotifDropdown(event)"
+            title="Notifications"
+        >
+            <i class="bi bi-bell"></i>
+            <span class="notif-badge" id="notif-badge">3</span>
+        </button>
+
+        <!-- Notification Dropdown -->
+        <div class="notif-dropdown" id="notif-dropdown">
+
+            <div class="notif-drop-head">
+                <span class="notif-drop-title">Notifications</span>
+
+                <button 
+                    class="notif-drop-mark"
+                    onclick="markAllRead()"
+                >
+                    Mark all as read
+                </button>
+            </div>
+
+            <div class="notif-list" id="notif-list">
+
+                <div class="notif-item unread">
+                    New appointment request received
+                </div>
+
+                <div class="notif-item unread">
+                    Payment has been confirmed
+                </div>
+
+                <div class="notif-item">
+                    System backup completed
+                </div>
+
+            </div>
+
+            <div class="notif-drop-foot">
+                <a href="#">View all notifications</a>
+            </div>
+
+        </div>
     </div>
 
-    <form method="POST" action="{{ route('logout') }}" style="display:inline; margin:0;">
-      @csrf
-      <button type="submit" class="btn-logout">
-        <i class="bi bi-box-arrow-right"></i> Logout
-      </button>
-    </form>
-  </div>
+    <!-- User -->
+    <div class="header-user-wrap" id="headerUserWrap">
+
+        <!-- Trigger chip -->
+        <div class="header-user" onclick="toggleHeaderDropdown()">
+
+            <div class="header-avatar">
+                @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
+                    <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+                @else
+                    {{ $sidebarInitials }}
+                @endif
+            </div>
+
+            <div>
+                <div class="header-user-name">{{ $displayName }}</div>
+
+                <div class="header-user-role">
+                    {{ ucfirst($authUser->position ?? $authUser->role ?? 'Admin') }}
+                </div>
+            </div>
+
+            <i class="bi bi-chevron-down header-user-caret"></i>
+        </div>
+
+        <!-- Dropdown -->
+        <div class="header-dropdown">
+
+            <div class="dropdown-header">
+                <div class="dropdown-header-name">{{ $displayName }}</div>
+
+                <div class="dropdown-header-email">
+                    {{ $authUser->email ?? '' }}
+                </div>
+            </div>
+
+            <a class="dropdown-item" href="{{ route('accountant.profile') }}">
+                <i class="bi bi-person-circle"></i>
+                My Profile
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                @csrf
+
+                <button type="submit" class="dropdown-item danger">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Logout
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
 </header>
 
 <div class="outer-wrapper">
@@ -447,11 +557,7 @@
         <span class="nav-label">Approved Records</span>
       </a>
 
-      <div class="nav-section-label" style="margin-top:16px;">Account</div>
-      <a class="{{ request()->routeIs('accountant.profile') ? 'nav-item active' : 'nav-item' }}" href="{{ route('accountant.profile') }}">
-        <div class="nav-icon"><i class="bi bi-person-badge"></i></div>
-        <span class="nav-label">My Profile</span>
-      </a>
+      
     </div>
     <div class="sidebar-footer">
       <div class="sidebar-footer-label">System</div>
@@ -720,6 +826,17 @@
 </div><!-- /.outer-wrapper -->
 
 <script>
+   const headerWrap = document.getElementById('headerUserWrap');
+
+  function toggleHeaderDropdown() {
+    headerWrap.classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!headerWrap.contains(e.target)) {
+      headerWrap.classList.remove('open');
+    }
+  });
   /* ── HERO AVATAR PREVIEW ── */
   function previewHeroAvatar(input) {
     if (!input.files || !input.files[0]) return;
