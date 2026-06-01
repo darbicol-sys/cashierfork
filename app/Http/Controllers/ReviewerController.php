@@ -24,6 +24,7 @@ class ReviewerController extends Controller
         $status = request()->query('status', '');
         $fund   = request()->query('fund', '');
         $q      = request()->query('search', '');
+        $notifId = request()->query('notif_id', '');
 
         $query = Payment::orderBy('created_at', 'desc');
 
@@ -45,6 +46,26 @@ class ReviewerController extends Controller
         // Apply fund filter
         if ($fund) {
             $query->where('fund_type', $fund);
+        }
+
+        // If notif_id is provided, try to find the notification and narrow to that payment
+        if ($notifId) {
+            try {
+                $user = auth()->user();
+                if ($user) {
+                    $note = $user->notifications()->where('id', $notifId)->first();
+                    if ($note) {
+                        $ndata = $note->data ?? [];
+                        if (!empty($ndata['payment_id'])) {
+                            $query->where('id', $ndata['payment_id']);
+                        } elseif (!empty($ndata['op_number']) || !empty($ndata['op'])) {
+                            $q = $ndata['op_number'] ?? $ndata['op'];
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                // ignore and fall back to normal search
+            }
         }
 
         // Apply search across name, op_number and transaction_type
