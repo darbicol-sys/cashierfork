@@ -1053,20 +1053,132 @@
                 <div class="form-header-info">
                   <div class="org">Department of Agrarian Reform — Regional Office V</div>
                   <div class="txn-name" id="form-txn-name">—</div>
+                  <div id="cash-bond-formula" style="display:none; font-size:.79rem; color:var(--muted); margin-top:6px;">Formula: Area x Zonal Value x 2.5%</div>
                 </div>
               </div>
               <div class="required-note"><i class="bi bi-asterisk"></i> Fields marked with * are required.</div>
               <div class="form-body">
-                <form method="POST" action="{{ route('reviewer.payments.store') }}" id="payment-form" novalidate>
+                <form method="POST" action="{{ route('reviewer.payments.store') }}" id="payment-form" data-role="reviewer" novalidate>
                   @csrf
                   <input type="hidden" name="transaction_type" id="hidden-txn-type" />
                   <input type="hidden" name="fund_type" id="hidden-fund-type" />
 
                   <div class="section-heading"><i class="bi bi-card-checklist"></i> Payment Details</div>
 
+                  <!-- CART-STYLE SERVICES (Certification / Copy Fee / Reproduction Cost) -->
                   <div class="field">
+                    <label>Services :</label>
+                    <div id="cert-cart" class="cert-cart" style="display:none;" data-require-one="true">
+                      <style>
+                        .cert-cart{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+                        .cert-cart-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:var(--panel);box-shadow:var(--elev-sm)}
+                        .cert-cart-row .svc-check{width:36px;display:flex;align-items:center;justify-content:center}
+                        .cert-cart-row .svc-check input{margin:0;vertical-align:middle;position:static;opacity:1;width:20px;height:20px;cursor:pointer;accent-color:var(--green-accent);-webkit-appearance:checkbox;appearance:checkbox}
+                        .cert-cart-row .svc-name{flex:1;font-weight:600}
+                        .cert-cart-row .svc-price{width:110px;text-align:right;color:var(--muted)}
+                        .cert-cart-row .svc-qty{display:flex;align-items:center;gap:6px}
+                        .cert-cart-row .svc-qty button{width:28px;height:28px;border-radius:6px;border:1px solid var(--muted);background:transparent}
+                        .cert-cart-row .svc-qty input{width:56px;text-align:center;padding:6px;border:1px solid var(--muted);border-radius:6px}
+                        .cert-cart-row .svc-sub{width:110px;text-align:right;font-weight:700}
+                        .cert-cart-row.checked{border-color:var(--green-accent);background:var(--green-light)}
+                      </style>
+
+                      <div class="cert-cart-row" data-service="certification">
+                        <div class="svc-check"><label class="svc-check-label"><input type="checkbox" class="svc-chk" data-service="certification" name="cert_type[]" value="certification" /> </label></div>
+                        <div class="svc-name">Certification</div>
+                        <div class="svc-price">₱60.00</div>
+                        <div class="svc-qty">
+                          <button type="button" class="qty-decr" data-service="certification">−</button>
+                          <input type="number" min="1" value="1" class="qty-input" name="svc_certification_qty" data-service="certification" />
+                          <button type="button" class="qty-incr" data-service="certification">+</button>
+                        </div>
+                        <div class="svc-sub" data-service="certification">₱60.00</div>
+                      </div>
+
+                      <div class="cert-cart-row" data-service="copy_fee">
+                        <div class="svc-check"><label class="svc-check-label"><input type="checkbox" class="svc-chk" data-service="copy_fee" name="cert_type[]" value="copy_fee" /> </label></div>
+                        <div class="svc-name">Copy Fee</div>
+                        <div class="svc-price">₱12.00</div>
+                        <div class="svc-qty">
+                          <button type="button" class="qty-decr" data-service="copy_fee">−</button>
+                          <input type="number" min="1" value="1" class="qty-input" name="copy_count" data-service="copy_fee" />
+                          <button type="button" class="qty-incr" data-service="copy_fee">+</button>
+                        </div>
+                        <div class="svc-sub" data-service="copy_fee">₱12.00</div>
+                      </div>
+
+                      <div class="cert-cart-row" data-service="reproduction_cost">
+                        <div class="svc-check"><label class="svc-check-label"><input type="checkbox" class="svc-chk" data-service="reproduction_cost" name="cert_type[]" value="reproduction_cost" /> </label></div>
+                        <div class="svc-name">Reproduction Cost</div>
+                        <div class="svc-price">₱28.00</div>
+                        <div class="svc-qty">
+                          <button type="button" class="qty-decr" data-service="reproduction_cost">−</button>
+                          <input type="number" min="1" value="1" class="qty-input" name="svc_reproduction_cost_qty" data-service="reproduction_cost" />
+                          <button type="button" class="qty-incr" data-service="reproduction_cost">+</button>
+                        </div>
+                        <div class="svc-sub" data-service="reproduction_cost">₱28.00</div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <!-- Filing Fee / Inspection Cost selection -->
+                    <div id="filing-inspection-fees" style="display:none; margin-bottom:10px;">
+                      <label>Fees :</label>
+                      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+                        <div class="cert-cart-row" data-service="filing_fee" style="display:flex;align-items:center;gap:12px;">
+                          <div class="svc-check"><label class="svc-check-label"><input type="checkbox" id="fee-filing-check" name="fee_filing_check" class="svc-chk" /></label></div>
+                          <div class="svc-name">Filing Fee</div>
+                          <div class="svc-price">₱2,000.00</div>
+                          <div class="svc-qty">
+                            <button type="button" class="qty-decr" id="filing-qty-decr">−</button>
+                            <input type="number" min="1" value="1" id="filing-qty" name="filing_qty" class="qty-input" data-service="filing_fee" />
+                            <button type="button" class="qty-incr" id="filing-qty-incr">+</button>
+                          </div>
+                          <div class="svc-sub" data-service="filing_fee">₱0.00</div>
+                        </div>
+
+                        <div class="cert-cart-row" data-service="inspection_cost" style="display:flex;align-items:flex-start;gap:12px;">
+                          <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                              <div class="svc-check"><label class="svc-check-label"><input type="checkbox" id="fee-inspection-check" name="fee_inspection_check" class="svc-chk" /></label></div>
+                              <div class="svc-name">Inspection Cost</div>
+                            </div>
+                            <div id="inspection-options" style="display:none; flex-direction:column; gap:8px; margin-left:36px;">
+                              <div class="inspection-option" data-price="10000" style="display:flex;align-items:center;gap:8px; width:100%; justify-content:space-between;">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                  <div class="svc-check"><label class="svc-check-label"><input type="checkbox" class="insp-opt-chk" name="inspection_option[]" value="10000" /></label></div>
+                                  <div class="svc-name">₱10,000</div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                  <button type="button" class="qty-decr insp-qty-decr">−</button>
+                                  <input type="number" min="1" value="1" class="insp-qty-input" name="inspection_qty_10000" />
+                                  <button type="button" class="qty-incr insp-qty-incr">+</button>
+                                  <div class="opt-sub" style="margin-left:12px;">₱0.00</div>
+                                </div>
+                              </div>
+                              <div class="inspection-option" data-price="15000" style="display:flex;align-items:center;gap:8px; width:100%; justify-content:space-between;">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                  <div class="svc-check"><label class="svc-check-label"><input type="checkbox" class="insp-opt-chk" name="inspection_option[]" value="15000" /></label></div>
+                                  <div class="svc-name">₱15,000</div>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                  <button type="button" class="qty-decr insp-qty-decr">−</button>
+                                  <input type="number" min="1" value="1" class="insp-qty-input" name="inspection_qty_15000" />
+                                  <button type="button" class="qty-incr insp-qty-incr">+</button>
+                                  <div class="opt-sub" style="margin-left:12px;">₱0.00</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="svc-sub" data-service="inspection_cost">₱0.00</div>
+                        </div>
+                      </div>
+                    </div>
+
                     <label>Amount : <span class="req">*</span></label>
-                    <div class="amount-wrap"><span>₱</span><input name="amount" type="number" min="0" step="0.01" placeholder="0.00" required data-validate="numeric" /></div>
+                    <div class="amount-wrap"><span>₱</span><input id="amount-input" name="amount" type="number" min="0" step="0.01" placeholder="0.00" required data-validate="numeric" /></div>
                   </div>
                   <div class="field">
                     <label>Name of Payor : <span class="req">*</span></label>
@@ -1111,13 +1223,7 @@
                   <div class="extra-fields" id="extra-certification_copy_fee">
                     <hr class="extra-divider"><div class="extra-label">Certification / Copy Fee Details</div>
                     <div class="field"><label>Letter Request : <span class="req">*</span></label><input name="letter_request" type="text" placeholder="Reference to the letter request" /></div>
-                    <div class="field"><label>Type of Transaction Paid : <span class="req">*</span></label>
-                      <div class="check-group">
-                        <label class="check-item"><input type="checkbox" name="cert_type[]" value="certification" onchange="toggleCheckItem(this)"> Certification</label>
-                        <label class="check-item"><input type="checkbox" name="cert_type[]" value="copy_fee" onchange="toggleCheckItem(this)"> Copy Fee</label>
-                        <label class="check-item"><input type="checkbox" name="cert_type[]" value="reproduction_cost" onchange="toggleCheckItem(this)"> Reproduction Cost</label>
-                      </div>
-                    </div>
+                    <!-- Service selections are displayed above as a cart; quantities and selection handled there -->
                     <div class="field"><label>Remarks / Comments :</label><textarea name="cert_remarks" placeholder="Enter any relevant remarks…" data-validate="text"></textarea></div>
                   </div>
                   <div class="extra-fields" id="extra-consignment">
@@ -1326,6 +1432,7 @@
 </div>
 
 <!-- ══════════════ SCRIPTS ══════════════ -->
+<script src="{{ asset('js/transaction-form.js') }}"></script>
 <script>
   const headerWrap = document.getElementById('headerUserWrap');
 
@@ -1546,6 +1653,32 @@
           el.querySelectorAll('input[required],textarea[required],select[required]').forEach(f => f.removeAttribute('required'));
         });
         const target = document.getElementById('extra-' + val);
+        // show/hide certification cart and filing/inspection UI depending on txn
+        const certCart = document.getElementById('cert-cart');
+        const filingWrap = document.getElementById('filing-inspection-fees');
+        if (certCart) {
+          if (val === 'certification_copy_fee') certCart.style.display = 'block';
+          else {
+            certCart.style.display = 'none';
+            // reset selections
+            certCart.querySelectorAll('input[type="checkbox"]').forEach(cb=>{ cb.checked = false; cb.dispatchEvent(new Event('change')); });
+            certCart.querySelectorAll('.qty-input').forEach(q=>{ q.value = 1; });
+            certCart.querySelectorAll('.svc-sub').forEach(s=>s.textContent = '₱0.00');
+          }
+          // recompute totals if available
+          if (typeof computeCertTotal === 'function') computeCertTotal();
+        }
+        if (filingWrap) {
+          if (val === 'filing_fee') filingWrap.style.display = 'block';
+          else {
+            filingWrap.style.display = 'none';
+            filingWrap.querySelectorAll('input[type="checkbox"]').forEach(cb=>{ cb.checked = false; cb.dispatchEvent(new Event('change')); });
+            filingWrap.querySelectorAll('.qty-input').forEach(q=>{ q.value = 1; });
+            filingWrap.querySelectorAll('.svc-sub, .opt-sub').forEach(el=>el.textContent = '₱0.00');
+          }
+          if (typeof computeFilingTotal === 'function') computeFilingTotal();
+          if (typeof computeCertTotal === 'function') computeCertTotal();
+        }
         if (target) {
           target.classList.add('show');
           target.querySelectorAll('[data-orig-required="1"]').forEach(f => f.setAttribute('required', ''));
@@ -1775,6 +1908,49 @@
 @if(session('success'))
 <script>try{ localStorage.removeItem('reviewer_form_draft_v1'); }catch(e){} </script>
 @endif
+
+<!-- Preview Modal (decoded JSON + Base64 encoded) - reused from Maker -->
+<style>
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .txn-modal { background: var(--surface); border-radius: 16px; width: 100%; max-width: 700px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; animation: modalIn .22s cubic-bezier(.16,1,.3,1); }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(16px) scale(.97); } to { opacity: 1; transform: none; } }
+  .modal-head { padding: 16px 22px; background: var(--green-deep); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .modal-head-left { display: flex; align-items: center; gap: 12px; }
+  .modal-head-icon { width: 36px; height: 36px; border-radius: 9px; background: rgba(201,153,42,.2); display: flex; align-items: center; justify-content: center; font-size: .95rem; color: var(--gold-light); flex-shrink: 0; }
+  .modal-head-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold-light); }
+  .modal-head-sub { font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,.3); }
+  .modal-close-btn { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.07); border: none; color: rgba(245,240,232,.5); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; transition: background .15s, color .15s; }
+  .modal-close-btn:hover { background: rgba(255,255,255,.14); color: var(--cream); }
+  .preview-summary { max-height:340px; overflow:auto; background:#fbfaf6; border:1px solid var(--border); padding:12px; border-radius:8px; }
+  .pg-btn { min-width: 30px; height: 30px; padding: 0 8px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-mid); font-family: 'DM Sans', sans-serif; font-size: .73rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .12s, border-color .12s, color .12s; }
+  .pg-btn:hover:not(:disabled) { background: var(--green-light); border-color: var(--green-accent); color: var(--green-mid); }
+  .pg-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .pg-btn.active { background: var(--green-mid); border-color: var(--green-mid); color: #fff; }
+</style>
+<div class="modal-overlay" id="preview-overlay" onclick="if(event.target===this) closePreview()">
+  <div class="txn-modal" style="max-width:820px; display:flex; flex-direction:column;">
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <div class="modal-head-icon"><i class="bi bi-eye"></i></div>
+        <div>
+          <div class="modal-head-title">Encoded Preview</div>
+          <div class="modal-head-sub">Review encoded submission data before sending</div>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closePreview()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div style="padding:14px 18px;">
+      <div style="margin-bottom:8px; font-weight:600;">Transaction Summary</div>
+      <div class="preview-summary" style="max-height:340px; overflow:auto; background:#fbfaf6; border:1px solid var(--border); padding:12px; border-radius:8px;"></div>
+      <input type="hidden" class="preview-encoded" />
+      <div style="display:flex; gap:10px; margin-top:12px; justify-content:flex-end;">
+        <button class="pg-btn" onclick="closePreview()">Back</button>
+        <button class="pg-btn active" onclick="confirmSubmitFromPreview()">Confirm & Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
