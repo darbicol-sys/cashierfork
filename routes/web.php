@@ -40,6 +40,9 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':maker'])-
 	Route::get('/maker', [MakerController::class, 'index'])->name('dashboard');
 	// Maker profile
 	Route::get('/maker/profile', [MakerController::class, 'profile'])->name('maker.profile');
+	// Maker profile update routes
+	Route::patch('/maker/profile', [MakerController::class, 'updateProfile'])->name('maker.profile.update');
+	Route::patch('/maker/profile/password', [MakerController::class, 'updatePassword'])->name('maker.profile.password');
 	// Handle payment form submissions from the dashboard (now served at /maker)
 	Route::post('/maker', [MakerController::class, 'store'])->name('dashboard.store')->middleware(\App\Http\Middleware\LogUserActivity::class);
 
@@ -86,6 +89,26 @@ Route::post('/payments', [MakerController::class, 'store'])->name('payments.stor
 			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
 		}
 	})->name('maker.notifications.mark_all');
+
+	// Maker: page to view all notifications
+	Route::get('/maker/notifications/all', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return redirect()->route('login');
+		$notes = $user->notifications()->orderBy('created_at', 'desc')->paginate(25);
+		return view('maker.notifications.notification', compact('notes'));
+	})->name('maker.notifications.page');
+
+	// Maker: clear all notifications
+	Route::delete('/maker/notifications/clear', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		try {
+			$user->notifications()->delete();
+			return response()->json(['ok' => true]);
+		} catch (\Throwable $e) {
+			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+		}
+	})->name('maker.notifications.clear_all');
 });
 
 // Accountant routes (require authenticated accountant)
@@ -137,6 +160,26 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':accountan
 			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
 		}
 	})->name('accountant.notifications.mark_all');
+
+	// Accountant: page to view all notifications
+	Route::get('/accountant/notifications/all', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return redirect()->route('login');
+		$notes = $user->notifications()->orderBy('created_at', 'desc')->paginate(25);
+		return view('accountant.notifications.notification', compact('notes'));
+	})->name('accountant.notifications.page');
+
+	// Accountant: clear all notifications
+	Route::delete('/accountant/notifications/clear', function (\Illuminate\Http\Request $request) {
+		$user = auth()->user();
+		if (! $user) return response()->json([], 401);
+		try {
+			$user->notifications()->delete();
+			return response()->json(['ok' => true]);
+		} catch (\Throwable $e) {
+			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+		}
+	})->name('accountant.notifications.clear_all');
 });
 
 
@@ -227,12 +270,24 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':reviewer'
 		}
 	})->name('notifications.mark_all');
 
+		// Reviewer: clear all notifications (delete)
+		Route::delete('/notifications/clear', function (\Illuminate\Http\Request $request) {
+			$user = auth()->user();
+			if (! $user) return response()->json([], 401);
+			try {
+				$user->notifications()->delete();
+				return response()->json(['ok' => true]);
+			} catch (\Throwable $e) {
+				return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+			}
+		})->name('notifications.clear_all');
+
 	// Page: view all notifications (reviewer)
 	Route::get('/notifications/all', function (\Illuminate\Http\Request $request) {
 		$user = auth()->user();
 		if (! $user) return redirect()->route('login');
 		$notes = $user->notifications()->orderBy('created_at', 'desc')->paginate(25);
-		return view('reviewer.notifications.index', compact('notes'));
+		return view('reviewer.notifications.notification', compact('notes'));
 	})->name('notifications.page');
 
 	// Reviewer: profile page

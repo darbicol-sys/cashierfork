@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Notifications\NewMessageNotification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class MakerController extends Controller
 {
@@ -40,6 +42,62 @@ class MakerController extends Controller
     {
         $user = auth()->user();
         return view('maker.profile.profile', compact('user'));
+    }
+
+    // Update maker profile
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        if (! $user) return redirect()->route('login');
+
+        $validated = $request->validate([
+            'first_name' => ['required','string','max:191'],
+            'last_name'  => ['required','string','max:191'],
+            'middle_name'=> ['nullable','string','max:191'],
+            'username'   => ['nullable','string','max:100'],
+            'phone_number' => ['nullable','string','max:50'],
+            'address'    => ['nullable','string','max:1000'],
+            'profile_picture' => ['nullable','image','max:4096'],
+        ]);
+
+        if ($request->hasFile('profile_picture')) {
+            $path = $request->file('profile_picture')->store('profiles', 'public');
+            if (!empty($user->profile_picture)) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            $user->profile_picture = $path;
+        }
+
+        $user->first_name = $validated['first_name'];
+        $user->last_name  = $validated['last_name'];
+        $user->middle_name = $validated['middle_name'] ?? null;
+        $user->username   = $validated['username'] ?? $user->username;
+        $user->phone_number = $validated['phone_number'] ?? $user->phone_number;
+        $user->address    = $validated['address'] ?? $user->address;
+        $user->save();
+
+        return redirect()->route('maker.profile')->with('success', 'Profile updated.');
+    }
+
+    // Update maker password
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+        if (! $user) return redirect()->route('login');
+
+        $validated = $request->validate([
+            'current_password' => ['required','string'],
+            'password' => ['required','string','min:8','confirmed'],
+        ]);
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+        }
+
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        return redirect()->route('maker.profile')->with('success', 'Password updated.');
     }
 
     // Show payment creation form (reuses payments.create view)

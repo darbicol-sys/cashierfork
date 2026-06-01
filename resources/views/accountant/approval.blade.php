@@ -359,7 +359,7 @@
             </div>
 
             <div class="notif-drop-foot">
-                <a href="#">View all notifications</a>
+              <a href="{{ route('accountant.notifications.page') }}">View all notifications</a>
             </div>
 
         </div>
