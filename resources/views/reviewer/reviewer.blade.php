@@ -1050,10 +1050,9 @@
             <div class="form-card" id="form-card">
               <div class="form-header">
                 <div class="form-header-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" style="width:40px;height:40px;object-fit:cover;border-radius:50%;display:block;" /></div>
-                <div class="form-header-info">
+                  <div class="form-header-info">
                   <div class="org">Department of Agrarian Reform — Regional Office V</div>
                   <div class="txn-name" id="form-txn-name">—</div>
-                  <div id="cash-bond-formula" style="display:none; font-size:.79rem; color:var(--muted); margin-top:6px;">Formula: Area x Zonal Value x 2.5%</div>
                 </div>
               </div>
               <div class="required-note"><i class="bi bi-asterisk"></i> Fields marked with * are required.</div>
@@ -1180,6 +1179,7 @@
                     <label>Amount : <span class="req">*</span></label>
                     <div class="amount-wrap"><span>₱</span><input id="amount-input" name="amount" type="number" min="0" step="0.01" placeholder="0.00" required data-validate="numeric" /></div>
                   </div>
+                  <div id="cash-bond-formula" style="display:none; font-size:.79rem; color:var(--muted); margin-top:6px;">Formula: Area x Zonal Value x 2.5%</div>
                   <div class="field">
                     <label>Name of Payor : <span class="req">*</span></label>
                     <input name="name" type="text" placeholder="Full name of payor" required />
@@ -1683,6 +1683,7 @@
           target.classList.add('show');
           target.querySelectorAll('[data-orig-required="1"]').forEach(f => f.setAttribute('required', ''));
         }
+        const formulaEl = document.getElementById('cash-bond-formula'); if (formulaEl) formulaEl.style.display = (val === 'cash_bond') ? 'block' : 'none';
         const card = document.getElementById('form-card'); if (card) card.classList.add('visible');
         const agree = document.getElementById('agree_terms'); if (agree) agree.checked = false;
         const submitBtn = document.getElementById('submit-btn'); if (submitBtn) submitBtn.disabled = true;
