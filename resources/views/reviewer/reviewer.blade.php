@@ -84,6 +84,7 @@
     .notif-list::-webkit-scrollbar { width: 3px; }
     .notif-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); transition: background .12s; }
+    .notif-item { text-decoration: none; color: inherit; }
     .notif-item:last-child { border-bottom: none; }
     .notif-item.unread { background: #f5fbf7; }
     .notif-item:hover { background: #f0f7f3; }
@@ -737,6 +738,42 @@
 
     </div>
   </aside>
+
+    <script>
+      // If the URL contains ?notif_id=..., fetch that specific notification and show it only
+      (function(){
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const nid = params.get('notif_id');
+          if (!nid) return;
+          const listEl = document.getElementById('notif-list');
+          const dropdown = document.getElementById('notif-dropdown');
+          if (!listEl || !dropdown) return;
+          fetch('/notifications', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.ok ? r.json() : Promise.reject('fetch failed'))
+            .then(arr => {
+              const n = arr.find(x => x.id === nid);
+              if (!n) return;
+              const d = n.data || {};
+              const icon = d.icon || 'bi-bell';
+              const cls  = d.cls || 'ni-gold';
+              const text = d.message || d.text || (d.name ? ('Transaction for ' + d.name) : 'Notification');
+              const time = n.created_at ? new Date(n.created_at).toLocaleString() : '';
+              const unreadCls = n.read ? '' : 'unread';
+              const html = `<div class="notif-item ${unreadCls}" data-id="${n.id}">
+                  <div class="notif-item-icon ${cls}"><i class="bi ${icon}"></i></div>
+                  <div class="notif-item-body">
+                    <div class="notif-item-text">${escapeHtml(text)}</div>
+                    <div class="notif-item-time">${escapeHtml(time)}</div>
+                  </div>
+                </div>`;
+              // don't modify or open the dropdown — keep the notification icon unchanged
+              dropdown.classList.remove('open');
+            }).catch(()=>{});
+        } catch(e) {}
+        function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+      })();
+    </script>
 
   <!-- ══ MAIN AREA ══ -->
   <div class="app-main">
@@ -1527,14 +1564,14 @@
       else if (n.status === 'rejected') actionText = 'was rejected. Please review.';
       const message = `Transaction for ${n.name} ${actionText}`;
       return `
-      <div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif(${n.id})">
+      <a href="/reviewer?notif_id=${n.id}" class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif(${n.id})">
         <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
         <div class="notif-item-body">
           <div class="notif-item-text">${message}</div>
           <div class="notif-item-time">${n.time}</div>
         </div>
         ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
-      </div>
+      </a>
       `;
     }).join('');
   }
