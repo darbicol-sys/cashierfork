@@ -155,7 +155,9 @@ class ReviewerController extends Controller
                 $now    = now();
                 $year   = $now->format('Y');
                 $month  = $now->format('m');
-                $like   = $prefix . '-' . $year . '-' . $month . '-%';
+
+                // Use year-only pattern when searching so the sequence is annual.
+                $like   = $prefix . '-' . $year . '-%';
 
                 $last = Payment::where('op_number', 'like', $like)
                     ->where('id', '!=', $id)
@@ -282,7 +284,9 @@ class ReviewerController extends Controller
         $now    = now();
         $year   = $now->format('Y');
         $month  = $now->format('m');
-        $like   = $prefix . '-' . $year . '-' . $month . '-%';
+
+        // Next OP number should consider the whole year so sequence increments across months.
+        $like   = $prefix . '-' . $year . '-%';
 
         $query = Payment::where('op_number', 'like', $like);
         if ($excludeId) {
