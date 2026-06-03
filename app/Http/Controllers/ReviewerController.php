@@ -90,7 +90,7 @@ class ReviewerController extends Controller
     }
 
     /**
-     * Forward a payment to accountant.
+    * Forward a payment to approver.
      */
     public function forward(Request $request, $id)
     {
@@ -106,23 +106,23 @@ class ReviewerController extends Controller
             AuditLog::create([
                 'user_id' => Auth::id(),
                 'action' => 'forward',
-                'description' => 'Forwarded payment #' . $payment->id . ' to Accountant',
+                'description' => 'Forwarded payment #' . $payment->id . ' to Approver',
                 'ip_address' => $request->ip(),
             ]);
         } catch (\Throwable $e) {
             // ignore logging errors
         }
-        // Notify accountants that a payment has been forwarded
+        // Notify approvers that a payment has been forwarded
         try {
-            $accountantRoleId = DB::table('roles')->where('name', 'accountant')->value('id');
-            if ($accountantRoleId) {
-                $accountants = User::where('role_id', $accountantRoleId)->get();
-                foreach ($accountants as $a) {
+            $approverRoleId = DB::table('roles')->where('name', 'approver')->value('id');
+            if ($approverRoleId) {
+                $approvers = User::where('role_id', $approverRoleId)->get();
+                foreach ($approvers as $a) {
                     $a->notify(new NewMessageNotification($payment));
                 }
             }
         } catch (\Throwable $e) {
-            Log::warning('Failed to notify accountants on forward: ' . $e->getMessage());
+            Log::warning('Failed to notify approvers on forward: ' . $e->getMessage());
         }
         // Also notify makers about the forward action
         try {

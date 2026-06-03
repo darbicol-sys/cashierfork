@@ -85,7 +85,7 @@ class AdminController extends Controller
 		$rolesMap = DB::table('roles')->pluck('name', 'id');
 
 		$totalUsers = $users->count();
-		$counts = ['maker' => 0, 'reviewer' => 0, 'accountant' => 0];
+		$counts = ['maker' => 0, 'reviewer' => 0, 'approver' => 0];
 
 		// enrich users with `role`, `last_login_at` (from sessions) and `is_active`
 		foreach ($users as $u) {
@@ -116,9 +116,9 @@ class AdminController extends Controller
 
 		$makerCount = $counts['maker'];
 		$reviewerCount = $counts['reviewer'];
-		$accountantCount = $counts['accountant'];
+		$approverCount = $counts['approver'];
 
-		return view('admin.users', compact('users', 'totalUsers', 'makerCount', 'reviewerCount', 'accountantCount'));
+		return view('admin.users', compact('users', 'totalUsers', 'makerCount', 'reviewerCount', 'approverCount'));
 	}
 
 	/**

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Notifications\NewMessageNotification;
 
-class AccountantController extends Controller
+class ApproverController extends Controller
 {
     /**
      * Show the accountant approval view.
@@ -75,7 +75,7 @@ class AccountantController extends Controller
             ];
         });
 
-        return view('accountant.approval', compact('payments', 'notif_data', 'total', 'waiting', 'approved', 'rejected', 'funds'));
+        return view('approver.approval', compact('payments', 'notif_data', 'total', 'waiting', 'approved', 'rejected', 'funds'));
     }
 
     /**
@@ -117,7 +117,7 @@ class AccountantController extends Controller
             ];
         });
 
-        return view('accountant.approvedlist', compact('approvedPayments', 'notif_data', 'total', 'totalSum', 'funds'));
+        return view('approver.approvedlist', compact('approvedPayments', 'notif_data', 'total', 'totalSum', 'funds'));
     }
 
     /**
@@ -141,7 +141,7 @@ class AccountantController extends Controller
             ];
         });
 
-        return view('accountant.profile', compact('notif_data'));
+        return view('approver.profile', compact('notif_data'));
     }
 
     /**

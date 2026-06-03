@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\MakerController;
-use App\Http\Controllers\AccountantController;
+use App\Http\Controllers\ApproverController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReviewerController;
 use Illuminate\Http\Request;
@@ -111,18 +111,18 @@ Route::post('/payments', [MakerController::class, 'store'])->name('payments.stor
 	})->name('maker.notifications.clear_all');
 });
 
-// Accountant routes (require authenticated accountant)
-Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':accountant'])->group(function () {
-    Route::get('/accountant/approved', [AccountantController::class, 'approved'])->name('accountant.approved');
-	Route::get('/accountant/approval', [AccountantController::class, 'approval'])->name('accountant.approval');
+// Accountant routes (require authenticated approver)
+Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':approver'])->group(function () {
+	Route::get('/accountant/approved', [ApproverController::class, 'approved'])->name('accountant.approved');
+	Route::get('/accountant/approval', [ApproverController::class, 'approval'])->name('accountant.approval');
 	// Accountant profile
-	Route::get('/accountant/profile', [AccountantController::class, 'profile'])->name('accountant.profile');
-	Route::patch('/accountant/profile', [AccountantController::class, 'updateProfile'])->name('accountant.profile.update');
-	Route::patch('/accountant/profile/password', [AccountantController::class, 'updatePassword'])->name('accountant.profile.password');
+	Route::get('/accountant/profile', [ApproverController::class, 'profile'])->name('accountant.profile');
+	Route::patch('/accountant/profile', [ApproverController::class, 'updateProfile'])->name('accountant.profile.update');
+	Route::patch('/accountant/profile/password', [ApproverController::class, 'updatePassword'])->name('accountant.profile.password');
 	// Remove profile picture
-	Route::post('/accountant/profile/picture/remove', [AccountantController::class, 'removeProfilePicture'])->name('accountant.profile.remove_picture');
-	Route::post('/accountant/approval/{id}/approve', [AccountantController::class, 'approve'])->name('accountant.approve');
-	Route::post('/accountant/approval/{id}/reject', [AccountantController::class, 'reject'])->name('accountant.reject');
+	Route::post('/accountant/profile/picture/remove', [ApproverController::class, 'removeProfilePicture'])->name('accountant.profile.remove_picture');
+	Route::post('/accountant/approval/{id}/approve', [ApproverController::class, 'approve'])->name('accountant.approve');
+	Route::post('/accountant/approval/{id}/reject', [ApproverController::class, 'reject'])->name('accountant.reject');
 
 	// Accountant notifications (JSON + mark read)
 	Route::get('/accountant/notifications', function (\Illuminate\Http\Request $request) {
@@ -166,7 +166,7 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':accountan
 		$user = auth()->user();
 		if (! $user) return redirect()->route('login');
 		$notes = $user->notifications()->orderBy('created_at', 'desc')->paginate(25);
-		return view('accountant.notifications.notification', compact('notes'));
+		return view('approver.notifications.notification', compact('notes'));
 	})->name('accountant.notifications.page');
 
 	// Accountant: clear all notifications

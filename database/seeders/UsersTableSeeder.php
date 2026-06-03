@@ -20,7 +20,7 @@ class UsersTableSeeder extends Seeder
         $usersHaveRoleId = Schema::hasColumn('users', 'role_id');
 
         $adminRoleId = $rolesExist ? DB::table('roles')->where('name', 'admin')->value('id') : null;
-        $accountantRoleId = $rolesExist ? DB::table('roles')->where('name', 'accountant')->value('id') : null;
+        $accountantRoleId = $rolesExist ? DB::table('roles')->where('name', 'approver')->value('id') : null;
         $reviewerRoleId = $rolesExist ? DB::table('roles')->where('name', 'reviewer')->value('id') : null;
         $makerRoleId = $rolesExist ? DB::table('roles')->where('name', 'maker')->value('id') : null;
 
@@ -52,17 +52,17 @@ class UsersTableSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'first_name' => 'Accountant',
+                'first_name' => 'Approver',
                 'middle_name' => null,
                 'last_name' => 'User',
-                'username' => 'accountant',
+                'username' => 'approver',
                 'email' => 'accountant@example.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
                 'remember_token' => Str::random(10),
                 'phone_number' => null,
                 'address' => null,
-                'position' => 'accountant',
+                'position' => 'approver',
                 'role_id' => $accountantRoleId,
                 'status' => 'active',
                 'profile_picture' => null,

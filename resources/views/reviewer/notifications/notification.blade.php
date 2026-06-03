@@ -640,15 +640,17 @@
   }
 
   async function markOneRead(id) {
-    try {
-      await fetch('/notifications/' + id + '/read', {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF }
-      });
-    } catch(e) {}
+    // mark locally first for immediate UI feedback
     const n = ALL_NOTIFS.find(x => x.id === id);
     if (n) n.unread = false;
     render();
+    try {
+      await fetch('/notifications/' + id + '/read', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF }
+      });
+    } catch(e) {}
   }
 
   async function markAllRead() {
@@ -687,8 +689,8 @@
     render();
   }
 
-  function readAndView(id) {
-    markOneRead(id);
+  async function readAndView(id) {
+    await markOneRead(id);
     // Redirect reviewer to dashboard showing only this notification
     window.location = '/reviewer?notif_id=' + encodeURIComponent(id);
   }

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Accountant — Approved Records</title>
+  <title>Approver — For Review</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
@@ -28,8 +28,10 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text-dark); }
 
+    /* ── TOP STRIPE ── */
     .top-stripe { height: 4px; background: linear-gradient(90deg, var(--green-accent), var(--gold), var(--red)); }
 
+    /* ── HEADER ── */
     .page-header {
       background: var(--green-deep);
       padding: 16px 32px;
@@ -41,7 +43,6 @@
       z-index: 200;
     }
 
-    /* ── LOGO FIX ── */
     .header-seal {
       width: 38px; height: 38px; border-radius: 50%;
       overflow: hidden; flex-shrink: 0;
@@ -120,8 +121,10 @@
     }
     .btn-logout:hover { background: linear-gradient(135deg, #d6a73b, #f0cf7b); transform: translateY(-1px); }
 
+    /* ── LAYOUT ── */
     .outer-wrapper { display: flex; min-height: calc(100vh - 72px); }
 
+    /* ── SIDEBAR ── */
     .sidebar {
       width: 260px; flex-shrink: 0; background: var(--green-deep);
       border-right: 1px solid rgba(255,255,255,.07);
@@ -154,26 +157,34 @@
     .sidebar-footer-label { font-size: .6rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: 4px; }
     .sidebar-footer-value { font-size: .73rem; color: rgba(245,240,232,.5); font-weight: 300; }
 
+    /* ── MAIN ── */
     .main-content { flex: 1; min-width: 0; }
-    .page-body { max-width: 1400px; margin: 0 auto; padding: 36px 28px 60px; }
 
+    /* FIX 1: Remove max-width constraint so table uses full available space */
+    .page-body { width: 100%; padding: 36px 36px 60px; }
+
+    /* ── PAGE TITLE ── */
     .page-title-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
     .page-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 700; color: var(--text-dark); margin-bottom: 3px; }
     .page-sub { font-size: .8rem; color: var(--muted); font-weight: 300; }
 
+    /* ── ALERTS ── */
     .alert-bar { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; font-size: .84rem; font-weight: 500; }
     .alert-success { background: var(--green-light); color: var(--green-accent); border: 1px solid rgba(45,122,79,.2); }
     .alert-danger   { background: #fdf0ef; color: var(--red); border: 1px solid rgba(160,37,28,.2); }
 
-    .approved-total-strip {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--green-light); border: 1px solid rgba(45,122,79,.2);
-      border-radius: 10px; padding: 14px 22px; margin-bottom: 20px;
-      flex-wrap: wrap; gap: 10px;
-    }
-    .approved-total-label { font-size: .82rem; color: var(--green-mid); font-weight: 500; display: flex; align-items: center; gap: 8px; }
-    .approved-total-amount { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--green-deep); }
+    /* ── STAT CARDS ── */
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .si-green { background: var(--green-light); color: var(--green-accent); }
+    .si-gold  { background: #fdf3dc; color: var(--gold); }
+    .si-amber { background: #fff7ed; color: #c2640a; }
+    .si-red   { background: #fdf0ef; color: var(--red); }
+    .stat-value { font-size: 1.35rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
+    .stat-label { font-size: .7rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
 
+    /* ── TOOLBAR ── */
     .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .search-wrap { position: relative; flex: 1; min-width: 200px; }
     .search-wrap i { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .88rem; pointer-events: none; }
@@ -182,52 +193,71 @@
     .filter-select { padding: 9px 32px 9px 12px; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: .82rem; color: var(--text-dark); background: var(--surface); outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238a9e90' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; cursor: pointer; transition: border-color .2s; }
     .filter-select:focus { border-color: var(--green-accent); }
 
+    /* ── TABLE CARD ── */
+    /* FIX 2: overflow-x: auto so table can scroll horizontally if needed, never clip */
     .table-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; }
-    .table-card-header-approved { padding: 14px 22px; background: linear-gradient(90deg, #0f3d2a, #1a5c3a); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .table-card-scroll { overflow-x: auto; }
+    .table-card-header { padding: 14px 22px; background: linear-gradient(90deg, var(--green-mid), var(--green-deep)); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .table-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 700; color: var(--gold-light); display: flex; align-items: center; gap: 9px; }
-    .approved-count-badge { font-size: .68rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(45,122,79,.35); color: #a3e4bc; border: 1px solid rgba(45,122,79,.4); }
+    .table-record-count { font-size: .68rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(201,153,42,.2); color: var(--gold-light); border: 1px solid rgba(201,153,42,.25); }
 
-    .approvals-table { width: 100%; border-collapse: collapse; }
+    /* ── TABLE ── */
+    .approvals-table { width: 100%; border-collapse: collapse; min-width: 860px; }
     .approvals-table thead tr { background: #faf8f4; border-bottom: 1.5px solid var(--border); }
-    .approvals-table thead th { padding: 14px 18px; font-size: .76rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-mid); white-space: nowrap; }
+    .approvals-table thead th { padding: 11px 16px; font-size: .68rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-mid); white-space: nowrap; }
     .approvals-table thead th:first-child { padding-left: 22px; }
     .approvals-table thead th:last-child  { padding-right: 22px; }
     .approvals-table tbody tr { border-bottom: 1px solid var(--border); transition: background .13s; }
     .approvals-table tbody tr:last-child { border-bottom: none; }
-    .approvals-table tbody tr:hover { background: #f2faf5; }
-    .approvals-table tbody td { padding: 16px 18px; font-size: .91rem; color: var(--text-dark); vertical-align: middle; }
+    .approvals-table tbody tr:hover { background: #f9f7f2; }
+    .approvals-table tbody td { padding: 13px 16px; font-size: .85rem; color: var(--text-dark); vertical-align: middle; }
     .approvals-table tbody td:first-child { padding-left: 22px; }
     .approvals-table tbody td:last-child  { padding-right: 22px; }
 
+    /* ── CELL STYLES ── */
     .payor-cell { display: flex; align-items: center; gap: 10px; }
-    .payor-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green-accent); color: #fff; font-size: .78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .payor-name { font-weight: 600; font-size: .95rem; color: var(--text-dark); }
-    .payor-contact { font-size: .78rem; color: var(--muted); margin-top: 2px; }
-    .amount-cell { font-weight: 700; font-size: 1rem; color: var(--green-mid); }
-    .fund-badge { display: inline-block; padding: 4px 11px; border-radius: 20px; background: #fdf3dc; color: var(--gold); font-size: .72rem; font-weight: 700; white-space: nowrap; }
-    .op-number { font-size: .84rem; color: var(--text-mid); font-weight: 500; }
-    .date-main { font-size: .89rem; color: var(--text-dark); font-weight: 500; }
-    .date-time  { font-size: .77rem; color: var(--muted); margin-top: 3px; }
-    .approved-on-main { font-size: .89rem; color: var(--green-accent); font-weight: 600; }
-    .approved-on-time { font-size: .77rem; color: var(--muted); margin-top: 3px; }
-    .approved-stamp { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: var(--green-light); color: var(--green-accent); font-size: .76rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; border: 1px solid rgba(45,122,79,.2); }
+    .payor-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--green-mid); color: #fff; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .payor-name { font-weight: 600; font-size: .87rem; color: var(--text-dark); }
+    .payor-contact { font-size: .72rem; color: var(--muted); margin-top: 1px; }
+    .amount-cell { font-weight: 700; font-size: .92rem; color: var(--green-mid); }
+    .fund-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; background: #fdf3dc; color: var(--gold); font-size: .68rem; font-weight: 700; white-space: nowrap; }
+    .op-number { font-size: .78rem; color: var(--text-mid); font-weight: 500; }
+    .date-main { font-size: .82rem; color: var(--text-dark); font-weight: 500; }
+    .date-time  { font-size: .7rem; color: var(--muted); margin-top: 2px; }
 
+    /* ── STATUS BADGES ── */
+    .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: .68rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; white-space: nowrap; }
+    .sb-approved { background: var(--green-light); color: var(--green-accent); }
+    .sb-waiting  { background: #fdf3dc; color: #a0700a; }
+    .sb-rejected { background: #fdf0ef; color: var(--red); }
+
+    /* ── ACTION BUTTONS ── */
+    /* FIX 3: actions cell never wraps, always shows both buttons */
+    .actions-cell { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+    .btn-approve { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border: none; border-radius: 7px; background: var(--green-accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s; white-space: nowrap; }
+    .btn-approve:hover { background: var(--green-mid); }
+    .btn-reject  { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border: 1.5px solid #e8c5c5; border-radius: 7px; background: #fdf0ef; color: var(--red); font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s, border-color .15s; white-space: nowrap; }
+    .btn-reject:hover { background: #fde0de; border-color: #f0a8a8; }
+
+    /* ── TABLE FOOTER / PAGINATION ── */
     .table-footer { padding: 12px 22px; background: #faf8f4; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .table-footer-info { font-size: .75rem; color: var(--muted); }
     .table-footer-info strong { color: var(--text-mid); }
+    .pagination-wrap { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .page-link, .page-number { padding: 6px 10px; border-radius: 8px; text-decoration: none; font-weight: 700; color: var(--green-accent); border: 1px solid transparent; background: transparent; }
+    .page-link.disabled { opacity: .5; pointer-events: none; color: var(--muted); }
+    .page-number { color: var(--text-dark); border: 1px solid transparent; }
+    .page-number:hover { background: #f2faf5; border-color: var(--border); }
+    .page-number.active { background: var(--gold); color: var(--green-deep); border-color: var(--gold); }
+    .page-summary { font-size: .85rem; color: var(--muted); margin-left: 12px; }
 
-    .pagination-wrap { display:flex; align-items:center; gap:8px; margin-left:auto; }
-    .page-link, .page-number { padding:6px 10px; border-radius:8px; text-decoration:none; font-weight:700; color:var(--green-accent); border:1px solid transparent; background:transparent; }
-    .page-link.disabled { opacity:0.5; pointer-events:none; color:var(--muted); }
-    .page-number { color:var(--text-dark); border:1px solid transparent; }
-    .page-number:hover { background:#f2faf5; border-color:var(--border); }
-    .page-number.active { background:var(--gold); color:var(--green-deep); border-color:var(--gold); }
-    .page-summary { font-size:.85rem; color:var(--muted); margin-left:12px; }
-
+    /* ── EMPTY STATE ── */
     .empty-row td { padding: 60px 20px; text-align: center; }
     .empty-icon { font-size: 2.4rem; color: var(--border); margin-bottom: 12px; }
     .empty-text { font-size: .85rem; color: var(--muted); }
 
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) {
       .outer-wrapper { flex-direction: column; }
       .sidebar { width: 100%; height: auto; position: static; }
@@ -239,12 +269,9 @@
       .notif-dropdown { right: -60px; width: 280px; }
     }
     @media (max-width: 640px) {
-      .approvals-table thead { display: none; }
-      .approvals-table tbody td { display: block; padding: 6px 16px; }
-      .approvals-table tbody td:first-child { padding-top: 14px; }
-      .approvals-table tbody td:last-child  { padding-bottom: 14px; }
+      .stat-row { grid-template-columns: 1fr 1fr; }
     }
-     .header-user-wrap { position: relative; }
+    .header-user-wrap { position: relative; }
 .header-user { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 8px; background: rgba(245,240,232,.07); border: 1px solid rgba(245,240,232,.12); border-radius: 10px; cursor: pointer; transition: background .15s, border-color .15s; user-select: none; }
 .header-user:hover { background: rgba(245,240,232,.13); border-color: rgba(245,240,232,.22); }
 .header-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; color: var(--green-deep); overflow: hidden; flex-shrink: 0; border: 2px solid rgba(201,153,42,.35); }
@@ -277,20 +304,26 @@
     .drawer-body { flex: 1; overflow-y: auto; padding: 20px 22px; }
     .drawer-body::-webkit-scrollbar { width: 3px; }
     .drawer-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .drawer-actions { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .drawer-action-approve { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border: none; border-radius: 8px; background: var(--green-accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s; }
+    .drawer-action-approve:hover { background: var(--green-mid); }
+    .drawer-action-modify { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 8px; background: #f5fbf7; color: var(--green-accent); font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700; cursor: pointer; transition: background .15s; }
+    .drawer-action-modify:hover { background: var(--green-light); }
     .drawer-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
     .drawer-section-title { font-size: .76rem; font-weight: 700; color: var(--green-accent); letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; margin-top: 8px; }
     .drawer-section-title i { font-size: .9rem; }
     .drawer-field { margin-bottom: 12px; }
     .drawer-field-label { font-size: .68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
     .drawer-field-value { font-size: .84rem; color: var(--text-dark); font-weight: 500; line-height: 1.5; }
-    .action-btn { width: 32px; height: 32px; border-radius: 7px; border: 1.5px solid var(--border); background: #faf8f4; color: var(--text-mid); display: inline-flex; align-items: center; justify-content: center; font-size: .9rem; cursor: pointer; transition: background .15s, border-color .15s, color .15s; text-decoration: none; }
+    .action-btn { width: 29px; height: 29px; border-radius: 7px; border: 1.5px solid var(--border); background: #faf8f4; color: var(--text-mid); display: inline-flex; align-items: center; justify-content: center; font-size: .83rem; cursor: pointer; transition: background .15s, border-color .15s, color .15s; text-decoration: none; flex-shrink: 0; }
     .action-btn:hover { background: var(--green-light); border-color: var(--green-accent); color: var(--green-accent); }
     @media (max-width: 768px) { .detail-drawer { width: 100vw; } }
 
   </style>
 </head>
 <body>
-  @php
+
+@php
   $authUser    = auth()->user();
   $displayName = trim(($authUser->first_name ?? '') . ' ' . ($authUser->last_name ?? '')) ?: ($authUser->name ?? 'Administrator');
   $sidebarInitials = strtoupper(substr($displayName, 0, 2));
@@ -307,9 +340,8 @@
     <div class="t2">Department of Agrarian Reform</div>
   </div>
   <div class="header-sep"></div>
-  <div class="header-page">Approved Records</div>
-
-  <div class="header-actions">
+  <div class="header-page">For Review</div>
+<div class="header-actions">
 
     <!-- Notification -->
     <div class="notif-wrapper">
@@ -377,9 +409,9 @@
             <div>
                 <div class="header-user-name">{{ $displayName }}</div>
 
-                <div class="header-user-role">
-                    {{ ucfirst($authUser->position ?? $authUser->role ?? 'Admin') }}
-                </div>
+                    <div class="header-user-role">
+                      {{ ucfirst($authUser->position ?? $authUser->role ?? 'Admin') }}
+                    </div>
             </div>
 
             <i class="bi bi-chevron-down header-user-caret"></i>
@@ -416,6 +448,8 @@
     </div>
 
 </div>
+
+
 </header>
 
 <div class="outer-wrapper">
@@ -423,31 +457,26 @@
   <aside class="sidebar">
     <div class="sidebar-inner">
       <div class="sidebar-profile">
-        @php
-          $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Accountant');
-        @endphp
-        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_picture))
-          <div class="profile-avatar"><img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
-        @else
-          <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
-        @endif
+        <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
         <div>
-          <div class="profile-name">{{ $displayName }}</div>
-          <div class="profile-role">Accountant</div>
+            <div class="profile-name">{{ $displayName ?? 'Approver User' }}</div>
+            <div class="profile-role">Approver</div>
         </div>
       </div>
       <hr class="sidebar-divider">
 
       <div class="nav-section-label" style="margin-top:16px;">Transactions</div>
-      <a class="nav-item" href="{{ route('accountant.approval') }}">
+      <a class="nav-item active" href="{{ route('accountant.approval') }}">
         <div class="nav-icon"><i class="bi bi-hourglass-split"></i></div>
         <span class="nav-label">For Review</span>
       </a>
-      <a class="nav-item active" href="{{ route('accountant.approved') }}">
+      <a class="nav-item" href="{{ route('accountant.approved') }}">
         <div class="nav-icon"><i class="bi bi-check2-circle"></i></div>
         <span class="nav-label">Approved Records</span>
       </a>
 
+     
+     
     </div>
     <div class="sidebar-footer">
       <div class="sidebar-footer-label">System</div>
@@ -469,31 +498,66 @@
         </div>
       @endif
 
-      @php
-        $approvedPayments = $approvedPayments ?? \App\Models\Payment::where('status', 'approved')->orderByDesc('updated_at')->get();
-        $approvedTotal    = $totalSum ?? ($approvedPayments->sum('amount') ?? 0);
-      @endphp
-
       <div class="page-title-row">
         <div>
-          <div class="page-title">Approved Transactions</div>
+          <div class="page-title">Approver — Approval Queue</div>
           <div class="page-sub">Department of Agrarian Reform — Regional Office V</div>
         </div>
       </div>
 
-      <div class="approved-total-strip">
-        <div class="approved-total-label">
-          <i class="bi bi-wallet2"></i> Total Approved Amount
+      @php
+        $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Approver');
+        $total    = $total ?? ($payments->total() ?? count($payments));
+        $waiting  = $waiting ?? $payments->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
+        $approved = $approved ?? \App\Models\Payment::where('status', 'approved')->count();
+        $rejected = $rejected ?? 0;
+      @endphp
+
+      <!-- STAT CARDS -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-icon si-green"><i class="bi bi-receipt"></i></div>
+          <div>
+            <div class="stat-value">{{ $total }}</div>
+            <div class="stat-label">Total Transactions</div>
+          </div>
         </div>
-        <div class="approved-total-amount">₱{{ number_format($approvedTotal, 2) }}</div>
+        <div class="stat-card">
+          <div class="stat-icon si-amber"><i class="bi bi-hourglass-split"></i></div>
+          <div>
+            <div class="stat-value">{{ $waiting }}</div>
+            <div class="stat-label">Awaiting Approval</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-green"><i class="bi bi-check-circle"></i></div>
+          <div>
+            <div class="stat-value">{{ $approved }}</div>
+            <div class="stat-label">Approved</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-red"><i class="bi bi-x-circle"></i></div>
+          <div>
+            <div class="stat-value">{{ $rejected }}</div>
+            <div class="stat-label">Rejected</div>
+          </div>
+        </div>
       </div>
 
-      <form id="filter-form" class="toolbar" method="GET" action="{{ route('accountant.approved') }}">
+      <!-- TOOLBAR -->
+      <form id="filter-form" class="toolbar" method="GET" action="{{ route('accountant.approval') }}">
         <div class="search-wrap">
           <i class="bi bi-search"></i>
-          <input type="text" id="approved-search" name="search" value="{{ request('search','') }}" placeholder="Search approved transactions…" onkeydown="if(event.key==='Enter'){this.form.submit();}"/>
+          <input type="text" id="tbl-search" name="search" value="{{ request('search','') }}" placeholder="Search by payor name or O.P. number…" onkeydown="if(event.key==='Enter'){this.form.submit();}"/>
         </div>
-        <select class="filter-select" id="approved-filter-fund" name="fund" onchange="this.form.submit()">
+        <select class="filter-select" id="filter-status" name="status" onchange="this.form.submit()">
+          <option value="">All Statuses</option>
+          <option value="approved" {{ request('status')=='approved' ? 'selected' : '' }}>Approved</option>
+          <option value="forwarded" {{ request('status')=='forwarded' ? 'selected' : '' }}>Waiting</option>
+          <option value="accountant_rejected" {{ request('status')=='accountant_rejected' ? 'selected' : '' }}>Rejected</option>
+        </select>
+        <select class="filter-select" id="filter-fund" name="fund" onchange="this.form.submit()">
           <option value="">All Funds</option>
           @foreach(($funds ?? []) as $f)
             <option value="{{ $f }}" {{ request('fund') == $f ? 'selected' : '' }}>{{ $f }}</option>
@@ -501,150 +565,179 @@
         </select>
       </form>
 
+      <!-- TABLE -->
       <div class="table-card">
-        <div class="table-card-header-approved">
+        <div class="table-card-header">
           <div class="table-card-title">
-            <i class="bi bi-check2-all"></i> Approved Payment Records
+            <i class="bi bi-clipboard2-check"></i> Transactions for Review
           </div>
-          <span class="approved-count-badge" id="approved-record-count">
-            {{ $total ?? ($approvedPayments->total() ?? $approvedPayments->count()) }} record{{ ($total ?? ($approvedPayments->total() ?? $approvedPayments->count())) !== 1 ? 's' : '' }}
-          </span>
+          <span class="table-record-count" id="record-count">{{ $total ?? ($payments->total() ?? count($payments)) }} record{{ ($total ?? ($payments->total() ?? count($payments))) !== 1 ? 's' : '' }}</span>
         </div>
 
-        <table class="approvals-table" id="approved-table">
-          <thead>
-            <tr>
-              <th>Payor</th>
-              <th>Amount</th>
-              <th>Fund</th>
-              <th>O.P. Number</th>
-              <th>Date Submitted</th>
-              <th>Approved On</th>
-              <th>Status</th>
-              <th style="width: 50px; text-align: center;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="approved-body">
-            @forelse($approvedPayments as $ap)
-              @php
-                $apNameParts = explode(' ', trim($ap->name));
-                $apInitials  = strtoupper(substr($apNameParts[0], 0, 1)) . (isset($apNameParts[1]) ? strtoupper(substr($apNameParts[1], 0, 1)) : '');
-                
-                // Drawer data
-                $txnNames  = [
-                  'appeal_fee'=>'Appeal Fee','bidding_documents'=>'Bidding Documents','cash_bond'=>'Cash Bond',
-                  'certification_copy_fee'=>'Certification, Copy Fee and Reproduction Cost','consignment'=>'Consignment',
-                  'execution_judgment'=>'Execution of Judgment Involving Money','filing_fee'=>'Filing Fee and Inspection Cost',
-                  'income_unserviceable'=>'Income from Sale of Unserviceable Property','legal_research'=>'Legal Research',
-                  'performance_bond'=>'Performance Bond','refund_cash_advances'=>'Refund of Cash Advances',
-                  'refund_overpayment'=>'Refund of Overpayment','settlement_disallowances'=>'Settlement of Notice of Disallowances',
-                  'unwithheld_remittances'=>'Unwithheld Remittances',
-                ];
-                $rawTxn    = $ap->transaction_type ?? '';
-                $txnLabel  = $txnNames[$rawTxn] ?? ucwords(str_replace('_',' ', $rawTxn));
-                $fundLabel = $ap->fund_type ?? '—';
-                $meta      = $ap->meta ?? [];
-                $details   = [];
-                if (!empty($ap->contact))      $details['Contact']      = $ap->contact;
-                if (!empty($ap->address))      $details['Address']      = $ap->address;
-                if (!empty($ap->email))        $details['Email']        = $ap->email;
-                if (!empty($ap->payment_mode)) $details['Payment Mode'] = ucfirst(str_replace('_',' ',$ap->payment_mode));
-                if (is_array($meta)) {
-                  foreach ($meta as $k => $v) {
-                    if ($v === null || $v === '') continue;
-                    $details[$k] = is_array($v) ? implode(', ', $v) : $v;
-                  }
-                }
-              @endphp
-              <tr
-                data-search="{{ strtolower($ap->name . ' ' . ($ap->op_number ?? '')) }}"
-                data-fund="{{ $ap->fund_type ?? '' }}"
-              >
-                <td>
-                  <div class="payor-cell">
-                    <div class="payor-avatar">{{ $apInitials }}</div>
-                    <div>
-                      <div class="payor-name">{{ $ap->name }}</div>
-                      <div class="payor-contact">{{ $ap->email ?? ($ap->contact ?? '—') }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td><span class="amount-cell">₱{{ number_format($ap->amount, 2) }}</span></td>
-                <td><span class="fund-badge">{{ $ap->fund_type ?? '—' }}</span></td>
-                <td><span class="op-number">{{ $ap->op_number ?? '—' }}</span></td>
-                <td>
-                  <div class="date-main">{{ $ap->created_at->format('M d, Y') }}</div>
-                  <div class="date-time">{{ $ap->created_at->format('h:i A') }}</div>
-                </td>
-                <td>
-                  <div class="approved-on-main">{{ $ap->updated_at->format('M d, Y') }}</div>
-                  <div class="approved-on-time">{{ $ap->updated_at->format('h:i A') }}</div>
-                </td>
-                <td>
-                  <span class="approved-stamp">
-                    <i class="bi bi-check-circle-fill"></i> Approved
-                  </span>
-                </td>
-                <td style="text-align: center;">
-                  <a href="#" class="action-btn" title="View" onclick="openDrawer({{ $ap->id }});return false;"><i class="bi bi-eye"></i></a>
-                </td>
+        <div class="table-card-scroll">
+          <table class="approvals-table" id="approvals-table">
+            <thead>
+              <tr>
+                <th>Payor</th>
+                <th>Amount</th>
+                <th>Fund</th>
+                <th>O.P. Number</th>
+                <th>Date Submitted</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
+            </thead>
+            <tbody id="table-body">
+              @forelse($payments as $p)
+                @php
+                  $status    = $p->status ?? 'submitted';
+                  $statusMap = [
+                    'approved'            => 'sb-approved',
+                    'forwarded'           => 'sb-waiting',
+                    'under_review'        => 'sb-waiting',
+                    'submitted'           => 'sb-waiting',
+                    'accountant_rejected' => 'sb-rejected',
+                    'rejected'            => 'sb-rejected',
+                  ];
+                  $statusCls  = $statusMap[$status] ?? 'sb-waiting';
+                  $statusIcon = match($status) {
+                    'approved'                        => 'bi-check-circle-fill',
+                    'accountant_rejected', 'rejected' => 'bi-x-circle-fill',
+                    default                           => 'bi-hourglass-split',
+                  };
+                  $nameParts = explode(' ', trim($p->name));
+                  $initials  = strtoupper(substr($nameParts[0], 0, 1)) . (isset($nameParts[1]) ? strtoupper(substr($nameParts[1], 0, 1)) : '');
+                  
+                  // Drawer data
+                  $txnNames  = [
+                    'appeal_fee'=>'Appeal Fee','bidding_documents'=>'Bidding Documents','cash_bond'=>'Cash Bond',
+                    'certification_copy_fee'=>'Certification, Copy Fee and Reproduction Cost','consignment'=>'Consignment',
+                    'execution_judgment'=>'Execution of Judgment Involving Money','filing_fee'=>'Filing Fee and Inspection Cost',
+                    'income_unserviceable'=>'Income from Sale of Unserviceable Property','legal_research'=>'Legal Research',
+                    'performance_bond'=>'Performance Bond','refund_cash_advances'=>'Refund of Cash Advances',
+                    'refund_overpayment'=>'Refund of Overpayment','settlement_disallowances'=>'Settlement of Notice of Disallowances',
+                    'unwithheld_remittances'=>'Unwithheld Remittances',
+                  ];
+                  $rawTxn    = $p->transaction_type ?? '';
+                  $txnLabel  = $txnNames[$rawTxn] ?? ucwords(str_replace('_',' ', $rawTxn));
+                  $fundLabel = $p->fund_type ?? '—';
+                  $meta      = $p->meta ?? [];
+                  $details   = [];
+                  if (!empty($p->contact))      $details['Contact']      = $p->contact;
+                  if (!empty($p->address))      $details['Address']      = $p->address;
+                  if (!empty($p->email))        $details['Email']        = $p->email;
+                  if (!empty($p->payment_mode)) $details['Payment Mode'] = ucfirst(str_replace('_',' ',$p->payment_mode));
+                  if (is_array($meta)) {
+                    foreach ($meta as $k => $v) {
+                      if ($v === null || $v === '') continue;
+                      $details[$k] = is_array($v) ? implode(', ', $v) : $v;
+                    }
+                  }
+                @endphp
+                <tr
+                  data-search="{{ strtolower($p->name . ' ' . ($p->op_number ?? '')) }}"
+                  data-status="{{ $status }}"
+                  data-fund="{{ $p->fund_type ?? '' }}"
+                >
+                  <td>
+                    <div class="payor-cell">
+                      <div class="payor-avatar">{{ $initials }}</div>
+                      <div>
+                        <div class="payor-name">{{ $p->name }}</div>
+                        <div class="payor-contact">{{ $p->email ?? ($p->contact ?? '—') }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="amount-cell">₱{{ number_format($p->amount, 2) }}</span></td>
+                  <td><span class="fund-badge">{{ $p->fund_type ?? '—' }}</span></td>
+                  <td><span class="op-number">{{ $p->op_number ?? '—' }}</span></td>
+                  <td>
+                    <div class="date-main">{{ $p->created_at->format('M d, Y') }}</div>
+                    <div class="date-time">{{ $p->created_at->format('h:i A') }}</div>
+                  </td>
+                  <td>
+                    <span class="status-badge {{ $statusCls }}">
+                      <i class="bi {{ $statusIcon }}"></i> {{ ucwords(str_replace('_', ' ', $status)) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="actions-cell">
+                      <a href="#" class="action-btn" title="View" onclick="openDrawer({{ $p->id }});return false;"><i class="bi bi-eye"></i></a>
+                      @if($status !== 'approved')
+                        <form method="POST" action="{{ route('accountant.approve', $p->id) }}"
+                          onsubmit="return confirm('Approve payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
+                          @csrf
+                          <button type="submit" class="btn-approve"><i class="bi bi-check-lg"></i> Approve</button>
+                        </form>
+                      @endif
+                      @if($status !== 'accountant_rejected')
+                        <form method="POST" action="{{ route('accountant.reject', $p->id) }}"
+                          onsubmit="var r=prompt('Enter rejection remarks (optional):');if(r===null)return false;this.querySelector('input[name=remarks]').value=r;return confirm('Reject payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
+                          @csrf
+                          <input type="hidden" name="remarks" value=""/>
+                          <button type="submit" class="btn-reject"><i class="bi bi-x-lg"></i> Reject</button>
+                        </form>
+                      @endif
+                    </div>
+                  </td>
+                </tr>
 
               <script>
                 window.__drawers = window.__drawers || {};
-                window.__drawers[{{ $ap->id }}] = {
-                  id: {{ $ap->id }}, name: @json($ap->name), email: @json($ap->email ?? '—'),
-                  contact: @json($ap->contact ?? '—'), address: @json($ap->address ?? '—'),
-                  amount: @json('₱'.number_format($ap->amount,2)), amountRaw: @json(number_format($ap->amount,2)),
-                  amountNum: @json((float)$ap->amount), txn: @json($txnLabel ?: '—'), rawTxn: @json($rawTxn),
-                  fund: @json($fundLabel), op: @json($ap->op_number ?? '—'),
-                  mode: @json(ucfirst(str_replace('_',' ',$ap->payment_mode ?? 'cash'))),
-                  rawMode: @json($ap->payment_mode ?? 'cash'), status: 'Approved',
-                  rawStatus: 'approved', statusCls: 'sb-approved', statusIcon: 'bi-check-circle-fill',
-                  date: @json($ap->created_at->format('F d, Y — h:i A')), meta: @json($ap->meta ?? []),
-                  dateShort: @json($ap->created_at->format('m/d/Y')), details: @json($details)
+                window.__drawers[{{ $p->id }}] = {
+                  id: {{ $p->id }}, name: @json($p->name), email: @json($p->email ?? '—'),
+                  contact: @json($p->contact ?? '—'), address: @json($p->address ?? '—'),
+                  amount: @json('₱'.number_format($p->amount,2)), amountRaw: @json(number_format($p->amount,2)),
+                  amountNum: @json((float)$p->amount), txn: @json($txnLabel ?: '—'), rawTxn: @json($rawTxn),
+                  fund: @json($fundLabel), op: @json($p->op_number ?? '—'),
+                  mode: @json(ucfirst(str_replace('_',' ',$p->payment_mode ?? 'cash'))),
+                  rawMode: @json($p->payment_mode ?? 'cash'), status: @json(ucfirst($status)),
+                  rawStatus: @json($status), statusCls: @json($statusCls), statusIcon: @json($statusIcon),
+                  date: @json($p->created_at->format('F d, Y — h:i A')), meta: @json($p->meta ?? []),
+                  dateShort: @json($p->created_at->format('m/d/Y')), details: @json($details)
                 };
               </script>
-            @empty
-              <tr class="empty-row">
-                <td colspan="7">
-                  <div class="empty-icon"><i class="bi bi-check2-circle"></i></div>
-                  <div class="empty-text">No approved transactions yet.</div>
-                </td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
+              @empty
+                <tr class="empty-row">
+                  <td colspan="7">
+                    <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                    <div class="empty-text">No payment records found.</div>
+                  </td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
 
         <div class="table-footer">
-          <span class="table-footer-info" id="approved-footer-info">
-            Showing <strong>{{ $approvedPayments->count() }}</strong>
-            of <strong>{{ $total ?? ($approvedPayments->total() ?? $approvedPayments->count()) }}</strong> approved records
+          <span class="table-footer-info" id="footer-info">
+            Showing <strong>{{ $payments->count() }}</strong>
+            of <strong>{{ $total ?? ($payments->total() ?? count($payments)) }}</strong> records
           </span>
 
-          @if(method_exists($approvedPayments, 'lastPage'))
+          @if(method_exists($payments, 'lastPage'))
             <div class="pagination-wrap" aria-label="Pagination">
-              @if($approvedPayments->onFirstPage())
+              @if($payments->onFirstPage())
                 <span class="page-link disabled">« Previous</span>
               @else
-                <a class="page-link" href="{{ $approvedPayments->previousPageUrl() }}">« Previous</a>
+                <a class="page-link" href="{{ $payments->previousPageUrl() }}">« Previous</a>
               @endif
 
-              @for($i = 1; $i <= $approvedPayments->lastPage(); $i++)
-                @if($i == $approvedPayments->currentPage())
+              @for($i = 1; $i <= $payments->lastPage(); $i++)
+                @if($i == $payments->currentPage())
                   <span class="page-number active">{{ $i }}</span>
                 @else
-                  <a class="page-number" href="{{ $approvedPayments->url($i) }}">{{ $i }}</a>
+                  <a class="page-number" href="{{ $payments->url($i) }}">{{ $i }}</a>
                 @endif
               @endfor
 
-              @if($approvedPayments->hasMorePages())
-                <a class="page-link" href="{{ $approvedPayments->nextPageUrl() }}">Next »</a>
+              @if($payments->hasMorePages())
+                <a class="page-link" href="{{ $payments->nextPageUrl() }}">Next »</a>
               @else
                 <span class="page-link disabled">Next »</span>
               @endif
 
-              <div class="page-summary">Showing {{ $approvedPayments->firstItem() }} to {{ $approvedPayments->lastItem() }} of {{ $approvedPayments->total() }} results</div>
+              <div class="page-summary">Showing {{ $payments->firstItem() }} to {{ $payments->lastItem() }} of {{ $payments->total() }} results</div>
             </div>
           @endif
         </div>
@@ -655,6 +748,74 @@
 </div>
 
 <script>
+  // If URL contains ?notif_id=..., fetch that notification and display its content
+  (function(){
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const nid = params.get('notif_id');
+      if (!nid) return;
+      const container = document.querySelector('.page-body');
+      if (!container) return;
+      fetch('/accountant/notifications', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.ok ? r.json() : Promise.reject('fetch failed'))
+        .then(arr => {
+          const n = arr.find(x => String(x.id) === String(nid));
+          if (!n) return;
+          const d = n.data || {};
+          const title = d.name || d.op_number || 'Notification';
+          const msg = d.message || d.text || (d.status ? (d.status + ' update') : 'You have a notification');
+          const time = n.created_at ? new Date(n.created_at).toLocaleString() : '';
+
+          // Try to find matching table row by O.P. number or payor name
+          const tbody = document.getElementById('table-body');
+          if (tbody) {
+            const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => !r.classList.contains('empty-row'));
+            const op = (d.op_number || d.op || '').toString().trim();
+            const name = (d.name || '').toString().trim().toLowerCase();
+            const matched = rows.filter(r => {
+              const opEl = r.querySelector('.op-number');
+              const opText = opEl ? opEl.textContent.trim() : '';
+              const search = (r.getAttribute('data-search') || '').toLowerCase();
+              if (op && opText && opText === op) return true;
+              if (op && opText && opText.includes(op)) return true;
+              if (name && search && search.includes(name)) return true;
+              return false;
+            });
+
+            if (matched.length) {
+              // hide other rows and update counts
+              rows.forEach(r => { r.style.display = matched.includes(r) ? '' : 'none'; });
+              const rc = matched.length;
+              document.getElementById('record-count').textContent = rc + ' record' + (rc !== 1 ? 's' : '');
+              const footer = document.getElementById('footer-info');
+              if (footer) footer.innerHTML = `Showing <strong>${rc}</strong> of <strong>${rc}</strong> records`;
+              // scroll to first matched row and open drawer if available
+              matched[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+              // try to open drawer (matching by op number)
+              const opVal = matched[0].querySelector('.op-number')?.textContent.trim();
+              if (window.__drawers) {
+                for (const k in window.__drawers) {
+                  if (String(window.__drawers[k].op) === String(opVal)) { openDrawer(k); break; }
+                }
+              }
+              return;
+            }
+          }
+
+          // fallback: show small alert if no matching row
+          const alert = document.createElement('div');
+          alert.className = 'alert-bar alert-success';
+          alert.style.marginBottom = '16px';
+          alert.innerHTML = `<i class="bi bi-bell-fill"></i> <strong>${escapeHtml(title)}</strong> — ${escapeHtml(msg)} <span style="margin-left:10px; font-size:.82rem; color:var(--muted);">${escapeHtml(time)}</span>`;
+          container.insertBefore(alert, container.firstChild);
+        }).catch(()=>{});
+    } catch(e) {}
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  })();
+</script>
+
+<script>
+
   const headerWrap = document.getElementById('headerUserWrap');
 
   function toggleHeaderDropdown() {
@@ -667,13 +828,15 @@
     }
   });
 
+  /* ── NOTIFICATIONS ── */
   const NOTIF_DATA = {!! json_encode($notif_data ?? []) !!};
   let notifOpen = false;
 
   function timeAgo(iso) {
     try {
       if (!iso) return '';
-      const then = new Date(iso); const now = new Date();
+      const then = new Date(iso);
+      const now = new Date();
       const s = Math.floor((now - then) / 1000);
       if (s < 5) return 'just now';
       if (s < 60) return s + ' seconds ago';
@@ -690,14 +853,27 @@
     const list = document.getElementById('notif-list');
     const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
     const badge = document.getElementById('notif-badge');
-    if (unreadCount > 0) { badge.classList.add('show'); badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount); }
-    else { badge.classList.remove('show'); badge.textContent = ''; }
-    if (NOTIF_DATA.length === 0) { list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>'; return; }
+    if (unreadCount > 0) {
+      badge.classList.add('show');
+      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+      badge.setAttribute('title', unreadCount + ' unread notifications');
+    } else {
+      badge.classList.remove('show');
+      badge.textContent = '';
+      badge.removeAttribute('title');
+    }
+    if (NOTIF_DATA.length === 0) {
+      list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>';
+      return;
+    }
     list.innerHTML = NOTIF_DATA.map(n => {
       const t = n.ts ? timeAgo(n.ts) : (n.time || '');
-      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/accountant/approval?notif_id=${n.id}';">
         <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
-        <div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>
+        <div class="notif-item-body">
+          <div class="notif-item-text">${n.text}</div>
+          <div class="notif-item-time">${t}</div>
+        </div>
         ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
       </div>`;
     }).join('');
@@ -733,54 +909,44 @@
       }
     }).catch(err => { console.warn('Failed to mark all read', err); NOTIF_DATA.forEach(n => n.unread = false); renderNotifList(); });
   }
+
   function toggleNotifDropdown(e) {
     e.stopPropagation();
     const dropdown = document.getElementById('notif-dropdown');
     notifOpen = !notifOpen;
-    if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); } else dropdown.classList.remove('open');
+    if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); }
+    else dropdown.classList.remove('open');
   }
 
-  function filterApproved() {
-    const form = document.getElementById('filter-form'); if (form) form.submit();
-  }
   document.addEventListener('click', function(e) {
-    const btn = document.getElementById('notif-btn'), dropdown = document.getElementById('notif-dropdown');
-    if (notifOpen && !btn.contains(e.target) && !dropdown.contains(e.target)) { dropdown.classList.remove('open'); notifOpen = false; }
+    const btn = document.getElementById('notif-btn');
+    const dropdown = document.getElementById('notif-dropdown');
+    if (notifOpen && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.remove('open');
+      notifOpen = false;
+    }
   });
+
   window.addEventListener('load', function() {
     const unreadCount = NOTIF_DATA.filter(n => n.unread).length;
     const badge = document.getElementById('notif-badge');
-    if (unreadCount > 0) { badge.classList.add('show'); badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount); }
-    else { badge.classList.remove('show'); }
+    if (unreadCount > 0) {
+      badge.classList.add('show');
+      badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+      badge.setAttribute('title', unreadCount + ' unread notifications');
+    } else {
+      badge.classList.remove('show');
+      badge.textContent = '';
+    }
   });
 
-  /* ─── DRAWER ─── */
-  let __active = null;
-  function openDrawer(id) {
-    const d = window.__drawers?.[id]; if (!d) return;
-    __active = d;
-    document.getElementById('drawer-payor-name').textContent = d.name;
-    let h = `<div class="status-badge ${d.statusCls}" style="margin-bottom:16px;font-size:.74rem;padding:5px 13px;"><i class="bi ${d.statusIcon}"></i> ${d.status}</div>`;
-    h += `<div class="drawer-section-title"><i class="bi bi-person-lines-fill"></i> Payor Information</div>`;
-    h += df('Full Name', d.name) + df('Email', d.email) + df('Contact Number', d.contact) + df('Address', d.address);
-    h += `<hr class="drawer-divider"><div class="drawer-section-title"><i class="bi bi-card-checklist"></i> Transaction Details</div>`;
-    h += df('Transaction Type', d.txn) + df('Fund', d.fund) + df('Amount', d.amount) + df('O.P. No.', d.op) + df('Payment Mode', d.mode) + df('Date Processed', d.date);
-    if (d.details && Object.keys(d.details).length) {
-      h += `<hr class="drawer-divider"><div class="drawer-section-title"><i class="bi bi-info-circle"></i> Additional Information</div>`;
-      for (const [k, v] of Object.entries(d.details)) h += df(k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()), v);
-    }
-    document.getElementById('drawer-body').innerHTML = h;
-    document.getElementById('drawer-overlay').classList.add('open');
-    document.getElementById('detail-drawer').classList.add('open');
-    document.body.style.overflow = 'hidden';
+  /* ── TABLE FILTER ── */
+  function filterTable() {
+    const form = document.getElementById('filter-form'); if (form) form.submit();
   }
-  function df(label, value) { return `<div class="drawer-field"><div class="drawer-field-label">${label}</div><div class="drawer-field-value">${value||'—'}</div></div>`; }
-  function closeDrawer() { document.getElementById('drawer-overlay').classList.remove('open'); document.getElementById('detail-drawer').classList.remove('open'); document.body.style.overflow = ''; }
 
   /* ─── ESCAPE KEY TO CLOSE DRAWER ─── */
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
-
-  // Client-side filtering removed; form submits to apply server-side filters.
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -803,7 +969,7 @@
   })();
 </script>
 
-<!-- ── DETAIL DRAWER ── -->
+<!-- ══ DETAIL DRAWER ══ -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
 <div class="detail-drawer" id="detail-drawer">
   <div class="drawer-head">
@@ -814,6 +980,31 @@
   </div>
   <div class="drawer-body" id="drawer-body"></div>
 </div>
+
+<script>
+  /* ─── DRAWER ─── */
+  let __active = null;
+  function openDrawer(id) {
+    const d = window.__drawers?.[id]; if (!d) return;
+    __active = d;
+    document.getElementById('drawer-payor-name').textContent = d.name;
+    let h = `<div class="status-badge ${d.statusCls}" style="margin-bottom:16px;font-size:.74rem;padding:5px 13px;"><i class="bi ${d.statusIcon}"></i> ${d.status}</div>`;
+    h += `<div class="drawer-section-title"><i class="bi bi-person-lines-fill"></i> Payor Information</div>`;
+    h += df('Full Name', d.name) + df('Email', d.email) + df('Contact Number', d.contact) + df('Address', d.address);
+    h += `<hr class="drawer-divider"><div class="drawer-section-title"><i class="bi bi-card-checklist"></i> Transaction Details</div>`;
+    h += df('Transaction Type', d.txn) + df('Fund', d.fund) + df('Amount', d.amount) + df('O.P. No.', d.op) + df('Payment Mode', d.mode) + df('Date Processed', d.date);
+    if (d.details && Object.keys(d.details).length) {
+      h += `<hr class="drawer-divider"><div class="drawer-section-title"><i class="bi bi-info-circle"></i> Additional Information</div>`;
+      for (const [k, v] of Object.entries(d.details)) h += df(k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()), v);
+    }
+    document.getElementById('drawer-body').innerHTML = h;
+    document.getElementById('drawer-overlay').classList.add('open');
+    document.getElementById('detail-drawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function df(label, value) { return `<div class="drawer-field"><div class="drawer-field-label">${label}</div><div class="drawer-field-value">${value||'—'}</div></div>`; }
+  function closeDrawer() { document.getElementById('drawer-overlay').classList.remove('open'); document.getElementById('detail-drawer').classList.remove('open'); document.body.style.overflow = ''; }
+</script>
 
 </body>
 </html>

@@ -938,8 +938,9 @@
   }
 
   function readNotif(id) {
-    fetch('/notifications/' + id + '/read', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' }})
-      .then(() => { const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList(); })
+    // mark locally first
+    const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList();
+    fetch('/notifications/' + id + '/read', { method: 'POST', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' }})
       .catch(() => { const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList(); });
   }
 

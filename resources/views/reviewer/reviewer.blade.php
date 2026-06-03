@@ -937,8 +937,8 @@
                   <div class="actions-cell">
                     <a href="#" class="action-btn" title="View" onclick="openDrawer({{ $p->id }});return false;"><i class="bi bi-eye"></i></a>
                     @if($status !== 'forwarded' && $status !== 'approved')
-                      <form method="POST" action="{{ route('payments.forward', $p->id) }}"
-                            onsubmit="return confirm('Forward payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount,2) }}) to Accountant?')">
+                          <form method="POST" action="{{ route('payments.forward', $p->id) }}"
+                            onsubmit="return confirm('Forward payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount,2) }}) to Approver?')">
                         @csrf
                         <button type="submit" class="btn-row-approve"><i class="bi bi-arrow-right-circle"></i> Forward</button>
                       </form>
@@ -1564,7 +1564,7 @@
       else if (n.status === 'rejected') actionText = 'was rejected. Please review.';
       const message = `Transaction for ${n.name} ${actionText}`;
       return `
-      <a href="/reviewer?notif_id=${n.id}" class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif(${n.id})">
+      <a href="/reviewer?notif_id=${n.id}" class="notif-item${n.unread ? ' unread' : ''}" onclick="event.preventDefault(); readNotif(${n.id}); window.location='/reviewer?notif_id=${n.id}';">
         <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
         <div class="notif-item-body">
           <div class="notif-item-text">${message}</div>
@@ -1577,17 +1577,12 @@
   }
 
   function readNotif(id) {
-    fetch('/notifications/' + id + '/read', { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' }})
-      .then(() => {
-        const n = NOTIF_DATA.find(x => x.id === id);
-        if (n) n.unread = false;
-        renderNotifList();
-      }).catch(() => {
-        // still mark locally
-        const n = NOTIF_DATA.find(x => x.id === id);
-        if (n) n.unread = false;
-        renderNotifList();
-      });
+    // mark locally first for immediate UI feedback
+    const n = NOTIF_DATA.find(x => x.id === id);
+    if (n) n.unread = false;
+    renderNotifList();
+    fetch('/notifications/' + id + '/read', { method: 'POST', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' }})
+      .catch(() => { const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList(); });
   }
 
   function markAllRead() {
@@ -1752,10 +1747,10 @@
     document.getElementById('drawer-payor-name').textContent = d.name;
     let h = `<div class="status-badge ${d.statusCls}" style="margin-bottom:16px;font-size:.74rem;padding:5px 13px;"><i class="bi ${d.statusIcon}"></i> ${d.status}</div>`;
     h += `<div class="drawer-actions">`;
-    if (!['forwarded_to_accountant','approved'].includes(d.rawStatus)) {
-      h += `<form method="POST" action="${d.forwardUrl}" onsubmit="return confirm('Forward payment from ${esc(d.name)} (${esc(d.amount)}) to Accountant?')" style="flex:1;">
+      if (!['forwarded_to_accountant','approved'].includes(d.rawStatus)) {
+      h += `<form method="POST" action="${d.forwardUrl}" onsubmit="return confirm('Forward payment from ${esc(d.name)} (${esc(d.amount)}) to Approver?')" style="flex:1;">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <button type="submit" class="drawer-action-approve" style="width:100%;"><i class="bi bi-arrow-right-circle"></i> Forward to Accountant</button>
+        <button type="submit" class="drawer-action-approve" style="width:100%;"><i class="bi bi-arrow-right-circle"></i> Forward to Approver</button>
       </form>`;
     }
     h += `<button type="button" class="drawer-action-modify" onclick="openModifyModal(window.__drawers[${id}].modifyData)"><i class="bi bi-pencil-fill"></i> Modify</button>`;

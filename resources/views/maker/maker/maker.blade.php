@@ -1766,9 +1766,33 @@
     fetch('/payments.json')
       .then(r => r.ok ? r.json() : Promise.reject(r))
       .then(payments => {
-        _allTransactions = Array.isArray(payments) ? payments : [];
-        renderModal();
-      })
+          _allTransactions = Array.isArray(payments) ? payments : [];
+
+          // If opened with a notification id in the URL, try to locate it and set the modal query
+          try {
+            const params = new URLSearchParams(window.location.search || '');
+            const nid = params.get('notif_id');
+            if (nid) {
+              fetch('/maker/notifications', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.ok ? r.json() : Promise.reject(r))
+                .then(list => {
+                  const n = Array.isArray(list) ? list.find(x => String(x.id) === String(nid)) : null;
+                  if (n) {
+                    // Prefer matching by op_number, fallback to name
+                    const op = n.data?.op_number || null;
+                    const name = n.data?.name || null;
+                    if (op) _modalQuery = String(op).toLowerCase();
+                    else if (name) _modalQuery = String(name).toLowerCase();
+                    else _modalQuery = '';
+                    _modalPage = 1;
+                  }
+                  renderModal();
+                }).catch(() => { renderModal(); });
+            } else {
+              renderModal();
+            }
+          } catch (e) { renderModal(); }
+        })
       .catch(() => {
         _allTransactions = DEMO_DATA;
         renderModal();
@@ -2260,7 +2284,7 @@
     list.innerHTML = NOTIF_DATA.map(n => {
       const t = n.ts ? timeAgo(n.ts) : (n.time || '');
       const text = (n.text || n.title || 'Notification');
-      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">` +
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readAndView('${n.id}')">` +
         `<div class="notif-item-body"><div class="notif-item-text">${text}</div><div class="notif-item-time">${t}</div></div>` +
         `${n.unread ? '<div class="notif-unread-dot"></div>' : ''}` +
       `</div>`;
@@ -2290,6 +2314,28 @@
       renderNotifList();
     });
   }
+
+  window.readAndView = function (id) {
+    if (!Array.isArray(NOTIF_DATA)) return window.location = '/maker?notif_id=' + encodeURIComponent(id);
+    fetch('{{ url('/maker/notifications') }}/' + id + '/read', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      credentials: 'same-origin'
+    }).then(r => {
+      const n = NOTIF_DATA.find(x => x.id === id);
+      if (n) n.unread = false;
+      renderNotifList();
+      window.location = '/maker?notif_id=' + encodeURIComponent(id);
+    }).catch(() => {
+      const n = NOTIF_DATA.find(x => x.id === id);
+      if (n) n.unread = false;
+      renderNotifList();
+      window.location = '/maker?notif_id=' + encodeURIComponent(id);
+    });
+  };
 
   function markAllRead() {
     if (!Array.isArray(NOTIF_DATA)) return;
@@ -2344,6 +2390,15 @@
         badge.classList.remove('show');
         badge.textContent = '';
       }
+      // If page loaded with a notification id, auto-open the transactions modal
+      try {
+        const params = new URLSearchParams(window.location.search || '');
+        const nid = params.get('notif_id');
+        if (nid) {
+          // small defer to allow initial layout to settle
+          setTimeout(() => { openModal(); }, 120);
+        }
+      } catch(e) {}
     } catch(e){}
   });
 

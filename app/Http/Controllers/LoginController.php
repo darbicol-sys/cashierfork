@@ -174,7 +174,7 @@ class LoginController extends Controller
         $role = strtolower($roleName ?? '');
         $position = strtolower(Auth::user()->position ?? '');
 
-        if ($role === 'accountant' || $position === 'accountant') {
+        if ($role === 'approver' || $position === 'approver') {
             return redirect()->intended(route('accountant.approval'));
         }
         if ($role === 'maker' || $position === 'maker') {

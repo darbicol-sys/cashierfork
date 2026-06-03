@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Notifications — DAR Cashier Accountant</title>
+  <title>Notifications — DAR Cashier Approver</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
@@ -267,7 +267,7 @@
         </div>
         <div>
           <div class="header-user-name">{{ $displayName }}</div>
-          <div class="header-user-role">{{ ucfirst($authUser->position ?? $authUser->role ?? 'Accountant') }}</div>
+          <div class="header-user-role">{{ ucfirst($authUser->position ?? $authUser->role ?? 'Approver') }}</div>
         </div>
         <i class="bi bi-chevron-down header-user-caret"></i>
       </div>
@@ -300,8 +300,8 @@
       <div class="sidebar-profile">
         <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
         <div>
-          <div class="profile-name">{{ $displayName ?? 'Accountant User' }}</div>
-          <div class="profile-role">Accountant</div>
+          <div class="profile-name">{{ $displayName ?? 'Approver User' }}</div>
+          <div class="profile-role">Approver</div>
         </div>
       </div>
       <hr class="sidebar-divider">
@@ -511,7 +511,7 @@
       approved:  { icon: 'bi-check-circle-fill',     cls: 'ni-green',  tagCls: 'tag-approved',  label: 'Approved',  type: 'type-approved',  msg: 'has been approved successfully.' },
       forwarded: { icon: 'bi-arrow-right-circle-fill', cls: 'ni-gold', tagCls: 'tag-forwarded', label: 'Forwarded', type: 'type-forwarded', msg: 'has been forwarded for your review.' },
       rejected:  { icon: 'bi-x-circle-fill',           cls: 'ni-red',  tagCls: 'tag-rejected',  label: 'Rejected',  type: 'type-rejected',  msg: 'was rejected. Please review the details.' },
-      accountant_rejected: { icon: 'bi-x-circle-fill', cls: 'ni-red', tagCls: 'tag-rejected', label: 'Rejected', type: 'type-rejected', msg: 'was rejected by the Accountant.' },
+      accountant_rejected: { icon: 'bi-x-circle-fill', cls: 'ni-red', tagCls: 'tag-rejected', label: 'Rejected', type: 'type-rejected', msg: 'was rejected by the Approver.' },
     };
     return map[status] || { icon: 'bi-bell-fill', cls: 'ni-purple', tagCls: 'tag-system', label: 'Update', type: 'type-system', msg: 'has a status update.' };
   }
@@ -529,7 +529,7 @@
     ].filter(Boolean).join('');
 
     return `
-    <div class="notif-card ${uCls} ${cfg.type}" data-id="${n.id}" data-status="${n.status}" onclick="readOne('${n.id}')">
+    <div class="notif-card ${uCls} ${cfg.type}" data-id="${n.id}" data-status="${n.status}" onclick="readAndView('${n.id}')">
       <div class="notif-icon-wrap ${cfg.cls}"><i class="bi ${cfg.icon}"></i></div>
       <div class="notif-content">
         <div class="notif-top">
@@ -590,6 +590,13 @@
   /* ── ACTIONS ── */
   async function readOne(id) {
     await markOneRead(id);
+  }
+
+  async function readAndView(id) {
+    try {
+      await markOneRead(id);
+    } catch (e) {}
+    window.location = '/accountant/approval?notif_id=' + encodeURIComponent(id);
   }
 
   async function markOneRead(id) {

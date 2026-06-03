@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>My Profile — DAR Accountant</title>
+  <title>My Profile — DAR Approver</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="icon" href="{{ asset('img/dar_logo.png') }}" />
@@ -401,7 +401,7 @@
     ? strtoupper(substr($nameParts[0],0,1) . substr($nameParts[count($nameParts)-1],0,1))
     : strtoupper(substr($user->name ?? 'AC', 0, 2));
   $fullName = trim(($user->first_name ?? '') . ' ' . ($user->middle_name ?? '') . ' ' . ($user->last_name ?? ''));
-  $fullName = preg_replace('/\s+/', ' ', $fullName) ?: ($user->name ?? 'Accountant');
+  $fullName = preg_replace('/\s+/', ' ', $fullName) ?: ($user->name ?? 'Approver');
 @endphp
 
 <div class="top-stripe"></div>
@@ -415,7 +415,7 @@
     <div class="t2">Department of Agrarian Reform</div>
   </div>
   <div class="header-sep"></div>
-  <div class="header-page">Accountant Panel</div>
+  <div class="header-page">Approver Panel</div>
 
   <div class="header-actions">
 
@@ -540,10 +540,10 @@
         </div>
         <div>
             @php
-              $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Accountant');
+              $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Approver');
             @endphp
           <div class="profile-name">{{ $displayName }}</div>
-          <div class="profile-role">Accountant</div>
+          <div class="profile-role">Approver</div>
         </div>
       </div>
       <hr class="sidebar-divider">
@@ -618,7 +618,7 @@
           <div class="profile-hero-info">
             <div class="profile-hero-name">{{ $fullName }}</div>
             <div class="profile-hero-meta">
-              <span class="profile-hero-role"><i class="bi bi-calculator-fill"></i> Accountant</span>
+              <span class="profile-hero-role"><i class="bi bi-calculator-fill"></i> Approver</span>
               <span class="profile-hero-email"><i class="bi bi-envelope"></i> {{ $user->email ?? '—' }}</span>
             </div>
           </div>
@@ -651,7 +651,7 @@
           </div>
           <div class="info-row">
             <span class="info-label">Role</span>
-            <span class="info-value">Accountant</span>
+            <span class="info-value">Approver</span>
           </div>
           <div class="info-row">
             <span class="info-label">Username</span>
@@ -902,7 +902,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function renderNotifList() {
     const list = document.getElementById('notif-list'); if (!list) return; const badge = document.getElementById('notif-badge'); const unreadCount = NOTIF_DATA.filter(n=>n.unread).length; if (badge) { if (unreadCount>0) { badge.classList.add('show'); badge.textContent = unreadCount>99?'99+':String(unreadCount); badge.setAttribute('title', unreadCount + ' unread notifications'); } else { badge.classList.remove('show'); badge.textContent=''; badge.removeAttribute('title'); } }
     if (NOTIF_DATA.length===0) { list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>'; return; }
-    list.innerHTML = NOTIF_DATA.map(n=>{ const t = n.ts ? timeAgo(n.ts) : (n.time||''); return `<div class="notif-item${n.unread?' unread':''}" onclick="readNotif('${n.id}')"><div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div><div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>${n.unread?'<div class="notif-unread-dot"></div>':''}</div>`; }).join('');
+    list.innerHTML = NOTIF_DATA.map(n=>{ const t = n.ts ? timeAgo(n.ts) : (n.time||''); return `<div class="notif-item${n.unread?' unread':''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/accountant/approval?notif_id=${n.id}';"><div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div><div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>${n.unread?'<div class="notif-unread-dot"></div>':''}</div>`; }).join('');
   }
 
   window.readNotif = function(id) {

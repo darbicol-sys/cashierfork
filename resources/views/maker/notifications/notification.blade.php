@@ -469,7 +469,7 @@
       n.op     ? `<span class="notif-tag tag-meta"><i class="bi bi-hash"></i> ${esc(n.op)}</span>` : '',
     ].filter(Boolean).join('');
     return `
-    <div class="notif-card ${uCl} ${c.type}" data-id="${n.id}" onclick="readOne('${n.id}')">
+    <div class="notif-card ${uCl} ${c.type}" data-id="${n.id}" onclick="readAndView('${n.id}')">
       <div class="notif-icon-wrap ${c.cls}"><i class="bi ${c.icon}"></i></div>
       <div class="notif-content">
         <div class="notif-top">
@@ -519,6 +519,11 @@
   }
 
   function readOne(id) { markOneRead(id); }
+
+  async function readAndView(id) {
+    await markOneRead(id);
+    window.location = '/maker?notif_id=' + encodeURIComponent(id);
+  }
 
   async function markOneRead(id) {
     try { await fetch('/maker/notifications/' + id + '/read', { method:'POST', headers:{ 'X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':CSRF } }); } catch(e) {}

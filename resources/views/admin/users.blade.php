@@ -174,6 +174,7 @@
     .data-table tbody td:first-child { padding-left: 22px; }
     .data-table tbody td:last-child  { padding-right: 22px; }
     .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--green-mid); color: #fff; font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
     .user-name  { font-weight: 600; font-size: .87rem; color: var(--text-dark); }
     .user-email { font-size: .72rem; color: var(--muted); margin-top: 1px; }
     .role-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: .68rem; font-weight: 700; white-space: nowrap; }
@@ -407,7 +408,7 @@
         </div>
         <div class="stat-card">
           <div class="stat-icon si-red"><i class="bi bi-person-gear"></i></div>
-          <div><div class="stat-value">{{ $accountantCount ?? '—' }}</div><div class="stat-label">Accountants</div></div>
+          <div><div class="stat-value">{{ $approverCount ?? '—' }}</div><div class="stat-label">Approvers</div></div>
         </div>
       </div>
 
@@ -421,7 +422,7 @@
           <option value="admin">Admin</option>
           <option value="maker">Maker</option>
           <option value="reviewer">Reviewer</option>
-          <option value="accountant">Accountant</option>
+          <option value="approver">Approver</option>
         </select>
         <select class="filter-select" id="filter-user-status" onchange="filterUsers()">
           <option value="">All Statuses</option>
@@ -457,7 +458,7 @@
                   'admin'      => 'rb-admin',
                   'maker'      => 'rb-cashier',
                   'reviewer'   => 'rb-reviewer',
-                  'accountant' => 'rb-accountant',
+                  'approver'   => 'rb-accountant',
                   default      => 'rb-cashier'
                 };
                 $uStatus = ($u->is_active ?? true) ? 'active' : 'inactive';
@@ -475,10 +476,15 @@
                 data-phone_number="{{ $u->phone_number ?? '' }}"
                 data-address="{{ $u->address ?? '' }}"
                 data-position="{{ $u->position ?? $u->role ?? '' }}"
+                data-profile_picture="{{ $u->profile_picture ?? '' }}"
                 data-created="{{ $u->created_at }}"
               >
                 <td style="width:56px;text-align:center;">
-                  <div class="user-avatar">{{ $initials }}</div>
+                  @if(!empty($u->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($u->profile_picture))
+                    <div class="user-avatar"><img src="{{ asset('storage/' . $u->profile_picture) }}" alt="{{ $u->first_name ?? 'User' }}"></div>
+                  @else
+                    <div class="user-avatar">{{ $initials }}</div>
+                  @endif
                 </td>
                 <td>
                   <div class="user-name">{{ trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')) ?: ($u->name ?? '—') }}</div>
@@ -660,7 +666,7 @@
                   <option value="" disabled selected>Select role…</option>
                   <option value="maker">Maker</option>
                   <option value="reviewer">Reviewer</option>
-                  <option value="accountant">Accountant</option>
+                  <option value="approver">Approver</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
@@ -754,7 +760,7 @@
                   <option value="" disabled>Select role…</option>
                   <option value="maker">Maker</option>
                   <option value="reviewer">Reviewer</option>
-                  <option value="accountant">Accountant</option>
+                  <option value="approver">Approver</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
@@ -856,7 +862,12 @@
     currentViewUserId = id;
     const ds      = row.dataset;
     const initials = (ds.first?.charAt(0) || '') + (ds.last?.charAt(0) || '');
-    document.getElementById('view-avatar').textContent    = initials.toUpperCase() || '?';
+    const avatarEl = document.getElementById('view-avatar');
+    if (ds.profile_picture) {
+      avatarEl.innerHTML = '<img src="/storage/' + ds.profile_picture + '" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">';
+    } else {
+      avatarEl.textContent = initials.toUpperCase() || '?';
+    }
     document.getElementById('view-fullname').textContent  = [ds.first, ds.middle, ds.last].filter(Boolean).join(' ') || '—';
     document.getElementById('view-email').textContent     = ds.email     || '—';
     document.getElementById('view-username').textContent  = ds.username  || '—';

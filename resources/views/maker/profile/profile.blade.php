@@ -962,7 +962,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     list.innerHTML = NOTIF_DATA.map(n => {
       const t = n.ts ? timeAgo(n.ts) : (n.time || '');
-      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readNotif('${n.id}')">
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="readAndView('${n.id}')">
         <div class="notif-item-body"><div class="notif-item-text">${n.text || n.title || ''}</div><div class="notif-item-time">${t}</div></div>
         ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
       </div>`;
@@ -976,6 +976,17 @@ document.addEventListener('DOMContentLoaded', function () {
       headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
       credentials: 'same-origin'
     }).catch(() => {});
+  };
+
+  window.readAndView = function (id) {
+    const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList();
+    fetch('{{ url('/maker/notifications') }}/' + id + '/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+      credentials: 'same-origin'
+    }).finally(() => {
+      window.location = '/maker?notif_id=' + encodeURIComponent(id);
+    });
   };
 
   window.markAllRead = function () {
