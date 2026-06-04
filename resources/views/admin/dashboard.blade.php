@@ -558,17 +558,31 @@
               </div>
 
               <div id="fund-breakdown">
-                @foreach(['Fund 01 — Regular' => 65, 'Fund 03 — ARF' => 20, 'Fund 07 — Trust' => 10, 'Fund 02 (LP/GOP)' => 5] as $fund => $pct)
-                  <div class="fund-item">
-                    <div class="fund-item-row">
-                      <span>{{ $fund }}</span>
-                      <span>{{ $pct }}%</span>
+                @if(!empty($fundBreakdown) && count($fundBreakdown) > 0)
+                  @foreach($fundBreakdown as $fb)
+                    <div class="fund-item">
+                      <div class="fund-item-row">
+                        <span>{{ $fb['label'] }}</span>
+                        <span>{{ $fb['pct'] }}%</span>
+                      </div>
+                      <div class="fund-bar-track">
+                        <div class="fund-bar-fill" style="width: {{ $fb['pct'] }}%;"></div>
+                      </div>
                     </div>
-                    <div class="fund-bar-track">
-                      <div class="fund-bar-fill" style="width: {{ $pct }}%;"></div>
+                  @endforeach
+                @else
+                  @foreach(['Fund 01 — Regular' => 65, 'Fund 03 — ARF' => 20, 'Fund 07 — Trust' => 10, 'Fund 02 (LP/GOP)' => 5] as $fund => $pct)
+                    <div class="fund-item">
+                      <div class="fund-item-row">
+                        <span>{{ $fund }}</span>
+                        <span>{{ $pct }}%</span>
+                      </div>
+                      <div class="fund-bar-track">
+                        <div class="fund-bar-fill" style="width: {{ $pct }}%;"></div>
+                      </div>
                     </div>
-                  </div>
-                @endforeach
+                  @endforeach
+                @endif
               </div>
 
             </div>

@@ -46,7 +46,29 @@ class AdminController extends Controller
 		}
 		$avgAmount = Payment::whereDate('created_at', today())->avg('amount') ?? 0;
 
-		return view('admin.dashboard', compact('totalUsers','totalTransactions','pendingApprovals','totalCollected','recentPayments','recentUsers','approvedCount','rejectedCount','activeUsers','logsToday','avgAmount'));
+		// Fund breakdown: totals per fund_type (approved payments only)
+		$fundTotalsQuery = Payment::select('fund_type', DB::raw('SUM(amount) as total'))
+			->where('status', 'approved')
+			->groupBy('fund_type')
+			->get();
+
+		$fundTotals = [];
+		$fundSum = 0;
+		foreach ($fundTotalsQuery as $f) {
+			$key = $f->fund_type ?: 'Unspecified';
+			$fundTotals[$key] = (float) $f->total;
+			$fundSum += $f->total;
+		}
+
+		$fundBreakdown = [];
+		if ($fundSum > 0) {
+			foreach ($fundTotals as $label => $total) {
+				$pct = round(($total / $fundSum) * 100, 1);
+				$fundBreakdown[] = ['label' => $label, 'total' => $total, 'pct' => $pct];
+			}
+		}
+
+		return view('admin.dashboard', compact('totalUsers','totalTransactions','pendingApprovals','totalCollected','recentPayments','recentUsers','approvedCount','rejectedCount','activeUsers','logsToday','avgAmount','fundBreakdown'));
 	}
 
 	/**
