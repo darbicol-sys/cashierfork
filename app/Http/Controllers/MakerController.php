@@ -329,7 +329,7 @@ class MakerController extends Controller
                 if ($reviewerRoleId) {
                     $reviewers = User::where('role_id', $reviewerRoleId)->get();
                     foreach ($reviewers as $r) {
-                        $r->notify(new NewMessageNotification($payment));
+                        $r->notify(new NewMessageNotification($payment, auth()->user()));
                     }
                 }
             } catch (\Throwable $e) {

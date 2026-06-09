@@ -23,8 +23,9 @@ class ReviewerController extends Controller
 
         $status = request()->query('status', '');
         $fund   = request()->query('fund', '');
-        $q      = request()->query('search', '');
-        $notifId = request()->query('notif_id', '');
+        $q         = request()->query('search', '');
+        $notifId   = request()->query('notif_id', '');
+        $paymentId = request()->query('payment_id', '');
 
         $query = Payment::orderBy('created_at', 'desc');
 
@@ -66,6 +67,11 @@ class ReviewerController extends Controller
             } catch (\Throwable $e) {
                 // ignore and fall back to normal search
             }
+        }
+
+        // If a direct payment_id was provided (for links from emails), narrow to that payment
+        if (! $notifId && $paymentId) {
+            $query->where('id', $paymentId);
         }
 
         // Apply search across name, op_number and transaction_type
@@ -118,24 +124,13 @@ class ReviewerController extends Controller
             if ($approverRoleId) {
                 $approvers = User::where('role_id', $approverRoleId)->get();
                 foreach ($approvers as $a) {
-                    $a->notify(new NewMessageNotification($payment));
+                    $a->notify(new NewMessageNotification($payment, Auth::user()));
                 }
             }
         } catch (\Throwable $e) {
             Log::warning('Failed to notify approvers on forward: ' . $e->getMessage());
         }
-        // Also notify makers about the forward action
-        try {
-            $makerRoleId = DB::table('roles')->where('name', 'maker')->value('id');
-            if ($makerRoleId) {
-                $makers = User::where('role_id', $makerRoleId)->get();
-                foreach ($makers as $m) {
-                    $m->notify(new NewMessageNotification($payment));
-                }
-            }
-        } catch (\Throwable $e) {
-            Log::warning('Failed to notify makers on forward: ' . $e->getMessage());
-        }
+        // Do not notify makers when forwarding; only approvers should be notified.
         return redirect()->route('reviewer')->with('success', 'Payment forwarded.');
     }
 
@@ -286,7 +281,7 @@ class ReviewerController extends Controller
             if ($makerRoleId) {
                 $makers = User::where('role_id', $makerRoleId)->get();
                 foreach ($makers as $m) {
-                    $m->notify(new NewMessageNotification($payment));
+                    $m->notify(new NewMessageNotification($payment, Auth::user()));
                 }
             }
         } catch (\Throwable $e) {

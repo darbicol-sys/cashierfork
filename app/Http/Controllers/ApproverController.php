@@ -229,7 +229,7 @@ class ApproverController extends Controller
             if ($reviewerRoleId) {
                 $reviewers = User::where('role_id', $reviewerRoleId)->get();
                 foreach ($reviewers as $r) {
-                    $r->notify(new NewMessageNotification($p));
+                    $r->notify(new NewMessageNotification($p, Auth::user()));
                 }
             }
         } catch (\Throwable $e) {
@@ -241,7 +241,7 @@ class ApproverController extends Controller
             if ($makerRoleId) {
                 $makers = User::where('role_id', $makerRoleId)->get();
                 foreach ($makers as $m) {
-                    $m->notify(new NewMessageNotification($p));
+                    $m->notify(new NewMessageNotification($p, Auth::user()));
                 }
             }
         } catch (\Throwable $e) {
@@ -279,7 +279,7 @@ class ApproverController extends Controller
             if ($reviewerRoleId) {
                 $reviewers = User::where('role_id', $reviewerRoleId)->get();
                 foreach ($reviewers as $r) {
-                    $r->notify(new NewMessageNotification($p));
+                    $r->notify(new NewMessageNotification($p, Auth::user()));
                 }
             }
         } catch (\Throwable $e) {
@@ -292,7 +292,7 @@ class ApproverController extends Controller
             if ($makerRoleId) {
                 $makers = User::where('role_id', $makerRoleId)->get();
                 foreach ($makers as $m) {
-                    $m->notify(new NewMessageNotification($p));
+                    $m->notify(new NewMessageNotification($p, Auth::user()));
                 }
             }
         } catch (\Throwable $e) {
