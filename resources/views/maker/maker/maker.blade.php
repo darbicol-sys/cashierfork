@@ -2422,3 +2422,28 @@
 </script>
 </body>
 </html>
+@if(session('success') || session('error'))
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    @if(session('success'))
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: @json(session('success')),
+        confirmButtonText: 'OK'
+      });
+    @endif
+
+    @if(session('error'))
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: @json(session('error')),
+        confirmButtonText: 'OK'
+      });
+    @endif
+  });
+</script>
+@endif
+
+</html>

@@ -1938,10 +1938,6 @@
   })();
 </script>
 
-@if(session('success'))
-<script>try{ localStorage.removeItem('reviewer_form_draft_v1'); }catch(e){} </script>
-@endif
-
 <!-- Preview Modal (decoded JSON + Base64 encoded) - reused from Maker -->
 <style>
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
@@ -2006,6 +2002,31 @@
         });
       });
     } catch (e) { /* noop */ }
+  })();
+</script>
+
+<script>
+  (function(){
+    try {
+      @if(session('success'))
+        try{ localStorage.removeItem('reviewer_form_draft_v1'); }catch(e){}
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: {!! json_encode(session('success')) !!},
+          confirmButtonText: 'OK'
+        });
+      @endif
+
+      @if(session('error'))
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: {!! json_encode(session('error')) !!},
+          confirmButtonText: 'OK'
+        });
+      @endif
+    } catch(e) { /* noop */ }
   })();
 </script>
 

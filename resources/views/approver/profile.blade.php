@@ -485,9 +485,9 @@
             <div>
                 <div class="header-user-name">{{ $displayName }}</div>
 
-                <div class="header-user-role">
-                    {{ ucfirst($authUser->position ?? $authUser->role ?? 'Admin') }}
-                </div>
+                 <div class="header-user-role">
+                     Approver
+                    </div>
             </div>
 
             <i class="bi bi-chevron-down header-user-caret"></i>

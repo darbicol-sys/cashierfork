@@ -16,12 +16,22 @@ class NewMessageNotification extends Notification
      * Create a new notification instance.
      */
     protected Payment $payment;
-    protected $initiator;
+    protected ?string $initiatorName = null;
 
     public function __construct(Payment $payment, $initiator = null)
     {
         $this->payment = $payment;
-        $this->initiator = $initiator;
+
+        // Normalize initiator into a simple display name to avoid
+        // serializing whole User models or calling auth() inside
+        // notifications (which can run outside the current request).
+        if (is_object($initiator)) {
+            $u = $initiator;
+            $name = trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')) ?: ($u->name ?? null);
+            $this->initiatorName = $name ?: null;
+        } else {
+            $this->initiatorName = $initiator ? (string) $initiator : null;
+        }
     }
 
     /**
@@ -31,7 +41,10 @@ class NewMessageNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        // Use only database notifications for now to avoid side-effects
+        // from mail rendering during request handling. If mail is needed
+        // re-enable 'mail' after confirming this fixes the issue.
+        return ['database'];
     }
 
     /**
@@ -131,20 +144,8 @@ class NewMessageNotification extends Notification
      */
     private function submitterName()
     {
-        if ($this->initiator) {
-            $u = $this->initiator;
-            $name = trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')) ?: ($u->name ?? null);
-            return $name ?: ($this->payment->name ?? '—');
-        }
-
-        try {
-            $u = auth()->user();
-            if ($u) {
-                $name = trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')) ?: ($u->name ?? null);
-                return $name ?: ($this->payment->name ?? '—');
-            }
-        } catch (\Throwable $e) {
-            // ignore
+        if ($this->initiatorName) {
+            return $this->initiatorName;
         }
 
         return $this->payment->name ?? '—';

@@ -48,30 +48,44 @@ class LoginController extends Controller
         }
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
-            // Credentials correct — create OTP, email it, and ask user to verify.
+            // Credentials correct — temporarily bypass OTP verification.
             $user = Auth::user();
 
-            // generate 6-digit numeric OTP
-            $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            // Prevent session fixation
+            $request->session()->regenerate();
 
-            // store OTP in cache keyed by user id for 5 minutes
-            Cache::put('login_otp_'.$user->id, $otp, now()->addMinutes(5));
-
-            // store pending user id and remember flag in session
-            session(['pending_login_user' => $user->id, 'pending_login_remember' => $request->filled('remember')]);
-
+            // Log successful login
             try {
-                Log::info('Attempting to send OTP email', ['email' => $user->email, 'user_id' => $user->id]);
-                Mail::to($user->email)->send(new OneTimePassword($otp, $user));
-                Log::info('OTP email sent', ['email' => $user->email, 'user_id' => $user->id]);
-            } catch (\Throwable $e) {
-                Log::error('Failed to send OTP email: '.$e->getMessage(), ['user_id' => $user->id]);
+                AuditLog::create([
+                    'user_id' => $user->id,
+                    'action' => 'login',
+                    'description' => 'User logged in (password only, OTP temporarily disabled)',
+                    'ip_address' => $request->ip(),
+                ]);
+            } catch (\Throwable $e) { /* silent */ }
+
+            // redirect based on role/position (reuse same logic as verifyOtp)
+            $roleName = null;
+            if (! empty($user->role_id)) {
+                $roleName = DB::table('roles')->where('id', $user->role_id)->value('name');
+            }
+            $role = strtolower($roleName ?? '');
+            $position = strtolower($user->position ?? '');
+
+            if ($role === 'approver' || $position === 'approver') {
+                return redirect()->intended(route('accountant.approval'));
+            }
+            if ($role === 'maker' || $position === 'maker') {
+                return redirect()->intended(route('dashboard'));
+            }
+            if ($role === 'admin' || $position === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
+            }
+            if ($role === 'reviewer' || $position === 'reviewer') {
+                return redirect()->intended(route('reviewer'));
             }
 
-            // logout temporary authentication so full login waits for OTP
-            Auth::logout();
-
-            return redirect()->route('auth.otp.show');
+            return redirect()->intended(route('dashboard'));
         }
 
         // increment attempts

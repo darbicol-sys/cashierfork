@@ -113,6 +113,7 @@ Route::post('/payments', [MakerController::class, 'store'])->name('payments.stor
 
 // Accountant routes (require authenticated approver)
 Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':approver'])->group(function () {
+	
 	Route::get('/accountant/approved', [ApproverController::class, 'approved'])->name('accountant.approved');
 	Route::get('/accountant/approval', [ApproverController::class, 'approval'])->name('accountant.approval');
 	// Accountant profile
@@ -221,6 +222,9 @@ Route::patch('/profile/password', [AdminController::class, 'updatePassword'])->n
 
 // Reviewer routes (require authenticated reviewer)
 Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':reviewer'])->group(function () {
+	// REVIEWER VIEW SINGLE PAYMENT
+Route::get('/reviewer/payment/{id}', [ReviewerController::class, 'show'])
+    ->name('reviewer.show');
 	Route::get('/reviewer', [ReviewerController::class, 'index'])->name('reviewer');
 	Route::put('/payments/{id}', [ReviewerController::class, 'update'])->name('payments.update')->middleware(\App\Http\Middleware\LogUserActivity::class);
 	// Reviewer forwards payments to Accountant for final approval

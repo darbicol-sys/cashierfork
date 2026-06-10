@@ -319,4 +319,5 @@ class ApproverController extends Controller
 
         return redirect()->route('accountant.profile')->with('success', 'Profile picture removed.');
     }
+    
 }

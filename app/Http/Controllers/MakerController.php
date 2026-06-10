@@ -355,4 +355,5 @@ class MakerController extends Controller
         // Default: go to payments listing (Maker view).
         return redirect()->route('payments.index')->with('success', 'Payment saved.');
     }
+    
 }

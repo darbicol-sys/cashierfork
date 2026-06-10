@@ -288,6 +288,19 @@ class ReviewerController extends Controller
             Log::warning('Failed to notify makers on modify: ' . $e->getMessage());
         }
 
+        // Also notify approvers that a payment was modified and may require attention
+        try {
+            $approverRoleId = DB::table('roles')->where('name', 'approver')->value('id');
+            if ($approverRoleId) {
+                $approvers = User::where('role_id', $approverRoleId)->get();
+                foreach ($approvers as $a) {
+                    $a->notify(new NewMessageNotification($payment, Auth::user()));
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Failed to notify approvers on modify: ' . $e->getMessage());
+        }
+
         return redirect()->route('reviewer')->with('success', 'Payment record updated successfully.');
     }
 
@@ -321,4 +334,5 @@ class ReviewerController extends Controller
             'op_number' => sprintf('%s-%s-%s-%04d', $prefix, $year, $month, $seq)
         ]);
     }
+    
 }

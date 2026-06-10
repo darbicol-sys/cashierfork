@@ -410,7 +410,7 @@
                 <div class="header-user-name">{{ $displayName }}</div>
 
                     <div class="header-user-role">
-                      {{ ucfirst($authUser->position ?? $authUser->role ?? 'Admin') }}
+                     Approver
                     </div>
             </div>
 
@@ -1005,6 +1005,31 @@
   function df(label, value) { return `<div class="drawer-field"><div class="drawer-field-label">${label}</div><div class="drawer-field-value">${value||'—'}</div></div>`; }
   function closeDrawer() { document.getElementById('drawer-overlay').classList.remove('open'); document.getElementById('detail-drawer').classList.remove('open'); document.body.style.overflow = ''; }
 </script>
+
+@if(session('success') || session('error'))
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    @if(session('success'))
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: @json(session('success')),
+        confirmButtonText: 'OK'
+      });
+    @endif
+
+    @if(session('error'))
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: @json(session('error')),
+        confirmButtonText: 'OK'
+      });
+    @endif
+  });
+</script>
+
+@endif
 
 </body>
 </html>
