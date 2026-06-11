@@ -41,10 +41,8 @@ class NewMessageNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        // Use only database notifications for now to avoid side-effects
-        // from mail rendering during request handling. If mail is needed
-        // re-enable 'mail' after confirming this fixes the issue.
-        return ['database'];
+        // Enable both database and mail channels so emails are sent.
+        return ['database', 'mail'];
     }
 
     /**
@@ -58,20 +56,20 @@ class NewMessageNotification extends Notification
         $raw = $this->payment->status ?? 'waiting';
 
         if ($raw === 'forwarded') {
-            // Approver-targeted email
-            $url = route('accountant.approval', ['payment_id' => $this->payment->id]);
+            // Approver-targeted email — use fixed demo URL for mail links
+            $url = 'https://cashierdemo.dar-bicol.com/';
             $subject = "Transaction forwarded awaiting approval: {$payer}";
             $line = "A transaction of ₱{$amount} submitted by {$payer} has been forwarded and requires your final approval.";
         } elseif ($raw === 'approved') {
             // Approved: notify both parties that OR can be issued
             $op = $this->payment->op_number ?? null;
-            $url = route('payments.index', ['search' => $op]);
+            $url = 'https://cashierdemo.dar-bicol.com/';
             $subject = "Transaction approved: " . ($op ?? $payer);
             $line = "The transaction " . ($op ? "({$op}) " : '') . "submitted by {$payer} has been approved and is ready to be issued with an Official Receipt.";
         } elseif (in_array($raw, ['rejected','accountant_rejected'])) {
             // Rejected: include approver remarks if available
             $op = $this->payment->op_number ?? null;
-            $url = route('payments.index', ['search' => $op]);
+            $url = 'https://cashierdemo.dar-bicol.com/';
             $subject = "Transaction rejected: " . ($op ?? $payer);
             $notes = $this->payment->meta['accountant_remarks'] ?? $this->payment->meta['reviewer_remarks'] ?? null;
             $line = "The transaction " . ($op ? "({$op}) " : '') . "submitted by {$payer} has been rejected.";
@@ -79,8 +77,8 @@ class NewMessageNotification extends Notification
                 $line .= "\n\nApprover notes: " . $notes;
             }
         } else {
-            // Default: reviewer / maker notifications
-            $url = route('reviewer', ['payment_id' => $this->payment->id]);
+            // Default: reviewer / maker notifications — link to demo site
+            $url = 'https://cashierdemo.dar-bicol.com/';
             $subject = "New transaction awaiting review: {$payer}";
             $line = "A new transaction of ₱{$amount} submitted by {$payer} requires your review.";
         }
