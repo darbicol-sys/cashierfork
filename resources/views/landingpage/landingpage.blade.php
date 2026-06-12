@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -92,8 +92,6 @@
             border-radius: 50%;
             flex-shrink: 0;
             display: block;
-            box-shadow: 0 0 0 3px rgba(232,184,75,.25);
-            animation: seal-pulse 3s ease-in-out infinite;
             object-fit: cover;
         }
 
@@ -373,6 +371,7 @@
             .btn-access { padding: 14px 36px; }
         }
     </style>
+<style>.dar-logo-wrap{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,0.95);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,0.4),0 4px 14px rgba(0,0,0,0.2);} .dar-logo-wrap img{width:40px;height:40px;object-fit:contain;}</style>
 </head>
 <body>
 
@@ -383,7 +382,7 @@
 
         <!-- TOP BAR -->
         <header class="top-bar">
-            <img src="{{ asset('img/dar_logo.png') }}" alt="DAR Logo" class="gov-seal" />
+            <span class="dar-logo-wrap"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR Logo" /></span>
             <div class="gov-label">
                 <div class="republic">Republic of the Philippines</div>
                 <div class="agency">Department of Agrarian Reform</div>
@@ -393,7 +392,7 @@
         <!-- HERO -->
         <main class="hero">
 
-            <p class="kicker">Official Government System</p>
+            <p class="kicker">DAR Regional Office V</p>
 
             <h1 class="hero-title">
                 Cashier <span class="accent">Transaction</span><br>Management System
@@ -431,7 +430,7 @@
 
         <!-- FOOTER -->
         <footer>
-            <p>&copy; 2025 Department of Agrarian Reform — Republic of the Philippines</p>
+            <p>&copy; 2026 Department of Agrarian Reform — Regional Office V</p>
             <div class="footer-links">
                 <a href="#">Privacy Policy</a>
                 <a href="#">Terms of Use</a>

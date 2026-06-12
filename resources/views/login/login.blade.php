@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -77,8 +77,6 @@
 
     /* ── CARD ── */
     .login-card {
-      <!-- Favicon -->
-      <link rel="icon" href="{{ asset('img/dar-logo.png') }}" />
       position: relative;
       z-index: 1;
       width: 100%;
@@ -103,7 +101,8 @@
       padding: 48px 36px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 32px;
       position: relative;
       overflow: hidden;
     }
@@ -131,11 +130,8 @@
 
     .visual-seal {
       width: 52px; height: 52px;
-      border-radius: 50%;
-      overflow: hidden;
+      border-radius: 0;
       display: block;
-      box-shadow: 0 0 0 4px rgba(201,153,42,.25);
-      animation: pulse-seal 3s ease-in-out infinite;
       background: transparent;
     }
 
@@ -146,8 +142,7 @@
       object-fit: cover;
     }
 
-    @keyframes pulse-seal {
-      0%,100% { box-shadow: 0 0 0 4px rgba(201,153,42,.25); }
+    
       50%      { box-shadow: 0 0 0 8px rgba(201,153,42,.1); }
     }
 
@@ -166,9 +161,9 @@
 
     .visual-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+      font-size: clamp(2rem, 3.8vw, 3rem);
       font-weight: 700;
-      line-height: 1.1;
+      line-height: 1.05;
       color: var(--cream);
       margin-top: 10px;
     }
@@ -176,6 +171,18 @@
     .visual-title em {
       font-style: normal;
       color: var(--gold-light);
+    }
+
+    .visual-subtitle {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .68rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      opacity: .75;
+      margin-top: 8px;
+      margin-bottom: 0;
     }
 
     .visual-rule {
@@ -409,6 +416,7 @@
       .login-card { max-width: 100%; }
     }
   </style>
+<style>.dar-logo-wrap{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,0.95);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,0.4),0 4px 14px rgba(0,0,0,0.2);} .dar-logo-wrap img{width:40px;height:40px;object-fit:contain;}</style>
 </head>
 <body>
 
@@ -419,19 +427,12 @@
     <!-- LEFT: Visual -->
     <div class="panel-visual">
       <div>
-        <div class="visual-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo"></div>
+        <div class="visual-seal"><span class="dar-logo-wrap"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo"></span></div>
+        <p class="visual-subtitle">DAR Regional Office V</p>
         <div class="visual-copy">
-          <p class="visual-eyebrow">DAR — Official System</p>
-          <h2 class="visual-title">Cashier<br><em>Transaction</em><br>Management</h2>
+          <h2 class="visual-title">Cashier<br><em>Transaction</em><br>Management<br>System</h2>
           <div class="visual-rule"></div>
-          <p class="visual-desc">Secure access portal for authorized Department of Agrarian Reform personnel.</p>
         </div>
-      </div>
-
-      <div class="visual-badges">
-        <div class="v-badge"><i class="bi bi-shield-lock-fill"></i> End-to-end secured session</div>
-        <div class="v-badge"><i class="bi bi-clock-history"></i> Full audit trail on all actions</div>
-        <div class="v-badge"><i class="bi bi-person-check-fill"></i> Authorized personnel only</div>
       </div>
 
       <span class="watermark">Department of Agrarian Reform</span>
@@ -497,7 +498,7 @@
 
   </div>
 
-  <p class="page-footer">&copy; {{ date('Y') }} Department of Agrarian Reform — Republic of the Philippines</p>
+  <p class="page-footer">&copy; 2026 Department of Agrarian Reform — Regional Office V</p>
 
   <!-- Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

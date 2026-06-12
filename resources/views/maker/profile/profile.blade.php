@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -42,7 +42,7 @@
       top: 0;
       z-index: 200;
     }
-    .header-seal { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .header-seal { width: 38px; height: 38px; border-radius: 0; flex-shrink: 0; }
     .header-seal img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
     .header-text .t1 { font-size: .58rem; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(245,240,232,.35); font-weight: 300; }
     .header-text .t2 { font-size: .85rem; font-weight: 600; color: var(--cream); }
@@ -413,6 +413,7 @@
       .tab-pane { padding: 20px 16px 24px; }
     }
   </style>
+<style>.dar-logo-wrap{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,0.95);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,0.4),0 4px 14px rgba(0,0,0,0.2);} .dar-logo-wrap img{width:40px;height:40px;object-fit:contain;}</style>
 </head>
 <body>
 
@@ -436,7 +437,7 @@
 
 <header class="page-header">
   <div class="header-seal">
-    <img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" />
+    <span class="dar-logo-wrap"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo" /></span>
   </div>
   <div class="header-text">
     <div class="t1">Republic of the Philippines</div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -121,17 +121,13 @@
 
     .visual-seal {
       width: 52px; height: 52px;
-      border-radius: 50%;
-      overflow: hidden;
+      border-radius: 0;
       display: block;
-      box-shadow: 0 0 0 4px rgba(201,153,42,.25);
-      animation: pulse-seal 3s ease-in-out infinite;
     }
 
     .visual-seal img { width: 100%; height: 100%; display: block; object-fit: cover; }
 
-    @keyframes pulse-seal {
-      0%,100% { box-shadow: 0 0 0 4px rgba(201,153,42,.25); }
+    
       50%      { box-shadow: 0 0 0 8px rgba(201,153,42,.1); }
     }
 
@@ -390,6 +386,7 @@
       .login-card { max-width: 100%; }
     }
   </style>
+<style>.dar-logo-wrap{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,0.95);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,0.4),0 4px 14px rgba(0,0,0,0.2);} .dar-logo-wrap img{width:40px;height:40px;object-fit:contain;}</style>
 </head>
 <body>
 
@@ -400,7 +397,7 @@
     <!-- LEFT: Visual -->
     <div class="panel-visual">
       <div>
-        <div class="visual-seal"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo"></div>
+        <div class="visual-seal"><span class="dar-logo-wrap"><img src="{{ asset('img/dar_logo.png') }}" alt="DAR logo"></span></div>
         <div class="visual-copy">
           <p class="visual-eyebrow">DAR — Official System</p>
           <h2 class="visual-title">Cashier<br><em>Transaction</em><br>Management</h2>
