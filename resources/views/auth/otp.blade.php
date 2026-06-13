@@ -429,7 +429,7 @@
       .otp-digit { width: 40px; flex: 0 0 40px; height: 48px; font-size: 1.2rem; }
     }
   </style>
-<style>.dar-logo-wrap{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,0.95);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,0.4),0 4px 14px rgba(0,0,0,0.2);} .dar-logo-wrap img{width:40px;height:40px;object-fit:contain;}</style>
+<style>.dar-logo-wrap{width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,0.95);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,0.4),0 4px 14px rgba(0,0,0,0.2);} .dar-logo-wrap img{width:40px;height:40px;object-fit:contain;border-radius:0!important;} .header-seal{width:auto!important;height:auto!important;overflow:visible!important;}</style>
 </head>
 <body>
 
