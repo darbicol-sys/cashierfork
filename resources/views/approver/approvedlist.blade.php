@@ -354,7 +354,7 @@
             </div>
 
             <div class="notif-drop-foot">
-              <a href="{{ route('accountant.notifications.page') }}">View all notifications</a>
+              <a href="{{ route('Approver.notifications.page') }}">View all notifications</a>
             </div>
 
         </div>
@@ -396,7 +396,7 @@
                 </div>
             </div>
 
-            <a class="dropdown-item" href="{{ route('accountant.profile') }}">
+            <a class="dropdown-item" href="{{ route('Approver.profile') }}">
                 <i class="bi bi-person-circle"></i>
                 My Profile
             </a>
@@ -439,11 +439,11 @@
       <hr class="sidebar-divider">
 
       <div class="nav-section-label" style="margin-top:16px;">Transactions</div>
-      <a class="nav-item" href="{{ route('accountant.approval') }}">
+      <a class="nav-item" href="{{ route('Approver.approval') }}">
         <div class="nav-icon"><i class="bi bi-hourglass-split"></i></div>
         <span class="nav-label">For Review</span>
       </a>
-      <a class="nav-item active" href="{{ route('accountant.approved') }}">
+      <a class="nav-item active" href="{{ route('Approver.approved') }}">
         <div class="nav-icon"><i class="bi bi-check2-circle"></i></div>
         <span class="nav-label">Approved Records</span>
       </a>
@@ -488,7 +488,7 @@
         <div class="approved-total-amount">₱{{ number_format($approvedTotal, 2) }}</div>
       </div>
 
-      <form id="filter-form" class="toolbar" method="GET" action="{{ route('accountant.approved') }}">
+      <form id="filter-form" class="toolbar" method="GET" action="{{ route('Approver.approved') }}">
         <div class="search-wrap">
           <i class="bi bi-search"></i>
           <input type="text" id="approved-search" name="search" value="{{ request('search','') }}" placeholder="Search approved transactions…" onkeydown="if(event.key==='Enter'){this.form.submit();}"/>
@@ -695,7 +695,7 @@
     if (NOTIF_DATA.length === 0) { list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>'; return; }
     list.innerHTML = NOTIF_DATA.map(n => {
       const t = n.ts ? timeAgo(n.ts) : (n.time || '');
-      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/accountant/approved?notif_id=${n.id}';">
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/approver/approved?notif_id=${n.id}';">
         <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
         <div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>
         ${n.unread ? '<div class="notif-unread-dot"></div>' : ''}
@@ -704,7 +704,7 @@
   }
 
   function readNotif(id) {
-    fetch('{{ url('/accountant/notifications') }}/' + id + '/read', {
+    fetch('{{ url('/approver/notifications') }}/' + id + '/read', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -719,7 +719,7 @@
   }
 
   function markAllRead() {
-    fetch('{{ route('accountant.notifications.mark_all') }}', {
+    fetch('{{ route('Approver.notifications.mark_all') }}', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

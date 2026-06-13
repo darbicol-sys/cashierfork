@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 
@@ -111,22 +111,22 @@ Route::post('/payments', [MakerController::class, 'store'])->name('payments.stor
 	})->name('maker.notifications.clear_all');
 });
 
-// Accountant routes (require authenticated approver)
+// Approver routes (require authenticated approver)
 Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':approver'])->group(function () {
 	
-	Route::get('/accountant/approved', [ApproverController::class, 'approved'])->name('accountant.approved');
-	Route::get('/accountant/approval', [ApproverController::class, 'approval'])->name('accountant.approval');
-	// Accountant profile
-	Route::get('/accountant/profile', [ApproverController::class, 'profile'])->name('accountant.profile');
-	Route::patch('/accountant/profile', [ApproverController::class, 'updateProfile'])->name('accountant.profile.update');
-	Route::patch('/accountant/profile/password', [ApproverController::class, 'updatePassword'])->name('accountant.profile.password');
+	Route::get('/approver/approved', [ApproverController::class, 'approved'])->name('Approver.approved');
+	Route::get('/approver/approval', [ApproverController::class, 'approval'])->name('Approver.approval');
+	// Approver profile
+	Route::get('/approver/profile', [ApproverController::class, 'profile'])->name('Approver.profile');
+	Route::patch('/approver/profile', [ApproverController::class, 'updateProfile'])->name('Approver.profile.update');
+	Route::patch('/approver/profile/password', [ApproverController::class, 'updatePassword'])->name('Approver.profile.password');
 	// Remove profile picture
-	Route::post('/accountant/profile/picture/remove', [ApproverController::class, 'removeProfilePicture'])->name('accountant.profile.remove_picture');
-	Route::post('/accountant/approval/{id}/approve', [ApproverController::class, 'approve'])->name('accountant.approve');
-	Route::post('/accountant/approval/{id}/reject', [ApproverController::class, 'reject'])->name('accountant.reject');
+	Route::post('/approver/profile/picture/remove', [ApproverController::class, 'removeProfilePicture'])->name('Approver.profile.remove_picture');
+	Route::post('/approver/approval/{id}/approve', [ApproverController::class, 'approve'])->name('Approver.approve');
+	Route::post('/approver/approval/{id}/reject', [ApproverController::class, 'reject'])->name('Approver.reject');
 
-	// Accountant notifications (JSON + mark read)
-	Route::get('/accountant/notifications', function (\Illuminate\Http\Request $request) {
+	// Approver notifications (JSON + mark read)
+	Route::get('/approver/notifications', function (\Illuminate\Http\Request $request) {
 		$user = auth()->user();
 		if (! $user) return response()->json([], 401);
 		$notes = $user->notifications()->orderBy('created_at', 'desc')->take(50)->get()->map(function ($n) {
@@ -138,9 +138,9 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':approver'
 			];
 		});
 		return response()->json($notes);
-	})->name('accountant.notifications.list');
+	})->name('Approver.notifications.list');
 
-	Route::post('/accountant/notifications/{id}/read', function ($id) {
+	Route::post('/approver/notifications/{id}/read', function ($id) {
 		$user = auth()->user();
 		if (! $user) return response()->json([], 401);
 		$note = $user->notifications()->where('id', $id)->first();
@@ -149,9 +149,9 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':approver'
 			return response()->json(['ok' => true]);
 		}
 		return response()->json(['ok' => false], 404);
-	})->name('accountant.notifications.read');
+	})->name('Approver.notifications.read');
 
-	Route::post('/accountant/notifications/mark-all', function (\Illuminate\Http\Request $request) {
+	Route::post('/approver/notifications/mark-all', function (\Illuminate\Http\Request $request) {
 		$user = auth()->user();
 		if (! $user) return response()->json([], 401);
 		try {
@@ -160,18 +160,18 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':approver'
 		} catch (\Throwable $e) {
 			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
 		}
-	})->name('accountant.notifications.mark_all');
+	})->name('Approver.notifications.mark_all');
 
-	// Accountant: page to view all notifications
-	Route::get('/accountant/notifications/all', function (\Illuminate\Http\Request $request) {
+	// Approver: page to view all notifications
+	Route::get('/approver/notifications/all', function (\Illuminate\Http\Request $request) {
 		$user = auth()->user();
 		if (! $user) return redirect()->route('login');
 		$notes = $user->notifications()->orderBy('created_at', 'desc')->paginate(25);
 		return view('approver.notifications.notification', compact('notes'));
-	})->name('accountant.notifications.page');
+	})->name('Approver.notifications.page');
 
-	// Accountant: clear all notifications
-	Route::delete('/accountant/notifications/clear', function (\Illuminate\Http\Request $request) {
+	// Approver: clear all notifications
+	Route::delete('/approver/notifications/clear', function (\Illuminate\Http\Request $request) {
 		$user = auth()->user();
 		if (! $user) return response()->json([], 401);
 		try {
@@ -180,7 +180,7 @@ Route::middleware(['auth', \App\Http\Middleware\RequireRole::class . ':approver'
 		} catch (\Throwable $e) {
 			return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
 		}
-	})->name('accountant.notifications.clear_all');
+	})->name('Approver.notifications.clear_all');
 });
 
 
@@ -227,7 +227,7 @@ Route::get('/reviewer/payment/{id}', [ReviewerController::class, 'show'])
     ->name('reviewer.show');
 	Route::get('/reviewer', [ReviewerController::class, 'index'])->name('reviewer');
 	Route::put('/payments/{id}', [ReviewerController::class, 'update'])->name('payments.update')->middleware(\App\Http\Middleware\LogUserActivity::class);
-	// Reviewer forwards payments to Accountant for final approval
+	// Reviewer forwards payments to Approver for final approval
 	Route::post('/payments/{id}/forward', [ReviewerController::class, 'forward'])->name('payments.forward');
 	Route::get('/payments/next-op', [ReviewerController::class, 'nextOpNumber'])->name('payments.next-op');
 

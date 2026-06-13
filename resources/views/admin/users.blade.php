@@ -181,7 +181,7 @@
     .rb-admin      { background: #fdf3dc; color: var(--gold); }
     .rb-cashier    { background: var(--green-light); color: var(--green-accent); }
     .rb-reviewer   { background: #eef3fc; color: #2a5fa0; }
-    .rb-accountant { background: #fdf0ef; color: var(--red); }
+    .rb-Approver { background: #fdf0ef; color: var(--red); }
     .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: .68rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; white-space: nowrap; }
     .sb-active   { background: var(--green-light); color: var(--green-accent); }
     .sb-inactive { background: #fdf0ef; color: var(--red); }
@@ -459,7 +459,7 @@
                   'admin'      => 'rb-admin',
                   'maker'      => 'rb-cashier',
                   'reviewer'   => 'rb-reviewer',
-                  'approver'   => 'rb-accountant',
+                  'approver'   => 'rb-Approver',
                   default      => 'rb-cashier'
                 };
                 $uStatus = ($u->is_active ?? true) ? 'active' : 'inactive';

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Notifications;
 
@@ -66,12 +66,12 @@ class NewMessageNotification extends Notification
             $url = 'https://cashierdemo.dar-bicol.com/';
             $subject = "Transaction approved: " . ($op ?? $payer);
             $line = "The transaction " . ($op ? "({$op}) " : '') . "submitted by {$payer} has been approved and is ready to be issued with an Official Receipt.";
-        } elseif (in_array($raw, ['rejected','accountant_rejected'])) {
+        } elseif (in_array($raw, ['rejected','approver_rejected'])) {
             // Rejected: include approver remarks if available
             $op = $this->payment->op_number ?? null;
             $url = 'https://cashierdemo.dar-bicol.com/';
             $subject = "Transaction rejected: " . ($op ?? $payer);
-            $notes = $this->payment->meta['accountant_remarks'] ?? $this->payment->meta['reviewer_remarks'] ?? null;
+            $notes = $this->payment->meta['Approver_remarks'] ?? $this->payment->meta['reviewer_remarks'] ?? null;
             $line = "The transaction " . ($op ? "({$op}) " : '') . "submitted by {$payer} has been rejected.";
             if ($notes) {
                 $line .= "\n\nApprover notes: " . $notes;
@@ -103,7 +103,7 @@ class NewMessageNotification extends Notification
             $icon = 'bi-check-circle-fill';
             $cls = 'ni-green';
             $message = "The transaction for {$payer} has been approved.";
-        } elseif (in_array($raw, ['rejected', 'accountant_rejected'])) {
+        } elseif (in_array($raw, ['rejected', 'approver_rejected'])) {
             $status = 'rejected';
             $icon = 'bi-x-circle-fill';
             $cls = 'ni-red';

@@ -463,7 +463,7 @@
             </div>
 
             <div class="notif-drop-foot">
-              <a href="{{ route('accountant.notifications.page') }}">View all notifications</a>
+              <a href="{{ route('Approver.notifications.page') }}">View all notifications</a>
             </div>
 
         </div>
@@ -505,7 +505,7 @@
                 </div>
             </div>
 
-            <a class="dropdown-item" href="{{ route('accountant.profile') }}">
+            <a class="dropdown-item" href="{{ route('Approver.profile') }}">
                 <i class="bi bi-person-circle"></i>
                 My Profile
             </a>
@@ -550,11 +550,11 @@
       <hr class="sidebar-divider">
 
       <div class="nav-section-label" style="margin-top:16px;">Transactions</div>
-      <a class="nav-item" href="{{ route('accountant.approval') }}">
+      <a class="nav-item" href="{{ route('Approver.approval') }}">
         <div class="nav-icon"><i class="bi bi-hourglass-split"></i></div>
         <span class="nav-label">For Review</span>
       </a>
-      <a class="nav-item" href="{{ route('accountant.approved') }}">
+      <a class="nav-item" href="{{ route('Approver.approved') }}">
         <div class="nav-icon"><i class="bi bi-check2-circle"></i></div>
         <span class="nav-label">Approved Records</span>
       </a>
@@ -684,7 +684,7 @@
 
         <!-- TAB: PERSONAL INFO -->
         <div class="tab-pane" id="tab-personal">
-          <form method="POST" action="{{ route('accountant.profile.update') }}" enctype="multipart/form-data">
+          <form method="POST" action="{{ route('Approver.profile.update') }}" enctype="multipart/form-data">
             @csrf
             @method('PATCH')
             <div class="form-grid">
@@ -762,7 +762,7 @@
 
             </div>
             <div class="form-footer">
-              <a href="{{ route('accountant.approval') }}" class="btn-action">
+              <a href="{{ route('Approver.approval') }}" class="btn-action">
                 <i class="bi bi-x-lg"></i> Cancel
               </a>
               <button type="submit" class="btn-action btn-primary">
@@ -774,7 +774,7 @@
 
         <!-- TAB: CHANGE PASSWORD -->
         <div class="tab-pane" id="tab-password">
-          <form method="POST" action="{{ route('accountant.profile.password') }}">
+          <form method="POST" action="{{ route('Approver.profile.password') }}">
             @csrf
             @method('PATCH')
             <div class="form-grid">
@@ -903,16 +903,16 @@ document.addEventListener('DOMContentLoaded', function() {
   function renderNotifList() {
     const list = document.getElementById('notif-list'); if (!list) return; const badge = document.getElementById('notif-badge'); const unreadCount = NOTIF_DATA.filter(n=>n.unread).length; if (badge) { if (unreadCount>0) { badge.classList.add('show'); badge.textContent = unreadCount>99?'99+':String(unreadCount); badge.setAttribute('title', unreadCount + ' unread notifications'); } else { badge.classList.remove('show'); badge.textContent=''; badge.removeAttribute('title'); } }
     if (NOTIF_DATA.length===0) { list.innerHTML = '<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No notifications yet.</p></div>'; return; }
-    list.innerHTML = NOTIF_DATA.map(n=>{ const t = n.ts ? timeAgo(n.ts) : (n.time||''); return `<div class="notif-item${n.unread?' unread':''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/accountant/approval?notif_id=${n.id}';"><div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div><div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>${n.unread?'<div class="notif-unread-dot"></div>':''}</div>`; }).join('');
+    list.innerHTML = NOTIF_DATA.map(n=>{ const t = n.ts ? timeAgo(n.ts) : (n.time||''); return `<div class="notif-item${n.unread?' unread':''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/approver/approval?notif_id=${n.id}';"><div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div><div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${t}</div></div>${n.unread?'<div class="notif-unread-dot"></div>':''}</div>`; }).join('');
   }
 
   window.readNotif = function(id) {
     const n = NOTIF_DATA.find(x => x.id === id); if (n) n.unread = false; renderNotifList();
-    fetch('{{ url('/accountant/notifications') }}/' + id + '/read', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }, credentials: 'same-origin' }).catch(()=>{});
+    fetch('{{ url('/approver/notifications') }}/' + id + '/read', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }, credentials: 'same-origin' }).catch(()=>{});
   };
 
   window.markAllRead = function() {
-    NOTIF_DATA.forEach(n=>n.unread=false); renderNotifList(); fetch('{{ route('accountant.notifications.mark_all') }}', { method:'POST', headers: { 'Content-Type':'application/json','X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }, credentials:'same-origin' }).catch(()=>{});
+    NOTIF_DATA.forEach(n=>n.unread=false); renderNotifList(); fetch('{{ route('Approver.notifications.mark_all') }}', { method:'POST', headers: { 'Content-Type':'application/json','X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }, credentials:'same-origin' }).catch(()=>{});
   };
 
   window.toggleNotifDropdown = function(e) { e.stopPropagation(); const dropdown = document.getElementById('notif-dropdown'); notifOpen = !notifOpen; if (notifOpen) { dropdown.classList.add('open'); renderNotifList(); } else dropdown.classList.remove('open'); };

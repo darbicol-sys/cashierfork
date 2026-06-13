@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -73,7 +73,7 @@ class LoginController extends Controller
             $position = strtolower($user->position ?? '');
 
             if ($role === 'approver' || $position === 'approver') {
-                return redirect()->intended(route('accountant.approval'));
+                return redirect()->intended(route('Approver.approval'));
             }
             if ($role === 'maker' || $position === 'maker') {
                 return redirect()->intended(route('dashboard'));
@@ -189,7 +189,7 @@ class LoginController extends Controller
         $position = strtolower(Auth::user()->position ?? '');
 
         if ($role === 'approver' || $position === 'approver') {
-            return redirect()->intended(route('accountant.approval'));
+            return redirect()->intended(route('Approver.approval'));
         }
         if ($role === 'maker' || $position === 'maker') {
             return redirect()->intended(route('dashboard'));

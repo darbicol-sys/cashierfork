@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -33,9 +33,9 @@ class AdminController extends Controller
 		$recentUsers = User::orderBy('created_at', 'desc')->limit(6)->get();
 		// Count approvals/rejections by updated_at so actions performed today are counted
 		$approvedCount = Payment::whereDate('updated_at', today())->where('status','approved')->count();
-		// consider both standard 'rejected' and 'accountant_rejected' statuses
+		// consider both standard 'rejected' and 'approver_rejected' statuses
 		$rejectedCount = Payment::whereDate('updated_at', today())
-			->whereIn('status', ['rejected', 'accountant_rejected'])
+			->whereIn('status', ['rejected', 'approver_rejected'])
 			->count();
 		$activeUsers = User::where('status','active')->count();
 		// audit_logs table may not exist on all installs — check first

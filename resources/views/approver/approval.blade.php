@@ -386,7 +386,7 @@
             </div>
 
             <div class="notif-drop-foot">
-              <a href="{{ route('accountant.notifications.page') }}">View all notifications</a>
+              <a href="{{ route('Approver.notifications.page') }}">View all notifications</a>
             </div>
 
         </div>
@@ -428,7 +428,7 @@
                 </div>
             </div>
 
-            <a class="dropdown-item" href="{{ route('accountant.profile') }}">
+            <a class="dropdown-item" href="{{ route('Approver.profile') }}">
                 <i class="bi bi-person-circle"></i>
                 My Profile
             </a>
@@ -466,11 +466,11 @@
       <hr class="sidebar-divider">
 
       <div class="nav-section-label" style="margin-top:16px;">Transactions</div>
-      <a class="nav-item active" href="{{ route('accountant.approval') }}">
+      <a class="nav-item active" href="{{ route('Approver.approval') }}">
         <div class="nav-icon"><i class="bi bi-hourglass-split"></i></div>
         <span class="nav-label">For Review</span>
       </a>
-      <a class="nav-item" href="{{ route('accountant.approved') }}">
+      <a class="nav-item" href="{{ route('Approver.approved') }}">
         <div class="nav-icon"><i class="bi bi-check2-circle"></i></div>
         <span class="nav-label">Approved Records</span>
       </a>
@@ -508,7 +508,7 @@
       @php
         $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Approver');
         $total    = $total ?? ($payments->total() ?? count($payments));
-        $waiting  = $waiting ?? $payments->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
+        $waiting  = $waiting ?? $payments->whereIn('status', ['forwarded', 'approver_rejected'])->count();
         $approved = $approved ?? \App\Models\Payment::where('status', 'approved')->count();
         $rejected = $rejected ?? 0;
       @endphp
@@ -546,7 +546,7 @@
       </div>
 
       <!-- TOOLBAR -->
-      <form id="filter-form" class="toolbar" method="GET" action="{{ route('accountant.approval') }}">
+      <form id="filter-form" class="toolbar" method="GET" action="{{ route('Approver.approval') }}">
         <div class="search-wrap">
           <i class="bi bi-search"></i>
           <input type="text" id="tbl-search" name="search" value="{{ request('search','') }}" placeholder="Search by payor name or O.P. number…" onkeydown="if(event.key==='Enter'){this.form.submit();}"/>
@@ -555,7 +555,7 @@
           <option value="">All Statuses</option>
           <option value="approved" {{ request('status')=='approved' ? 'selected' : '' }}>Approved</option>
           <option value="forwarded" {{ request('status')=='forwarded' ? 'selected' : '' }}>Waiting</option>
-          <option value="accountant_rejected" {{ request('status')=='accountant_rejected' ? 'selected' : '' }}>Rejected</option>
+          <option value="approver_rejected" {{ request('status')=='approver_rejected' ? 'selected' : '' }}>Rejected</option>
         </select>
         <select class="filter-select" id="filter-fund" name="fund" onchange="this.form.submit()">
           <option value="">All Funds</option>
@@ -596,13 +596,13 @@
                     'forwarded'           => 'sb-waiting',
                     'under_review'        => 'sb-waiting',
                     'submitted'           => 'sb-waiting',
-                    'accountant_rejected' => 'sb-rejected',
+                    'approver_rejected' => 'sb-rejected',
                     'rejected'            => 'sb-rejected',
                   ];
                   $statusCls  = $statusMap[$status] ?? 'sb-waiting';
                   $statusIcon = match($status) {
                     'approved'                        => 'bi-check-circle-fill',
-                    'accountant_rejected', 'rejected' => 'bi-x-circle-fill',
+                    'approver_rejected', 'rejected' => 'bi-x-circle-fill',
                     default                           => 'bi-hourglass-split',
                   };
                   $nameParts = explode(' ', trim($p->name));
@@ -664,18 +664,16 @@
                     <div class="actions-cell">
                       <a href="#" class="action-btn" title="View" onclick="openDrawer({{ $p->id }});return false;"><i class="bi bi-eye"></i></a>
                       @if($status !== 'approved')
-                        <form method="POST" action="{{ route('accountant.approve', $p->id) }}"
-                          onsubmit="return confirm('Approve payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
+                        <form method="POST" action="{{ route('Approver.approve', $p->id) }}" id="approve-form-{{ $p->id }}">
                           @csrf
-                          <button type="submit" class="btn-approve"><i class="bi bi-check-lg"></i> Approve</button>
+                          <button type="button" class="btn-approve" onclick="confirmApprove({{ $p->id }}, '{{ addslashes($p->name) }}', '{{ number_format($p->amount, 2) }}')"><i class="bi bi-check-lg"></i> Approve</button>
                         </form>
                       @endif
-                      @if($status !== 'accountant_rejected')
-                        <form method="POST" action="{{ route('accountant.reject', $p->id) }}"
-                          onsubmit="var r=prompt('Enter rejection remarks (optional):');if(r===null)return false;this.querySelector('input[name=remarks]').value=r;return confirm('Reject payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount, 2) }})?')">
+                      @if($status !== 'approver_rejected')
+                        <form method="POST" action="{{ route('Approver.reject', $p->id) }}" id="reject-form-{{ $p->id }}">
                           @csrf
-                          <input type="hidden" name="remarks" value=""/>
-                          <button type="submit" class="btn-reject"><i class="bi bi-x-lg"></i> Reject</button>
+                          <input type="hidden" name="remarks" value="" id="remarks-{{ $p->id }}"/>
+                          <button type="button" class="btn-reject" onclick="confirmReject({{ $p->id }}, '{{ addslashes($p->name) }}', '{{ number_format($p->amount, 2) }}')"><i class="bi bi-x-lg"></i> Reject</button>
                         </form>
                       @endif
                     </div>
@@ -756,7 +754,7 @@
       if (!nid) return;
       const container = document.querySelector('.page-body');
       if (!container) return;
-      fetch('/accountant/notifications', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      fetch('/approver/notifications', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => r.ok ? r.json() : Promise.reject('fetch failed'))
         .then(arr => {
           const n = arr.find(x => String(x.id) === String(nid));
@@ -868,7 +866,7 @@
     }
     list.innerHTML = NOTIF_DATA.map(n => {
       const t = n.ts ? timeAgo(n.ts) : (n.time || '');
-      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/accountant/approval?notif_id=${n.id}';">
+      return `<div class="notif-item${n.unread ? ' unread' : ''}" onclick="event.preventDefault(); readNotif('${n.id}'); window.location='/approver/approval?notif_id=${n.id}';">
         <div class="notif-item-icon ${n.cls}"><i class="bi ${n.icon}"></i></div>
         <div class="notif-item-body">
           <div class="notif-item-text">${n.text}</div>
@@ -880,7 +878,7 @@
   }
 
   function readNotif(id) {
-    fetch('{{ url('/accountant/notifications') }}/' + id + '/read', {
+    fetch('{{ url('/approver/notifications') }}/' + id + '/read', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -895,7 +893,7 @@
   }
 
   function markAllRead() {
-    fetch('{{ route('accountant.notifications.mark_all') }}', {
+    fetch('{{ route('Approver.notifications.mark_all') }}', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -951,6 +949,42 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  function confirmApprove(id, name, amount) {
+    Swal.fire({
+      title: 'Approve Payment?',
+      html: `Approving payment from <strong>${name}</strong><br>Amount: <strong>₱${amount}</strong>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Approve',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2d7a4f',
+      cancelButtonColor: '#6c757d'
+    }).then(result => {
+      if (result.isConfirmed) document.getElementById('approve-form-' + id).submit();
+    });
+  }
+
+  function confirmReject(id, name, amount) {
+    Swal.fire({
+      title: 'Reject Payment?',
+      html: `Rejecting payment from <strong>${name}</strong><br>Amount: <strong>₱${amount}</strong>`,
+      icon: 'warning',
+      input: 'textarea',
+      inputLabel: 'Remarks (optional)',
+      inputPlaceholder: 'Enter reason for rejection...',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Reject',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#c0392b',
+      cancelButtonColor: '#6c757d'
+    }).then(result => {
+      if (result.isConfirmed) {
+        document.getElementById('remarks-' + id).value = result.value || '';
+        document.getElementById('reject-form-' + id).submit();
+      }
+    });
+  }
+
   (function(){
     try {
       const logoutForms = document.querySelectorAll('form[action="{{ route('logout') }}"]');

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -17,7 +17,7 @@ use App\Notifications\NewMessageNotification;
 class ApproverController extends Controller
 {
     /**
-     * Show the accountant approval view.
+     * Show the Approver approval view.
      */
     public function approval()
     {
@@ -26,7 +26,7 @@ class ApproverController extends Controller
         $fundParam   = request()->query('fund', '');
         $q           = request()->query('search', '');
 
-        $query = Payment::whereIn('status', ['forwarded', 'accountant_rejected'])->orderBy('created_at', 'desc');
+        $query = Payment::whereIn('status', ['forwarded', 'approver_rejected'])->orderBy('created_at', 'desc');
 
         if ($statusParam) {
             $s = strtolower($statusParam);
@@ -35,7 +35,7 @@ class ApproverController extends Controller
             } elseif ($s === 'waiting' || $s === 'forwarded') {
                 $query->whereIn('status', ['forwarded','submitted','under_review','waiting']);
             } elseif ($s === 'rejected') {
-                $query->whereIn('status', ['accountant_rejected','rejected']);
+                $query->whereIn('status', ['approver_rejected','rejected']);
             } else {
                 $query->where('status', $s);
             }
@@ -54,12 +54,12 @@ class ApproverController extends Controller
         }
 
         $total = (clone $query)->count();
-        $waiting = (clone $query)->whereIn('status', ['forwarded', 'accountant_rejected'])->count();
+        $waiting = (clone $query)->whereIn('status', ['forwarded', 'approver_rejected'])->count();
         $approved = (clone $query)->where('status', 'approved')->count();
-        $rejected = (clone $query)->where('status', 'accountant_rejected')->count();
+        $rejected = (clone $query)->where('status', 'approver_rejected')->count();
         $payments = (clone $query)->paginate(10)->withQueryString();
         $funds = Payment::whereNotNull('fund_type')->select('fund_type')->distinct()->orderBy('fund_type')->pluck('fund_type');
-        // Load recent notifications for the authenticated accountant to render in the header
+        // Load recent notifications for the authenticated Approver to render in the header
         $notifications = Auth::user()->notifications()->latest()->take(20)->get();
         $notif_data = $notifications->map(function($n) {
             $d = $n->data ?? [];
@@ -101,7 +101,7 @@ class ApproverController extends Controller
         $approvedPayments = (clone $query)->paginate(10)->withQueryString();
         $funds = Payment::whereNotNull('fund_type')->select('fund_type')->distinct()->orderBy('fund_type')->pluck('fund_type');
 
-        // Load recent notifications for the authenticated accountant to render in the header
+        // Load recent notifications for the authenticated Approver to render in the header
         $notifications = Auth::user() ? Auth::user()->notifications()->latest()->take(20)->get() : collect([]);
         $notif_data = $notifications->map(function($n) {
             $d = $n->data ?? [];
@@ -121,11 +121,11 @@ class ApproverController extends Controller
     }
 
     /**
-     * Show accountant profile page.
+     * Show Approver profile page.
      */
     public function profile()
     {
-        // Load recent notifications for the authenticated accountant to render in the header
+        // Load recent notifications for the authenticated Approver to render in the header
         $notifications = Auth::user() ? Auth::user()->notifications()->latest()->take(20)->get() : collect([]);
         $notif_data = $notifications->map(function($n) {
             $d = $n->data ?? [];
@@ -145,7 +145,7 @@ class ApproverController extends Controller
     }
 
     /**
-     * Update accountant profile.
+     * Update Approver profile.
      */
     public function updateProfile(Request $request)
     {
@@ -158,7 +158,7 @@ class ApproverController extends Controller
             'username' => ['nullable','string','max:255', Rule::unique('users')->ignore($user->id)],
             'phone_number' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:1000',
-            'profile_picture' => 'nullable|image|max:2048',
+            'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         // Handle uploaded profile picture separately
@@ -181,11 +181,11 @@ class ApproverController extends Controller
             try { Storage::disk('public')->delete($oldPicture); } catch (\Throwable $e) { /* ignore */ }
         }
 
-        return redirect()->route('accountant.profile')->with('success', 'Profile updated.');
+        return redirect()->route('Approver.profile')->with('success', 'Profile updated.');
     }
 
     /**
-     * Update accountant password.
+     * Update Approver password.
      */
     public function updatePassword(Request $request)
     {
@@ -197,13 +197,13 @@ class ApproverController extends Controller
         ]);
 
         if (!Hash::check($data['current_password'], $user->password)) {
-            return redirect()->route('accountant.profile')->with('error', 'Current password is incorrect.');
+            return redirect()->route('Approver.profile')->with('error', 'Current password is incorrect.');
         }
 
         $user->password = Hash::make($data['password']);
         $user->save();
 
-        return redirect()->route('accountant.profile')->with('success', 'Password updated.');
+        return redirect()->route('Approver.profile')->with('success', 'Password updated.');
     }
 
     /**
@@ -248,7 +248,7 @@ class ApproverController extends Controller
             Log::warning('Failed to notify makers on approve: ' . $e->getMessage());
         }
 
-        return redirect()->route('accountant.approval')->with('success', 'Payment approved.');
+        return redirect()->route('Approver.approval')->with('success', 'Payment approved.');
     }
 
     /**
@@ -257,12 +257,12 @@ class ApproverController extends Controller
     public function reject($id)
     {
         $p = Payment::findOrFail($id);
-        // Mark as accountant_rejected and allow reviewer to edit/resend
-        $p->status = 'accountant_rejected';
+        // Mark as approver_rejected and allow reviewer to edit/resend
+        $p->status = 'approver_rejected';
         // capture optional remarks
         $remarks = request()->input('remarks');
         $meta = $p->meta ?? [];
-        if ($remarks) $meta['accountant_remarks'] = $remarks;
+        if ($remarks) $meta['Approver_remarks'] = $remarks;
         $p->meta = $meta;
         $p->save();
 
@@ -299,7 +299,7 @@ class ApproverController extends Controller
             Log::warning('Failed to notify makers on reject: ' . $e->getMessage());
         }
 
-        return redirect()->route('accountant.approval')->with('success', 'Payment rejected and returned to Reviewer.');
+        return redirect()->route('Approver.approval')->with('success', 'Payment rejected and returned to Reviewer.');
     }
 
     /**
@@ -308,7 +308,7 @@ class ApproverController extends Controller
     public function removeProfilePicture(Request $request)
     {
         $user = Auth::user();
-        if (! $user) return redirect()->route('accountant.profile')->with('error', 'Unauthorized.');
+        if (! $user) return redirect()->route('Approver.profile')->with('error', 'Unauthorized.');
 
         $old = $user->profile_picture;
         if ($old && Storage::disk('public')->exists($old)) {
@@ -317,7 +317,7 @@ class ApproverController extends Controller
         $user->profile_picture = null;
         $user->save();
 
-        return redirect()->route('accountant.profile')->with('success', 'Profile picture removed.');
+        return redirect()->route('Approver.profile')->with('success', 'Profile picture removed.');
     }
     
 }

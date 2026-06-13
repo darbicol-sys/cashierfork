@@ -412,7 +412,7 @@
           </div>
 
           <div class="stat-card">
-            <a href="{{ route('accountant.approval') }}">
+            <a href="{{ route('Approver.approval') }}">
               <div class="stat-icon si-amber"><i class="bi bi-hourglass-split"></i></div>
               <div>
                 <div class="stat-value">{{ $pendingApprovals ?? '—' }}</div>
@@ -460,7 +460,7 @@
                     @php
                       $rawStatus = $p->status ?? '';
                       $statusSlug = strtolower($rawStatus);
-                      if ($statusSlug === 'accountant_rejected') $statusSlug = 'rejected';
+                      if ($statusSlug === 'approver_rejected') $statusSlug = 'rejected';
                       $statusLabel = $statusSlug === 'rejected' ? 'Rejected' : ucwords(str_replace('_', ' ', $rawStatus));
                     @endphp
                     <td>

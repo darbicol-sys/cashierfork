@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -57,7 +57,7 @@ class MakerController extends Controller
             'username'   => ['nullable','string','max:100'],
             'phone_number' => ['nullable','string','max:50'],
             'address'    => ['nullable','string','max:1000'],
-            'profile_picture' => ['nullable','image','max:4096'],
+            'profile_picture' => ['nullable','image','mimes:jpg,jpeg,png,gif','max:4096'],
         ]);
 
         if ($request->hasFile('profile_picture')) {
@@ -156,9 +156,9 @@ class MakerController extends Controller
         if ($status) {
             $s = strtolower($status);
             if ($s === 'waiting') {
-                $query->whereIn('status', ['submitted','under_review','accountant_rejected','waiting']);
+                $query->whereIn('status', ['submitted','under_review','approver_rejected','waiting']);
             } elseif ($s === 'rejected') {
-                $query->whereIn('status', ['rejected','accountant_rejected']);
+                $query->whereIn('status', ['rejected','approver_rejected']);
             } else {
                 $query->where('status', $s);
             }
@@ -178,7 +178,7 @@ class MakerController extends Controller
 
         $totalCount = (clone $query)->count();
         $totalSum   = (clone $query)->sum('amount');
-        $awaiting   = (clone $query)->whereIn('status', ['submitted','under_review','accountant_rejected','waiting'])->count();
+        $awaiting   = (clone $query)->whereIn('status', ['submitted','under_review','approver_rejected','waiting'])->count();
         $approved   = (clone $query)->where('status', 'approved')->count();
 
         $payments = (clone $query)->paginate(25)->withQueryString();
@@ -197,7 +197,7 @@ class MakerController extends Controller
             $raw = $p->status ?? 'waiting';
             if (in_array($raw, ['approved'])) {
                 $status = 'approved';
-            } elseif (in_array($raw, ['rejected', 'accountant_rejected'])) {
+            } elseif (in_array($raw, ['rejected', 'approver_rejected'])) {
                 $status = 'rejected';
             } else {
                 $status = 'waiting';

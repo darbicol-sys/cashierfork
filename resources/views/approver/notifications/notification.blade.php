@@ -253,7 +253,7 @@
   <div class="header-page">Notifications</div>
 
   <div class="header-actions">
-    <a href="{{ route('accountant.approval') }}" class="btn-back" title="Back to Dashboard">
+    <a href="{{ route('Approver.approval') }}" class="btn-back" title="Back to Dashboard">
       <i class="bi bi-arrow-left"></i>
     </a>
 
@@ -279,7 +279,7 @@
           <div class="dropdown-header-name">{{ $displayName }}</div>
           <div class="dropdown-header-email">{{ $authUser->email ?? '' }}</div>
         </div>
-        <a class="dropdown-item" href="{{ route('accountant.profile') }}">
+        <a class="dropdown-item" href="{{ route('Approver.profile') }}">
           <i class="bi bi-person-circle"></i> My Profile
         </a>
         <div class="dropdown-divider"></div>
@@ -310,11 +310,11 @@
       <hr class="sidebar-divider">
 
       <div class="nav-section-label" style="margin-top:16px;">Transactions</div>
-      <a class="nav-item" href="{{ route('accountant.approval') }}">
+      <a class="nav-item" href="{{ route('Approver.approval') }}">
         <div class="nav-icon"><i class="bi bi-hourglass-split"></i></div>
         <span class="nav-label">For Review</span>
       </a>
-      <a class="nav-item" href="{{ route('accountant.approved') }}">
+      <a class="nav-item" href="{{ route('Approver.approved') }}">
         <div class="nav-icon"><i class="bi bi-check2-circle"></i></div>
         <span class="nav-label">Approved Records</span>
       </a>
@@ -345,7 +345,7 @@
           <div class="page-title">All Notifications</div>
           <div class="page-sub">Department of Agrarian Reform — Regional Office V</div>
         </div>
-        <a href="{{ route('accountant.approval') }}" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--green-accent);text-decoration:none;">
+        <a href="{{ route('Approver.approval') }}" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--green-accent);text-decoration:none;">
           <i class="bi bi-arrow-left"></i> Back to Review Queue
         </a>
       </div>
@@ -454,7 +454,7 @@
   /* ── FETCH ── */
   async function fetchAll() {
     try {
-      const res = await fetch('/accountant/notifications', {
+      const res = await fetch('/approver/notifications', {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       });
       if (!res.ok) throw new Error('failed');
@@ -514,7 +514,7 @@
       approved:  { icon: 'bi-check-circle-fill',     cls: 'ni-green',  tagCls: 'tag-approved',  label: 'Approved',  type: 'type-approved',  msg: 'has been approved successfully.' },
       forwarded: { icon: 'bi-arrow-right-circle-fill', cls: 'ni-gold', tagCls: 'tag-forwarded', label: 'Forwarded', type: 'type-forwarded', msg: 'has been forwarded for your review.' },
       rejected:  { icon: 'bi-x-circle-fill',           cls: 'ni-red',  tagCls: 'tag-rejected',  label: 'Rejected',  type: 'type-rejected',  msg: 'was rejected. Please review the details.' },
-      accountant_rejected: { icon: 'bi-x-circle-fill', cls: 'ni-red', tagCls: 'tag-rejected', label: 'Rejected', type: 'type-rejected', msg: 'was rejected by the Approver.' },
+      approver_rejected: { icon: 'bi-x-circle-fill', cls: 'ni-red', tagCls: 'tag-rejected', label: 'Rejected', type: 'type-rejected', msg: 'was rejected by the Approver.' },
     };
     return map[status] || { icon: 'bi-bell-fill', cls: 'ni-purple', tagCls: 'tag-system', label: 'Update', type: 'type-system', msg: 'has a status update.' };
   }
@@ -556,14 +556,14 @@
   function render() {
     let list = ALL_NOTIFS;
     if (currentFilter === 'unread')   list = list.filter(n => n.unread);
-    else if (currentFilter !== 'all') list = list.filter(n => n.status === currentFilter || (currentFilter === 'rejected' && n.status === 'accountant_rejected'));
+    else if (currentFilter !== 'all') list = list.filter(n => n.status === currentFilter || (currentFilter === 'rejected' && n.status === 'approver_rejected'));
 
     /* counts */
     document.getElementById('count-total').textContent    = ALL_NOTIFS.length;
     document.getElementById('count-unread').textContent   = ALL_NOTIFS.filter(n => n.unread).length;
     document.getElementById('count-forwarded').textContent = ALL_NOTIFS.filter(n => n.status === 'forwarded').length;
     document.getElementById('count-approved').textContent  = ALL_NOTIFS.filter(n => n.status === 'approved').length;
-    document.getElementById('count-rejected').textContent  = ALL_NOTIFS.filter(n => ['rejected','accountant_rejected'].includes(n.status)).length;
+    document.getElementById('count-rejected').textContent  = ALL_NOTIFS.filter(n => ['rejected','approver_rejected'].includes(n.status)).length;
 
     const today     = list.filter(n =>  isToday(n.created));
     const yesterday = list.filter(n =>  isYesterday(n.created));
@@ -599,12 +599,12 @@
     try {
       await markOneRead(id);
     } catch (e) {}
-    window.location = '/accountant/approval?notif_id=' + encodeURIComponent(id);
+    window.location = '/approver/approval?notif_id=' + encodeURIComponent(id);
   }
 
   async function markOneRead(id) {
     try {
-      await fetch('/accountant/notifications/' + id + '/read', {
+      await fetch('/approver/notifications/' + id + '/read', {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF }
       });
@@ -616,7 +616,7 @@
 
   async function markAllRead() {
     try {
-      await fetch('{{ route('accountant.notifications.mark_all') }}', {
+      await fetch('{{ route('Approver.notifications.mark_all') }}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
         credentials: 'same-origin'
@@ -628,7 +628,7 @@
 
   async function deleteOne(id) {
     try {
-      await fetch('/accountant/notifications/' + id, {
+      await fetch('/approver/notifications/' + id, {
         method: 'DELETE',
         headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': CSRF }
       });
@@ -640,7 +640,7 @@
   async function clearAllNotifications() {
     closeClearModal();
     try {
-      await fetch('{{ route('accountant.notifications.clear_all') }}', {
+      await fetch('{{ route('Approver.notifications.clear_all') }}', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
         credentials: 'same-origin'

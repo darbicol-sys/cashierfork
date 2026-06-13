@@ -565,7 +565,7 @@
       approved:  { icon: 'bi-check-circle-fill',    cls: 'ni-green',  tagCls: 'tag-approved', label: 'Approved',  typeCls: 'type-approved',  msg: 'has been approved and is ready for printing.' },
       waiting:   { icon: 'bi-hourglass-split',       cls: 'ni-gold',   tagCls: 'tag-waiting',  label: 'Waiting',   typeCls: 'type-waiting',   msg: 'is awaiting your review and action.' },
       rejected:  { icon: 'bi-x-circle-fill',         cls: 'ni-red',    tagCls: 'tag-rejected', label: 'Rejected',  typeCls: 'type-rejected',  msg: 'was rejected. Please check and take action.' },
-      forwarded: { icon: 'bi-arrow-right-circle-fill', cls: 'ni-blue', tagCls: 'tag-forwarded', label: 'Forwarded', typeCls: 'type-forwarded', msg: 'has been forwarded to the Accountant.' },
+      forwarded: { icon: 'bi-arrow-right-circle-fill', cls: 'ni-blue', tagCls: 'tag-forwarded', label: 'Forwarded', typeCls: 'type-forwarded', msg: 'has been forwarded to the Approver.' },
     };
     return map[status] || { icon: 'bi-bell-fill', cls: 'ni-purple', tagCls: 'tag-system', label: 'Update', typeCls: 'type-system', msg: 'has a status update.' };
   }

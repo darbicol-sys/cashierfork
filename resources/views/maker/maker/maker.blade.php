@@ -2097,8 +2097,12 @@
   }
 
   function confirmSubmitFromPreview() {
-    // submit the form for real
     closePreview();
+    const btn = document.getElementById('submit-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Submitting...';
+    }
     document.getElementById('payment-form')?.submit();
   }
 

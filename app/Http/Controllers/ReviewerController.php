@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -37,7 +37,7 @@ class ReviewerController extends Controller
             } elseif ($s === 'waiting') {
                 $query->whereIn('status', ['submitted','under_review','waiting']);
             } elseif ($s === 'rejected') {
-                $query->whereIn('status', ['rejected','accountant_rejected']);
+                $query->whereIn('status', ['rejected','approver_rejected']);
             } else {
                 // direct match for any other status string
                 $query->where('status', $s);
@@ -103,7 +103,7 @@ class ReviewerController extends Controller
         $payment = Payment::findOrFail($id);
         $payment->status = 'forwarded';
         $meta = $payment->meta ?? [];
-        unset($meta['accountant_remarks']);
+        unset($meta['Approver_remarks']);
         $payment->meta = $meta;
         $payment->save();
 

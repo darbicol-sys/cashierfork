@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Middleware;
 
@@ -49,7 +49,7 @@ public function handle(Request $request, Closure $next, $role)
                     ->with('error', 'Unauthorized access.');
 
             case 'approver':
-                return redirect()->route('accountant.approval')
+                return redirect()->route('Approver.approval')
                     ->with('error', 'Unauthorized access.');
 
             case 'admin':

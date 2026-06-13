@@ -454,7 +454,7 @@
       approved:  { icon:'bi-check-circle-fill',      cls:'ni-green', tagCls:'tag-approved',  label:'Approved',  type:'type-approved',  msg:'has been approved successfully.' },
       waiting:   { icon:'bi-hourglass-split',         cls:'ni-gold',  tagCls:'tag-waiting',   label:'Waiting',   type:'type-waiting',   msg:'is awaiting review.' },
       rejected:  { icon:'bi-x-circle-fill',           cls:'ni-red',   tagCls:'tag-rejected',  label:'Rejected',  type:'type-rejected',  msg:'has been rejected. Please check for remarks.' },
-      forwarded: { icon:'bi-arrow-right-circle-fill', cls:'ni-blue',  tagCls:'tag-forwarded', label:'Forwarded', type:'type-forwarded', msg:'has been forwarded to the Accountant.' },
+      forwarded: { icon:'bi-arrow-right-circle-fill', cls:'ni-blue',  tagCls:'tag-forwarded', label:'Forwarded', type:'type-forwarded', msg:'has been forwarded to the Approver.' },
     };
     return m[st] || { icon:'bi-bell-fill', cls:'ni-purple', tagCls:'tag-system', label:'Update', type:'type-system', msg:'has a status update.' };
   }

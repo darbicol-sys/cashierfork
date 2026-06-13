@@ -1748,7 +1748,7 @@
     document.getElementById('drawer-payor-name').textContent = d.name;
     let h = `<div class="status-badge ${d.statusCls}" style="margin-bottom:16px;font-size:.74rem;padding:5px 13px;"><i class="bi ${d.statusIcon}"></i> ${d.status}</div>`;
     h += `<div class="drawer-actions">`;
-      if (!['forwarded_to_accountant','approved'].includes(d.rawStatus)) {
+      if (!['forwarded_to_Approver','approved'].includes(d.rawStatus)) {
       h += `<form method="POST" action="${d.forwardUrl}" onsubmit="return confirm('Forward payment from ${esc(d.name)} (${esc(d.amount)}) to Approver?')" style="flex:1;">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <button type="submit" class="drawer-action-approve" style="width:100%;"><i class="bi bi-arrow-right-circle"></i> Forward to Approver</button>
@@ -1843,14 +1843,14 @@
           const st = (d.status || 'waiting').toLowerCase();
           let cls = 'sb-default', icon = 'bi-circle';
           if (st === 'approved') { cls = 'sb-approved'; icon = 'bi-check-circle-fill'; }
-          else if (['rejected','accountant_rejected'].includes(st)) { cls = 'sb-rejected'; icon = 'bi-x-circle-fill'; }
+          else if (['rejected','approver_rejected'].includes(st)) { cls = 'sb-rejected'; icon = 'bi-x-circle-fill'; }
           else if (['waiting','submitted','under_review','forwarded'].includes(st)) { cls = 'sb-waiting'; icon = 'bi-hourglass-split'; }
           sb.className = 'status-badge ' + cls;
           sb.innerHTML = `<i class="bi ${icon}"></i> ` + (st.charAt(0).toUpperCase() + st.slice(1));
         });
         const total    = list.length;
         const sum      = list.reduce((s, it) => s + (parseFloat(it.amount || 0) || 0), 0);
-        const awaiting = list.filter(it => ['submitted','under_review','accountant_rejected','waiting'].includes(it.status || 'waiting')).length;
+        const awaiting = list.filter(it => ['submitted','under_review','approver_rejected','waiting'].includes(it.status || 'waiting')).length;
         const approved = list.filter(it => (it.status || '') === 'approved').length;
         const elTotal  = document.getElementById('stat-total-count');   if (elTotal)  elTotal.textContent  = total;
         const elAmt    = document.getElementById('stat-total-amount');  if (elAmt)    elAmt.textContent    = '₱' + sum.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

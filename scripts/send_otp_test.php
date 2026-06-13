@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 // Bootstrap the application so facades and services are available
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 // try common seeded emails first
 $candidates = [
     'admin@example.com',
-    'accountant@example.com',
+    'Approver@example.com',
     'reviewer@example.com',
     'maker@example.com',
     'user1@example.com'
