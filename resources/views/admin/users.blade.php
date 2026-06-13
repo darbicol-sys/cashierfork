@@ -698,7 +698,7 @@
       </div>
       <div class="modal-foot">
         <button type="button" class="btn-cancel" onclick="closeModal('add-user-modal')">Cancel</button>
-        <button type="submit" class="btn-action btn-primary"><i class="bi bi-person-check-fill"></i> Create User</button>
+        <button type="submit" class="btn-action btn-primary" id="add-user-submit"><i class="bi bi-person-check-fill"></i> Create User</button>
       </div>
     </form>
   </div>
@@ -809,7 +809,7 @@
       </div>
       <div class="modal-foot">
         <button type="button" class="btn-cancel" onclick="closeModal('edit-user-modal')">Cancel</button>
-        <button type="submit" class="btn-action btn-primary"><i class="bi bi-check-lg"></i> Save Changes</button>
+        <button type="submit" class="btn-action btn-primary" id="edit-user-submit"><i class="bi bi-check-lg"></i> Save Changes</button>
       </div>
     </form>
   </div>
@@ -970,17 +970,9 @@
         }).then(result => { if (result.isConfirmed) this.submit(); });
       });
     });
-  });
-</script>
 
-</body>
-</html>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  (function(){
-    try {
-      const logoutForms = document.querySelectorAll('form[action="{{ route('logout') }}"]');
-      logoutForms.forEach(f => f.addEventListener('submit', function(ev){
+    document.querySelectorAll('form[action="{{ route('logout') }}"]').forEach(f => {
+      f.addEventListener('submit', function(ev) {
         ev.preventDefault();
         Swal.fire({
           title: 'Log out?',
@@ -990,7 +982,26 @@
           confirmButtonText: 'Yes, log out',
           cancelButtonText: 'Cancel'
         }).then(result => { if (result.isConfirmed) f.submit(); });
-      }));
-    } catch (e) {}
-  })();
+      });
+    });
+
+    const addUserForm = document.querySelector('#add-user-modal form');
+    if (addUserForm) {
+      addUserForm.addEventListener('submit', function() {
+        const btn = document.getElementById('add-user-submit');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Creating...'; }
+      });
+    }
+
+    const editUserForm = document.getElementById('edit-user-form');
+    if (editUserForm) {
+      editUserForm.addEventListener('submit', function() {
+        const btn = document.getElementById('edit-user-submit');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...'; }
+      });
+    }
+  });
 </script>
+
+</body>
+</html>

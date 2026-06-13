@@ -938,10 +938,9 @@
                   <div class="actions-cell">
                     <a href="#" class="action-btn" title="View" onclick="openDrawer({{ $p->id }});return false;"><i class="bi bi-eye"></i></a>
                     @if($status !== 'forwarded' && $status !== 'approved')
-                          <form method="POST" action="{{ route('payments.forward', $p->id) }}"
-                            onsubmit="return confirm('Forward payment from {{ addslashes($p->name) }} (₱{{ number_format($p->amount,2) }}) to Approver?')">
+                          <form method="POST" action="{{ route('payments.forward', $p->id) }}" id="forward-form-{{ $p->id }}">
                         @csrf
-                        <button type="submit" class="btn-row-approve"><i class="bi bi-arrow-right-circle"></i> Forward</button>
+                        <button type="button" class="btn-row-approve" onclick="confirmForward({{ $p->id }}, '{{ addslashes($p->name) }}', '{{ number_format($p->amount,2) }}')"><i class="bi bi-arrow-right-circle"></i> Forward</button>
                       </form>
                     @else
                       <button class="btn-row-approve" disabled style="opacity:.5;cursor:not-allowed;"><i class="bi bi-arrow-right-circle"></i> Forward</button>
@@ -1463,7 +1462,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" onclick="closeModifyModal()">Cancel</button>
-        <button type="submit" class="btn-modal-save"><i class="bi bi-floppy"></i> Save Changes</button>
+        <button type="submit" class="btn-modal-save" id="modify-save-btn"><i class="bi bi-floppy"></i> Save Changes</button>
       </div>
     </form>
   </div>
@@ -1749,9 +1748,9 @@
     let h = `<div class="status-badge ${d.statusCls}" style="margin-bottom:16px;font-size:.74rem;padding:5px 13px;"><i class="bi ${d.statusIcon}"></i> ${d.status}</div>`;
     h += `<div class="drawer-actions">`;
       if (!['forwarded_to_Approver','approved'].includes(d.rawStatus)) {
-      h += `<form method="POST" action="${d.forwardUrl}" onsubmit="return confirm('Forward payment from ${esc(d.name)} (${esc(d.amount)}) to Approver?')" style="flex:1;">
+      h += `<form method="POST" action="${d.forwardUrl}" id="drawer-forward-form" style="flex:1;">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <button type="submit" class="drawer-action-approve" style="width:100%;"><i class="bi bi-arrow-right-circle"></i> Forward to Approver</button>
+        <button type="button" class="drawer-action-approve" style="width:100%;" onclick="confirmForwardDrawer('${esc(d.name)}', '${esc(d.amount)}')"><i class="bi bi-arrow-right-circle"></i> Forward to Approver</button>
       </form>`;
     }
     h += `<button type="button" class="drawer-action-modify" onclick="openModifyModal(window.__drawers[${id}].modifyData)"><i class="bi bi-pencil-fill"></i> Modify</button>`;
@@ -2030,6 +2029,47 @@
       @endif
     } catch(e) { /* noop */ }
   })();
+</script>
+
+<script>
+  function confirmForward(id, name, amount) {
+    Swal.fire({
+      title: 'Forward Payment?',
+      html: `Forward payment from <strong>${name}</strong><br>Amount: <strong>₱${amount}</strong><br>to the Approver?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Forward',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2d7a4f',
+      cancelButtonColor: '#6c757d'
+    }).then(result => {
+      if (result.isConfirmed) document.getElementById('forward-form-' + id).submit();
+    });
+  }
+  function confirmForwardDrawer(name, amount) {
+    Swal.fire({
+      title: 'Forward Payment?',
+      html: `Forward payment from <strong>${name}</strong><br>Amount: <strong>₱${amount}</strong><br>to the Approver?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Forward',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2d7a4f',
+      cancelButtonColor: '#6c757d'
+    }).then(result => {
+      if (result.isConfirmed) {
+        const form = document.getElementById('drawer-forward-form');
+        if (form) form.submit();
+      }
+    });
+  }
+  document.getElementById('modify-form').addEventListener('submit', function() {
+    const btn = document.getElementById('modify-save-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...';
+    }
+  });
 </script>
 
 </body>

@@ -425,24 +425,6 @@
       <h1 class="form-heading">Reset Password</h1>
       <p class="form-sub">Choose a strong new password for your account.</p>
 
-      @if ($errors->any())
-        <div style="
-          background: rgba(160,37,28,.07);
-          border: 1px solid rgba(160,37,28,.2);
-          border-radius: 8px;
-          padding: 10px 14px;
-          font-size: .82rem;
-          color: #7a1c16;
-          margin-bottom: 18px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        ">
-          <i class="bi bi-exclamation-circle-fill" style="color: #a0251c; font-size: .9rem; flex-shrink:0;"></i>
-          {{ $errors->first() }}
-        </div>
-      @endif
-
       <form method="POST" action="{{ route('password.update') }}">
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">
