@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -61,9 +61,9 @@ class MakerController extends Controller
         ]);
 
         if ($request->hasFile('profile_picture')) {
-            $path = $request->file('profile_picture')->store('profiles', 'public');
+            $path = $request->file('profile_picture')->store('profiles', 'uploads');
             if (!empty($user->profile_picture)) {
-                Storage::disk('public')->delete($user->profile_picture);
+                Storage::disk('uploads')->delete($user->profile_picture);
             }
             $user->profile_picture = $path;
         }

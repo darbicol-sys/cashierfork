@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -297,8 +297,8 @@
     <div class="header-user-wrap" id="headerUserWrap">
       <div class="header-user" onclick="toggleHeaderDropdown()">
         <div class="header-avatar">
-          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
-            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($authUser->profile_picture))
+            <img src="{{ asset('uploads/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
           @else
             {{ $sidebarInitials }}
           @endif
@@ -336,9 +336,9 @@
     <div class="sidebar-inner">
 
       <div class="sidebar-profile">
-        @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
+        @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($authUser->profile_picture))
           <div class="profile-avatar">
-            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}"
+            <img src="{{ asset('uploads/' . $authUser->profile_picture) }}" alt="{{ $displayName }}"
                  style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;">
           </div>
         @else
@@ -481,8 +481,8 @@
                 data-created="{{ $u->created_at }}"
               >
                 <td style="width:56px;text-align:center;">
-                  @if(!empty($u->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($u->profile_picture))
-                    <div class="user-avatar"><img src="{{ asset('storage/' . $u->profile_picture) }}" alt="{{ $u->first_name ?? 'User' }}"></div>
+                  @if(!empty($u->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($u->profile_picture))
+                    <div class="user-avatar"><img src="{{ asset('uploads/' . $u->profile_picture) }}" alt="{{ $u->first_name ?? 'User' }}"></div>
                   @else
                     <div class="user-avatar">{{ $initials }}</div>
                   @endif

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -164,7 +164,7 @@ class ApproverController extends Controller
         // Handle uploaded profile picture separately
         $oldPicture = $user->profile_picture;
         if ($request->hasFile('profile_picture')) {
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $path = $request->file('profile_picture')->store('profile_pictures', 'uploads');
             $user->profile_picture = $path;
         }
 
@@ -178,7 +178,7 @@ class ApproverController extends Controller
 
         // Delete old picture if replaced
         if (!empty($path) && $oldPicture && $oldPicture !== $path) {
-            try { Storage::disk('public')->delete($oldPicture); } catch (\Throwable $e) { /* ignore */ }
+            try { Storage::disk('uploads')->delete($oldPicture); } catch (\Throwable $e) { /* ignore */ }
         }
 
         return redirect()->route('Approver.profile')->with('success', 'Profile updated.');
@@ -311,8 +311,8 @@ class ApproverController extends Controller
         if (! $user) return redirect()->route('Approver.profile')->with('error', 'Unauthorized.');
 
         $old = $user->profile_picture;
-        if ($old && Storage::disk('public')->exists($old)) {
-            try { Storage::disk('public')->delete($old); } catch (\Throwable $e) { /* ignore */ }
+        if ($old && Storage::disk('uploads')->exists($old)) {
+            try { Storage::disk('uploads')->delete($old); } catch (\Throwable $e) { /* ignore */ }
         }
         $user->profile_picture = null;
         $user->save();

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 
@@ -315,10 +315,10 @@ Route::get('/reviewer/payment/{id}', [ReviewerController::class, 'show'])
 		]);
 
 		if ($request->hasFile('profile_picture')) {
-			$path = $request->file('profile_picture')->store('profiles', 'public');
+			$path = $request->file('profile_picture')->store('profiles', 'uploads');
 			// remove old picture if present
 			if (!empty($user->profile_picture)) {
-				\Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_picture);
+				\Illuminate\Support\Facades\Storage::disk('uploads')->delete($user->profile_picture);
 			}
 			$user->profile_picture = $path;
 		}

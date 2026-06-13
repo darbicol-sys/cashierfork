@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -351,8 +351,8 @@ class AdminController extends Controller
 		if ($request->hasFile('profile_picture')) {
 			$file = $request->file('profile_picture');
 			$path = $file->store('avatars', 'public');
-			if (!empty($user->profile_picture) && Storage::disk('public')->exists($user->profile_picture)) {
-				Storage::disk('public')->delete($user->profile_picture);
+			if (!empty($user->profile_picture) && Storage::disk('uploads')->exists($user->profile_picture)) {
+				Storage::disk('uploads')->delete($user->profile_picture);
 			}
 			$user->profile_picture = $path;
 		}

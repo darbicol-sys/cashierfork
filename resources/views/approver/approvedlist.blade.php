@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -367,8 +367,8 @@
         <div class="header-user" onclick="toggleHeaderDropdown()">
 
             <div class="header-avatar">
-                @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
-                    <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+                @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($authUser->profile_picture))
+                    <img src="{{ asset('uploads/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
                 @else
                     {{ $sidebarInitials }}
                 @endif
@@ -426,8 +426,8 @@
         @php
           $displayName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? '')) ?: (auth()->user()->name ?? 'Approver');
         @endphp
-        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_picture))
-          <div class="profile-avatar"><img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
+        @if(!empty(auth()->user()->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists(auth()->user()->profile_picture))
+          <div class="profile-avatar"><img src="{{ asset('uploads/' . auth()->user()->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;"></div>
         @else
           <div class="profile-avatar">{{ strtoupper(substr($displayName ?? 'AC', 0, 2)) }}</div>
         @endif

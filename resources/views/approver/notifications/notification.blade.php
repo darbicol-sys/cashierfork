@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -260,8 +260,8 @@
     <div class="header-user-wrap" id="headerUserWrap">
       <div class="header-user" onclick="toggleHeaderDropdown()">
         <div class="header-avatar">
-          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
-            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($authUser->profile_picture))
+            <img src="{{ asset('uploads/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
           @else
             {{ $sidebarInitials }}
           @endif

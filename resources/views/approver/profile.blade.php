@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -476,8 +476,8 @@
         <div class="header-user" onclick="toggleHeaderDropdown()">
 
             <div class="header-avatar">
-                @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
-                    <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+                @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($authUser->profile_picture))
+                    <img src="{{ asset('uploads/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
                 @else
                     {{ $sidebarInitials }}
                 @endif
@@ -534,7 +534,7 @@
       <div class="sidebar-profile">
         <div class="profile-avatar-sm">
           @if(!empty(auth()->user()->profile_picture))
-            <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="{{ auth()->user()->name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
+            <img src="{{ asset('uploads/' . auth()->user()->profile_picture) }}" alt="{{ auth()->user()->name }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
           @else
             {{ $initials }}
           @endif
@@ -600,7 +600,7 @@
           <div class="profile-hero-avatar-container" onclick="document.getElementById('hero-pic-input').click()" title="Change profile picture">
             <div class="profile-hero-avatar">
               @if(!empty($user->profile_picture))
-                <img id="hero-avatar-img" src="{{ asset('storage/' . $user->profile_picture) }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
+                <img id="hero-avatar-img" src="{{ asset('uploads/' . $user->profile_picture) }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
               @else
                 <span id="hero-avatar-initials">{{ $initials }}</span>
               @endif

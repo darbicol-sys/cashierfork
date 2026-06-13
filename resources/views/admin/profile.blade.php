@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -407,8 +407,8 @@
       <!-- Trigger chip -->
       <div class="header-user" onclick="toggleHeaderDropdown()">
         <div class="header-avatar">
-          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
-            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
+          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($authUser->profile_picture))
+            <img src="{{ asset('uploads/' . $authUser->profile_picture) }}" alt="{{ $displayName }}">
           @else
             {{ $sidebarInitials }}
           @endif
@@ -447,8 +447,8 @@
     <div class="sidebar-inner">
       <div class="sidebar-profile">
         <div class="profile-avatar-sm">
-          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($authUser->profile_picture))
-            <img src="{{ asset('storage/' . $authUser->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
+          @if(!empty($authUser->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($authUser->profile_picture))
+            <img src="{{ asset('uploads/' . $authUser->profile_picture) }}" alt="{{ $displayName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
           @else
             {{ $sidebarInitials }}
           @endif
@@ -522,8 +522,8 @@
         <div class="profile-hero-avatar-wrap">
           <div class="profile-hero-avatar-container" onclick="document.getElementById('hero-pic-input').click()" title="Change profile picture">
             <div class="profile-hero-avatar">
-              @if(!empty($user->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->profile_picture))
-                <img id="hero-avatar-img" src="{{ asset('storage/' . $user->profile_picture) }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
+              @if(!empty($user->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($user->profile_picture))
+                <img id="hero-avatar-img" src="{{ asset('uploads/' . $user->profile_picture) }}" alt="{{ $fullName }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">
               @else
                 {{ $initials }}
               @endif
@@ -618,9 +618,9 @@
               <div class="form-group span-2">
                 <label class="form-label">Profile Picture</label>
                 <input type="file" name="profile_picture" id="tab-pic-input" accept="image/*" class="form-control-dar">
-                @if(!empty($user->profile_picture) && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->profile_picture))
+                @if(!empty($user->profile_picture) && \Illuminate\Support\Facades\Storage::disk('uploads')->exists($user->profile_picture))
                   <div class="form-hint" style="margin-top:8px;">
-                    Current: <img src="{{ asset('storage/' . $user->profile_picture) }}" alt="profile" style="height:48px; border-radius:6px; vertical-align:middle; margin-left:8px;">
+                    Current: <img src="{{ asset('uploads/' . $user->profile_picture) }}" alt="profile" style="height:48px; border-radius:6px; vertical-align:middle; margin-left:8px;">
                   </div>
                 @endif
                 @error('profile_picture')
