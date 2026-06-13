@@ -350,7 +350,7 @@ class AdminController extends Controller
 
 		if ($request->hasFile('profile_picture')) {
 			$file = $request->file('profile_picture');
-			$path = $file->store('avatars', 'public');
+			$path = $file->store('avatars', 'uploads');
 			if (!empty($user->profile_picture) && Storage::disk('uploads')->exists($user->profile_picture)) {
 				Storage::disk('uploads')->delete($user->profile_picture);
 			}
